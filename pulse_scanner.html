@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pulse Scanner</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap');
+:root{
+  --bg:#0d0f14;--bg2:#12151c;--bg3:#181c26;--bg4:#1e2330;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);
+  --text:#cdd6e8;--text2:#6b7a90;--text3:#3a4455;
+  --green:#00c97a;--gd:rgba(0,201,122,0.13);
+  --red:#ff3d55;--rd:rgba(255,61,85,0.13);
+  --blue:#2d8cff;--bd:rgba(45,140,255,0.15);
+  --amber:#f5a623;--ad:rgba(245,166,35,0.15);
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:12px;overflow:hidden}
+body{display:flex;flex-direction:column}
+.bar{height:42px;background:var(--bg2);border-bottom:1px solid var(--border2);display:flex;align-items:center;padding:0 12px;gap:5px;flex-shrink:0}
+.logo{font-family:var(--mono);font-size:13px;font-weight:500;margin-right:6px}
+.sep{width:1px;height:18px;background:var(--border2);margin:0 2px;flex-shrink:0}
+.tab{padding:0 11px;height:42px;display:flex;align-items:center;font-size:12px;color:#fff;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;user-select:none}
+.tab:hover{color:var(--text)}.tab.on{color:var(--blue);border-bottom-color:var(--blue)}
+.right{margin-left:auto;display:flex;align-items:center;gap:5px}
+.si{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-size:12px;padding:3px 8px;width:130px;outline:none}
+.si:focus{border-color:var(--blue);color:var(--text)}.si::placeholder{color:var(--text3)}
+.vtg{display:flex;border:1px solid var(--border2);border-radius:3px;overflow:hidden}
+.vb{background:var(--bg3);border:none;color:#fff;padding:4px 9px;cursor:pointer;font-size:12px;font-family:var(--mono)}
+.vb:hover{background:var(--bg4)}.vb.on{background:var(--bd);color:var(--blue)}
+.ki{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:10px;padding:3px 7px;width:190px;outline:none}
+.ki:focus{border-color:var(--blue)}.ki::placeholder{color:var(--text3)}
+.sbtn{background:var(--gd);border:1px solid var(--green);border-radius:3px;color:var(--green);font-family:var(--mono);font-size:11px;padding:3px 10px;cursor:pointer;white-space:nowrap}
+.sbtn:hover{background:rgba(0,201,122,0.22)}.sbtn.busy{opacity:0.5;cursor:default}
+.xbtn{background:transparent;border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 8px;cursor:pointer}
+.xbtn:hover{color:var(--text)}
+.tfg{display:flex;gap:2px}
+.tf{background:transparent;border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 7px;cursor:pointer}
+.tf.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.sbar{display:none;align-items:center;gap:8px;padding:5px 14px;background:var(--bg3);border-bottom:1px solid var(--border2);flex-shrink:0}
+.sbar.show{display:flex}
+.stks{font-size:9px;color:var(--text2);flex:1;line-height:1.8;overflow:hidden;max-height:36px}
+.sacts{display:flex;gap:5px;flex-shrink:0}
+.sab{background:var(--bg2);border:1px solid var(--border2);border-radius:3px;color:#fff;font-size:11px;padding:3px 9px;cursor:pointer;font-family:var(--mono)}
+.sab:hover{color:var(--text)}.sab.red{color:var(--red)}
+.abar{display:none;flex-direction:column;gap:3px;padding:6px 14px;background:rgba(245,166,35,0.08);border-bottom:1px solid rgba(245,166,35,0.3);flex-shrink:0;max-height:110px;overflow-y:auto}
+.abar.show{display:flex}
+.alert-item{display:flex;align-items:center;gap:8px;font-size:11px;font-family:var(--mono)}
+.atk{color:var(--blue);cursor:pointer;width:50px;flex-shrink:0}
+.atk:hover{text-decoration:underline}
+.amsg{color:var(--amber);flex:1}
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.lv{flex:1;overflow-y:auto}
+.lhdr{display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5}
+.lhdr-name{flex:1;font-size:9px;color:#ccc;letter-spacing:.07em;text-transform:uppercase}
+.lhdr-bar{width:110px;flex-shrink:0}
+.lhdr-tf{width:70px;text-align:right;font-size:9px;color:#ccc;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);flex-shrink:0;cursor:pointer}
+.lhdr-tf:hover,.lhdr-tf.on{color:var(--blue)}
+.lhdr-rs{width:32px;text-align:right;font-size:9px;color:#ccc;font-family:var(--mono);flex-shrink:0}
+.lhdr-cnt{width:26px;text-align:right;font-size:9px;color:#ccc;flex-shrink:0}
+.lrow{display:flex;align-items:center;padding:0 14px;height:38px;border-bottom:1px solid var(--border);transition:background .08s}
+.lrow:hover{background:var(--bg3)}.lrow.sel{background:rgba(45,140,255,.06);border-left:2px solid var(--blue)}
+.lchk{margin-right:9px;flex-shrink:0;accent-color:var(--blue);width:12px;height:12px;cursor:pointer}
+.lname{flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px;cursor:pointer}
+.lname:hover{color:var(--blue)}
+.lbar-w{width:110px;height:3px;background:var(--bg4);border-radius:2px;flex-shrink:0;overflow:hidden;margin-right:2px;cursor:pointer}
+.lbar{height:100%;border-radius:2px}
+.ltf{width:70px;text-align:right;font-family:var(--mono);font-size:12px;flex-shrink:0;cursor:pointer}
+.ltf:hover{opacity:.7}
+.lrs{width:32px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0}
+.lcnt{width:26px;text-align:right;font-size:11px;color:#aab;flex-shrink:0}
+.pos{color:var(--green)}.neg{color:var(--red)}.neu{color:#8899aa}
+.hv{flex:1;overflow-y:auto;padding:8px}
+.hgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:4px}
+.hcell{padding:10px 12px 8px;border-radius:4px;cursor:pointer}
+.hcell:hover{opacity:.82}
+.hcell-name{font-size:11px;font-weight:500;color:rgba(255,255,255,.9);margin-bottom:4px;line-height:1.3}
+.hcell-pct{font-family:var(--mono);font-size:15px;font-weight:500;color:#fff}
+.hcell-cnt{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px}
+.dv{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.dhdr{padding:8px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px;flex-shrink:0;background:var(--bg2)}
+.dback{background:transparent;border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 8px;cursor:pointer}
+.dback:hover{color:var(--text)}
+.dtitle{font-size:14px;font-weight:500}.dsub{font-size:10px;color:#aab}
+.dsi{margin-left:auto;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-size:12px;padding:3px 8px;width:130px;outline:none}
+.dsi:focus{border-color:var(--blue);color:var(--text)}.dsi::placeholder{color:var(--text3)}
+.tw{flex:1;overflow-y:auto}
+table{width:100%;border-collapse:collapse}
+thead{position:sticky;top:0;background:var(--bg2);z-index:4}
+th{padding:8px 10px;font-size:10px;color:#fff;text-align:right;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--border2);font-family:var(--mono);white-space:nowrap;cursor:pointer}
+th:first-child{text-align:left}th:hover{color:var(--blue)}
+th.asc::after{content:' ▲';font-size:7px}th.desc::after{content:' ▼';font-size:7px}
+td{padding:8px 10px;border-bottom:1px solid var(--border);font-size:12px;text-align:right;font-family:var(--mono);white-space:nowrap}
+td:first-child{text-align:left;font-family:var(--sans)}
+tr:hover td{background:var(--bg3)}
+.tk{color:var(--blue);cursor:pointer;font-weight:500;font-family:var(--mono)}.tk:hover{text-decoration:underline}
+.bc{display:inline-flex;align-items:center;gap:5px}
+.bbg{width:38px;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden;flex-shrink:0}
+.bfg{height:100%;border-radius:2px}
+.vc{display:inline-block;padding:1px 5px;border-radius:2px;font-size:10px}
+.pv{flex:1;overflow-y:auto;padding:10px 16px}
+.asv{flex:1;overflow-y:auto;padding:12px 16px}
+.as-section{margin-bottom:20px}
+.as-title{font-size:11px;color:#fff;margin-bottom:8px;letter-spacing:.05em;text-transform:uppercase;font-family:var(--mono);padding-bottom:4px;border-bottom:1px solid var(--border)}
+.as-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.as-label{flex:1;font-size:12px}
+.as-sub{font-size:11px;color:#aab;margin-top:2px}
+.as-in{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12px;padding:3px 8px;width:70px;outline:none;text-align:right}
+.as-in:focus{border-color:var(--blue)}
+.as-toggle{display:flex;gap:4px}
+.as-tog{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 8px;cursor:pointer}
+.as-tog.on{background:var(--gd);border-color:var(--green);color:var(--green)}
+.state{padding:60px 20px;text-align:center;color:#aab;font-size:12px;line-height:2.4}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="logo">Pulse Scanner</div>
+  <div class="sep"></div>
+  <div class="tab on" id="tab-themes" onclick="setTab('themes')">Themes</div>
+  <div class="tab" id="tab-movers" onclick="setTab('movers')">Top Movers</div>
+  <div class="tab" id="tab-alerts" onclick="setTab('alerts')">Alerts</div>
+  <div class="tab" id="tab-scan" onclick="setTab('scan')">50MA Scan</div>
+  <div class="tab" id="tab-positions" onclick="setTab('positions')">Positions</div>
+  <div class="right">
+    <input class="si" id="gsearch" placeholder="Search..." oninput="onSearch(this.value)">
+    <div class="vtg">
+      <button class="vb on" id="vb-list" onclick="setView('list')">☰ List</button>
+      <button class="vb" id="vb-heat" onclick="setView('heat')">⊞ Heat</button>
+    </div>
+    <input class="ki" id="apiKey" type="text" placeholder="Polygon API key" autocomplete="off">
+    <button class="sbtn" id="syncBtn" onclick="doSync()">⟳ Sync</button>
+    <button class="xbtn" onclick="clearCache()">Clear</button>
+    <div class="tfg">
+      <button class="tf on" onclick="setTF(this,'today')">Today</button>
+      <button class="tf" onclick="setTF(this,'1W')">1W</button>
+      <button class="tf" onclick="setTF(this,'1M')">1M</button>
+      <button class="tf" onclick="setTF(this,'3M')">3M</button>
+      <button class="tf" onclick="setTF(this,'YTD')">YTD</button>
+    </div>
+  </div>
+</div>
+<div class="abar" id="abar"></div>
+<div class="sbar" id="sbar">
+  <div class="stks" id="stks"></div>
+  <div class="sacts">
+    <button class="sab" onclick="copyTickers()">Copy</button>
+    <button class="sab" onclick="dlCSV()">CSV</button>
+    <button class="sab red" onclick="clearSel()">Clear</button>
+  </div>
+</div>
+<div class="main" id="main">
+  <div id="onboard" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:0;padding:40px 20px;text-align:center">
+    <div style="font-family:var(--mono);font-size:22px;font-weight:500;color:var(--text);margin-bottom:8px">Pulse Scanner</div>
+    <div style="font-size:13px;color:#aab;margin-bottom:36px">Real-time theme & sector performance powered by Polygon.io</div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:28px 32px;max-width:420px;width:100%;text-align:left">
+      <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px">Get Started</div>
+      <div style="font-size:12px;color:#ccc;margin-bottom:20px;line-height:1.7">
+        You need a <a href="https://polygon.io/dashboard/signup" target="_blank" style="color:var(--blue)">Polygon.io Starter</a> API key (~$29/mo) to sync live market data.
+        Your key is stored locally in your browser and never shared.
+      </div>
+
+      <div style="font-size:10px;color:var(--text2);font-family:var(--mono);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Step 1 — Enter your API key above and hit Sync</div>
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:10px 12px;font-size:12px;color:#ccc;margin-bottom:16px;font-family:var(--mono)">
+        ↑ Paste key in the field at top right, then click <span style="color:var(--green)">⟳ Sync</span>
+      </div>
+
+      <div style="font-size:10px;color:var(--text2);font-family:var(--mono);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Step 2 — Explore your themes</div>
+      <div style="font-size:12px;color:#ccc;line-height:1.7;margin-bottom:16px">
+        After syncing, browse 48 themes ranked by performance. Click any theme to see individual tickers with ATR, volume, and % change across all timeframes.
+      </div>
+
+      <div style="font-size:10px;color:var(--text2);font-family:var(--mono);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Step 3 — Set up TradingView (optional)</div>
+      <div style="font-size:11px;color:var(--text3);line-height:1.7">
+        In TradingView, save your indicators as a <strong style="color:var(--text2)">Default Chart Layout</strong> so they load automatically when you click any ticker link.
+      </div>
+    </div>
+
+    <div style="display:flex;gap:24px;margin-top:24px;font-size:11px;color:#aab">
+      <div>⚡ 48 themes</div>
+      <div>📊 ATR / 50MA scan</div>
+      <div>🔔 Custom alerts</div>
+      <div>🔄 Auto-refresh</div>
+      <div>🔒 100% local</div>
+    </div>
+  </div>
+</div>
+<script>
+const THEMES=[
+  {id:'silver',name:'Silver',etf:'SILJ',tickers:['SLV','PSLV','AG','PAAS','CDE','HL','MAG','FSM','EXK','WPM','SILJ','HYMC','SSRM','NGD']},
+  {id:'gold',name:'Gold',etf:'GLD',tickers:['GLD','IAU','GOLD','NEM','AEM','KGC','AU','SA','EQX','EGO','GFI','IAG','ARMN','ORLA','AAUC','FNV','RGLD','WPM','HMY','BTG','SSRM']},
+  {id:'prec_metals',name:'Other Precious Metals & Mining',etf:'PICK',tickers:['SBSW','UUUU','CCJ','NXE','DNN','URG','UEC','PLG','LTBR','UAMY']},
+  {id:'oil_drill',name:'Oil & Gas Drilling',etf:'OIH',tickers:['RIG','VAL','NE','HP','PTEN','DO','NBR','OII','BORR','HAL']},
+  {id:'nuclear',name:'Nuclear Energy',etf:'NLR',tickers:['CCJ','NNE','SMR','BWXT','OKLO','UEC','DNN','URG','UUUU','LEU','FLNC','VST','GEV','TLN','AMSC']},
+  {id:'clean_e',name:'Clean Energy',etf:'ICLN',tickers:['ENPH','SEDG','ARRY','FSLR','RUN','BE','PLUG','FCEL']},
+  {id:'res_const',name:'Residential Construction',etf:'ITB',tickers:['DHI','LEN','PHM','TOL','NVR','MDC','LGIH','SKY','TMHC','BLD','IBP']},
+  {id:'ind_metals',name:'Other Industrial Metals & Mining',etf:'XME',tickers:['FCX','SCCO','AA','HBM','TECK','CENX','AMR','ARCH','BTU','CEIX','HCC']},
+  {id:'marine',name:'Marine Shipping',etf:'STNG',tickers:['ZIM','MATX','DAC','GSL','SBLK','GOGL','STNG','TNK','FRO','INSW']},
+  {id:'defense',name:'Defense',etf:'ITA',tickers:['LMT','RTX','NOC','GD','BA','KTOS','CACI','LDOS','DRS','HII','LHX','AXON','PLTR','BWXT','HWM','ARBE']},
+  {id:'robotics',name:'Robotics / Automation',etf:'ROBO',tickers:['ISRG','ROK','NVTS','AMBA','RDVT','CGNX','TER','FANUY','BRZE','PATH','ACMR']},
+  {id:'semis',name:'Semiconductors',etf:'SMH',tickers:['NVDA','AMD','AVGO','MRVL','AMAT','LRCX','KLAC','ASML','TER','MPWR','QCOM','ON','SWKS','INTC','MU','TSM','ARM','MCHP','ADI','TXN','GFS','ENTG','CRDO','WOLF','HIMX','APH','KEYS','RMBS','SMTC']},
+  {id:'memory',name:'Memory',etf:'MU',tickers:['MU','WDC','SMCI','MRAM']},
+  {id:'optics',name:'Optics',etf:'COHR',tickers:['COHR','LITE','AAOI','VIAV','COHU','OSIS','GLW']},
+  {id:'edge_ai',name:'Edge AI / Edge Cloud',etf:'BOTZ',tickers:['AI','IONQ','SOUN','BBAI','QUBT','RGTI','ARQQ','RCAT','DUAV']},
+  {id:'cloud',name:'Cloud Infrastructure',etf:'SKYY',tickers:['AMZN','MSFT','GOOGL','CRM','SNOW','NET','DDOG','MDB','ESTC','GTLB','ORCL','CFLT','HUBS','ZS']},
+  {id:'cyber',name:'Cybersecurity',etf:'CIBR',tickers:['CRWD','PANW','ZS','S','FTNT','TENB','CYBR','OKTA','RPD','VRNS','SAIL','QLYS','DDOG','RBRK']},
+  {id:'comp_hw',name:'Computer Hardware',etf:'AAPL',tickers:['AAPL','DELL','HPQ','HPE','STX','WDC','NTAP','PSTG','SMCI','VRT','POWL']},
+  {id:'fintech',name:'Fintech',etf:'FINX',tickers:['SQ','PYPL','AFRM','UPST','SOFI','HOOD','COIN','LC','MSTR']},
+  {id:'btc_miners',name:'Bitcoin Miners / HPC',etf:'MARA',tickers:['MARA','RIOT','CLSK','WULF','CORZ','HUT','IREN','BTBT','HIVE','CIFR','APLD','BTDR','NBTC']},
+  {id:'fin_data',name:'Financial Data & Exchanges',etf:'IYG',tickers:['MSCI','ICE','CME','NDAQ','SPGI','MCO','FDS','MKTX','TW']},
+  {id:'space',name:'Space',etf:'UFO',tickers:['RKLB','LUNR','ASTS','PL','SPIR','BKSY','RDW','SATL','IRDM','MNTS','ACHR','JOBY']},
+  {id:'ev',name:'Electric Vehicles',etf:'DRIV',tickers:['TSLA','RIVN','LCID','NIO','LI','XPEV','MVST']},
+  {id:'reit_office',name:'REIT - Office',etf:'SRVR',tickers:['BXP','SLG','HIW','PDM','DEA','PGRE','ESRT','VNO','SPG']},
+  {id:'re_dev',name:'Real Estate Development',etf:'CBRE',tickers:['CBRE','JLL','FPH','HHH','JBGS']},
+  {id:'luxury',name:'Luxury Goods',etf:'RL',tickers:['LVMUY','CPRI','TPR','RL','PVH','MOV','GOOS','VFC','WRBY','DECK']},
+  {id:'biotech',name:'Oncology / Biotech',etf:'XBI',tickers:['MRNA','BNTX','AGEN','KYMR','IMVT','RCUS','TGTX','ZYME','BEAM','EDIT','NTLA','CRSP','FATE','CYTK','SRPT','ALNY','ARQT','KURA','MLTX','ZURA','CHRS','MRUS','FGEN','RIGL','QURE','BCAB','SNDX','WVE','OVID','RZLT','TARS','NKTR','CRBP','PYXS','CDTX']},
+  {id:'glp1',name:'GLP-1 / Weight Loss',etf:'NVO',tickers:['NVO','LLY','VKTX','HIMS','RDVT','AMRN','CALT']},
+  {id:'util_indep',name:'Utilities - Indep Power',etf:'VST',tickers:['VST','NRG','NEE','CEG','AES','ORA','GEV','CWEN','RUN','ETR','PCG','EXC','PPL','D','SO','DUK','GPRE']},
+  {id:'cons_cyc',name:'Consumer Cyclical',etf:'XLY',tickers:['HD','MCD','LOW','NKE','BKNG','TJX','SBUX','CMG','YUM','ABNB','RCL','CCL','MGM','WYNN','LVS','ORLY','AZO','DKS','EBAY','ETSY','LYFT','UBER','DASH','PDD']},
+  {id:'cons_disc',name:'Retail / Apparel',etf:'XRT',tickers:['WMT','TGT','COST','DLTR','DG','ROST','ANF','AEO','LULU','URBN','GAP']},
+  {id:'cons_staples',name:'Consumer Staples',etf:'XLP',tickers:['PG','KO','PEP','PM','MO','CL','KMB','GIS','K','HSY','CAG','MKC','CELH','ELF','MDLZ','KHC','CALM','BYND']},
+  {id:'restaurants',name:'Restaurants / Leisure',etf:'EATZ',tickers:['MCD','SBUX','CMG','YUM','QSR','DPZ','SHAK','JACK','CAKE','CAVA','EAT']},
+  {id:'med_devices',name:'Medical Devices',etf:'IHI',tickers:['MDT','ABT','ISRG','SYK','BSX','EW','ZBH','DXCM','PODD','INMD','TNDM','GMED','ALGN','NTRA','ATEC','IRTC','NVRO','RVTY','TMDX','GRAL','WGS']},
+  {id:'pharma',name:'Pharmaceuticals',etf:'XPH',tickers:['JNJ','PFE','MRK','ABBV','BMY','AMGN','GILD','BIIB','REGN','VRTX','GSK','AZN','TEVA','GMAB','JAZZ']},
+  {id:'hospitals',name:'Healthcare / Hospitals',etf:'IHF',tickers:['UNH','CVS','CI','HUM','CNC','MOH','ELV','HCA','THC','UHS','TEM','OMCL','GDRX','AMWL']},
+  {id:'banks',name:'Banking',etf:'KBE',tickers:['JPM','BAC','WFC','C','GS','MS','USB','PNC','TFC','FITB','HBAN','KEY','CFG','RF','MTB','ZION']},
+  {id:'insurance',name:'Insurance',etf:'KIE',tickers:['AIG','MET','PRU','AFL','ALL','TRV','CB','PGR','HIG','ACGL']},
+  {id:'asset_mgmt',name:'Asset Management',etf:'IAI',tickers:['BLK','BX','APO','KKR','CG','ARES','BAM','TPG','OWL','IVZ']},
+  {id:'saas',name:'SaaS / Software',etf:'IGV',tickers:['CRM','NOW','WDAY','ADBE','ORCL','INTU','TEAM','ZM','DOCU','NCNO','PCTY','PAYC','MNDY','PCOR','VEEV','OPEN']},
+  {id:'adtech',name:'AdTech / Digital Media',etf:'GOOGL',tickers:['GOOGL','META','TTD','MGNI','DV','IAS','CRTO','PUBM','ZETA','APP','NFLX','SNAP','ROKU','SPOT','PINS','RDDT','RBLX','EA','BIDU','DUOL','COUR']},
+  {id:'oil_ep',name:'Oil & Gas E&P',etf:'XOP',tickers:['XOM','CVX','COP','EOG','DVN','FANG','MPC','VLO','PSX','HES','APA','OXY','MRO','CTRA','SM','MTDR','TRGP','EQT']},
+  {id:'chemicals',name:'Chemicals',etf:'XLB',tickers:['LIN','APD','ECL','SHW','DD','DOW','LYB','EMN','CE','OLN','ALB','FMC','SQM']},
+  {id:'agriculture',name:'Agriculture',etf:'MOO',tickers:['DE','ADM','BG','MOS','NTR','CF','CTVA','AGCO','SMG']},
+  {id:'logistics',name:'Shipping / Logistics',etf:'XTN',tickers:['UPS','FDX','ODFL','SAIA','XPO','GXO','CHRW','EXPD','JBHT','WERN','KNX','URI','CSX']},
+  {id:'build_mat',name:'Building Materials',etf:'PKB',tickers:['VMC','MLM','NUE','STLD','RS','CMC','BECN','BLDR','GMS','DOOR','UFPI','TREX','PWR','ROAD','CCK','BALL']},
+  {id:'aerospace',name:'Aerospace & Airlines',etf:'ITA',tickers:['BA','HWM','SPR','AAL','UAL','DAL','LUV','ALK','JOBY','ACHR']},
+  {id:'mining',name:'Copper / Base Metals',etf:'COPX',tickers:['FCX','SCCO','AA','HBM','TECK','CENX','VALE','MP','RIO','BHP','GLNCY','NOVN','CPER','ATI','UAMY']},
+];
+
+let cache={},stats={},view='list',tf='today',tab='themes';
+let drillId=null,drillSort={col:'today',dir:'desc'},selected=new Set();
+let syncing=false,autoRefreshTimer=null;
+let alertSettings={atrMA:3.0,volMult:2.0,enabled:true,volFilter:false};
+let triggeredAlerts=[];
+let positions=[{"ticker": "VIAV", "shares": 0, "entry": 18.13, "notes": "", "direction": "long"}, {"ticker": "WDC", "shares": 0, "entry": 191.25, "notes": "", "direction": "long"}, {"ticker": "LWLG", "shares": 0, "entry": 6.85, "notes": "", "direction": "long"}, {"ticker": "VRT", "shares": 0, "entry": 176.0, "notes": "", "direction": "long"}, {"ticker": "COHR", "shares": 0, "entry": 191.5, "notes": "", "direction": "long"}, {"ticker": "BE", "shares": 0, "entry": 150.9, "notes": "", "direction": "long"}, {"ticker": "NOK", "shares": 0, "entry": 7.1, "notes": "", "direction": "long"}, {"ticker": "POWL", "shares": 0, "entry": 183.65, "notes": "", "direction": "long"}, {"ticker": "CGON", "shares": 0, "entry": 50.65, "notes": "", "direction": "long"}, {"ticker": "GLW", "shares": 0, "entry": 131.27, "notes": "", "direction": "long"}, {"ticker": "BB", "shares": 0, "entry": 3.89, "notes": "", "direction": "long"}, {"ticker": "MU", "shares": 0, "entry": 410.65, "notes": "", "direction": "long"}, {"ticker": "LITE", "shares": 0, "entry": 739.87, "notes": "", "direction": "long"}, {"ticker": "KEYS", "shares": 0, "entry": 294.63, "notes": "", "direction": "long"}, {"ticker": "WULF", "shares": 0, "entry": 17.54, "notes": "", "direction": "long"}, {"ticker": "TSLA", "shares": 0, "entry": 360.58, "notes": "", "direction": "long"}, {"ticker": "JAZZ", "shares": 0, "entry": 189.15, "notes": "", "direction": "long"}, {"ticker": "SQM", "shares": 0, "entry": 86.1, "notes": "", "direction": "long"}, {"ticker": "CCJ", "shares": 0, "entry": 122.1, "notes": "", "direction": "long"}, {"ticker": "SSRM", "shares": 0, "entry": 30.47, "notes": "", "direction": "long"}, {"ticker": "LULU", "shares": 0, "entry": 159.8, "notes": "", "direction": "short"}, {"ticker": "DPZ", "shares": 0, "entry": 352.86, "notes": "", "direction": "short"}]; // [{ticker, shares, entry, notes}]
+
+const f2=v=>v==null?'—':(v>0?'+':'')+v.toFixed(2)+'%';
+const pc=v=>v==null?'neu':v>0?'pos':v<0?'neg':'neu';
+const avg=a=>a.length?+(a.reduce((x,y)=>x+y,0)/a.length).toFixed(2):null;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const fmtDate=d=>d.toISOString().split('T')[0];
+
+function miniBar(v){
+  const w=document.createElement('span');w.className='bc';
+  const bg=document.createElement('span');bg.className='bbg';
+  const fg=document.createElement('span');fg.className='bfg';
+  if(v!=null){fg.style.width=Math.min(Math.abs(v)*5.5,100)+'%';fg.style.background=v>=0?'var(--green)':'var(--red)';}
+  bg.appendChild(fg);
+  const l=document.createElement('span');l.className=pc(v);l.textContent=f2(v);
+  w.append(bg,l);return w;
+}
+
+function atrBar(v){
+  if(v==null){const s=document.createElement('span');s.className='neu';s.textContent='—';return s;}
+  const ab=Math.abs(v);
+  const col=v>=3?'#00ff9d':v>=1.5?'var(--green)':v<=-3?'#ff6b7a':v<=-1.5?'var(--red)':'var(--text2)';
+  const w=document.createElement('span');w.className='bc';
+  const bg=document.createElement('span');bg.className='bbg';bg.style.width='44px';
+  const fg=document.createElement('span');fg.className='bfg';
+  fg.style.width=Math.min(ab/5*100,100)+'%';fg.style.background=v>=0?'var(--green)':'var(--red)';
+  bg.appendChild(fg);
+  const l=document.createElement('span');l.style.color=col;if(ab>=3)l.style.fontWeight='500';
+  l.textContent=(v>0?'+':'')+v.toFixed(2)+'x';
+  w.append(bg,l);return w;
+}
+
+function volChip(vol,av){
+  const s=document.createElement('span');
+  if(!vol||!av){s.className='neu';s.textContent='—';return s;}
+  const x=vol/av;s.className='vc';s.textContent=x.toFixed(1)+'x';
+  s.style.color=x>=2?'var(--green)':x>=1.3?'var(--amber)':'var(--text2)';
+  s.style.background=x>=2?'var(--gd)':x>=1.3?'var(--ad)':'transparent';
+  return s;
+}
+
+function heatBg(v){
+  if(v==null)return'#181c26';
+  if(v>=5)return'#005c34';if(v>=3)return'#007840';if(v>=1)return'#009152';
+  if(v>=0)return'#004d28';if(v>=-1)return'#5c000f';if(v>=-3)return'#7a0018';
+  if(v>=-5)return'#990022';return'#b8002a';
+}
+
+function computeRS(){
+  const TFS=['today','1W','1M','3M','YTD'];
+  const W={today:2,'1W':2,'1M':1.5,'3M':1,'YTD':0.5};
+  const scores={};THEMES.forEach(t=>scores[t.id]=0);
+  TFS.forEach(t=>{
+    const sorted=[...THEMES].filter(th=>stats[th.id]?.[t]!=null).sort((a,b)=>(stats[a.id][t]??-999)-(stats[b.id][t]??-999));
+    sorted.forEach((th,i)=>scores[th.id]+=(i+1)*(W[t]||1));
+  });
+  const vals=Object.values(scores);const mn=Math.min(...vals),mx=Math.max(...vals);
+  const rs={};THEMES.forEach(t=>{rs[t.id]=mx>mn?Math.round((scores[t.id]-mn)/(mx-mn)*98)+1:50;});
+  return rs;
+}
+
+// ── DATA ─────────────────────────────────────────────────────────────────────
+async function doSync(){
+  const key=document.getElementById('apiKey').value.trim();
+  if(!key){alert('Enter your Polygon API key.');return;}
+  if(syncing)return;
+  syncing=true;
+  const btn=document.getElementById('syncBtn');btn.classList.add('busy');
+  cache={};stats={};
+
+  const now=new Date();
+  const allTickers=[...new Set(THEMES.flatMap(t=>t.tickers))];
+  const etfs=[...new Set(THEMES.map(t=>t.etf))];
+  // Also include any position tracker tickers
+  const posTickers=positions.map(p=>p.ticker).filter(Boolean);
+  const all=[...new Set([...etfs,...allTickers,...posTickers])];
+  const fromDate=new Date(now);fromDate.setDate(fromDate.getDate()-450);
+  const fromStr=fmtDate(fromDate),toStr=fmtDate(now);
+
+  btn.textContent='⟳ Snapshot...';
+  for(let i=0;i<all.length;i+=50){
+    const batch=all.slice(i,i+50).join(',');
+    try{
+      const r=await fetch('https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?tickers='+encodeURIComponent(batch)+'&apiKey='+key);
+      const d=await r.json();
+      (d.tickers||[]).forEach(t=>{
+        cache[t.ticker]={today:t.todaysChangePerc!=null?+(t.todaysChangePerc).toFixed(2):null,price:t.day?.c||t.prevDay?.c||null,volume:t.day?.v||null,avgVolume:t.prevDay?.v||null,'1W':null,'1M':null,'3M':null,YTD:null,atr:null,ma50:null,atrMA:null};
+      });
+    }catch(e){}
+  }
+
+  let done=0,idx2=0;
+  const tasks=all.map(ticker=>async()=>{
+    try{
+      const r=await fetch('https://api.polygon.io/v2/aggs/ticker/'+ticker+'/range/1/day/'+fromStr+'/'+toStr+'?adjusted=true&sort=asc&limit=400&apiKey='+key);
+      const d=await r.json();
+      const bars=d.results||[];
+      if(bars.length>=16&&bars[bars.length-1].h!=null){
+        const last=bars[bars.length-1].c,prev=bars[bars.length-2].c;
+        const anchor=days=>{const cut=days==='ytd'?new Date(now.getFullYear(),0,1).getTime():Date.now()-days*864e5;let a=bars[0].c;for(const b of bars){if(b.t>=cut){a=b.c;break;}}return a;};
+        const pct=(a,v)=>a?+((v-a)/a*100).toFixed(2):null;
+        if(!cache[ticker])cache[ticker]={today:null,price:null,volume:null,avgVolume:null};
+        cache[ticker].price=+last.toFixed(2);
+        cache[ticker]['1W']=pct(anchor(7),last);cache[ticker]['1M']=pct(anchor(30),last);
+        cache[ticker]['3M']=pct(anchor(90),last);cache[ticker].YTD=pct(anchor('ytd'),last);
+        if(prev&&(cache[ticker].today==null||cache[ticker].today===0))cache[ticker].today=+((last-prev)/prev*100).toFixed(2);
+        cache[ticker].volume=bars[bars.length-1].v||cache[ticker].volume||null;
+        cache[ticker].avgVolume=Math.round(bars.slice(-20).reduce((s,b)=>s+b.v,0)/20)||cache[ticker].avgVolume||null;
+        const allTRs=[];
+        for(let i=1;i<bars.length;i++){const b=bars[i],pc2=bars[i-1].c;if(b.h!=null&&b.l!=null&&pc2!=null){const tr=Math.max(b.h-b.l,Math.abs(b.h-pc2),Math.abs(b.l-pc2));allTRs.push(Math.min(tr,b.c*0.15));}}
+        let atr14=allTRs.slice(0,14).reduce((s,v)=>s+v,0)/14;
+        for(let i=14;i<allTRs.length;i++)atr14=(atr14*13+allTRs[i])/14;
+        const ma50arr=bars.slice(-50).map(b=>b.c).filter(v=>v!=null);
+        const ma50=ma50arr.length>=50?+(ma50arr.reduce((s,v)=>s+v,0)/ma50arr.length).toFixed(2):null;
+        cache[ticker].atr=+atr14.toFixed(2);cache[ticker].ma50=ma50;
+        cache[ticker].atrMA=(ma50!=null&&atr14>0)?+((last-ma50)/atr14).toFixed(2):null;
+        // Mark stale if last bar is more than 7 calendar days old (delisted/halted)
+        const lastBarAge=(Date.now()-bars[bars.length-1].t)/864e5;
+        cache[ticker].stale=lastBarAge>7;
+      }
+    }catch(e){}
+    done++;
+    btn.textContent='⟳ '+done+'/'+all.length;
+    if(done%15===0||done===all.length){buildStats();if(!drillId&&tab==='themes')renderMain();}
+  });
+  const workers=Array.from({length:12},async()=>{while(idx2<tasks.length)await tasks[idx2++]();});
+  await Promise.all(workers);
+
+  buildStats();checkAlerts();saveCache();
+  syncing=false;btn.textContent='⟳ Sync';btn.classList.remove('busy');
+  renderMain();scheduleAutoRefresh();
+}
+
+function buildStats(){
+  THEMES.forEach(th=>{
+    const e=cache[th.etf];
+    if(e&&(e.today!=null||e['1W']!=null)){stats[th.id]={today:e.today,'1W':e['1W'],'1M':e['1M'],'3M':e['3M'],YTD:e.YTD};}
+    else{
+      const t=[],w=[],m=[],q=[],y=[];
+      th.tickers.forEach(tk=>{const c=cache[tk];if(!c)return;if(c.today!=null)t.push(c.today);if(c['1W']!=null)w.push(c['1W']);if(c['1M']!=null)m.push(c['1M']);if(c['3M']!=null)q.push(c['3M']);if(c.YTD!=null)y.push(c.YTD);});
+      stats[th.id]={today:avg(t),'1W':avg(w),'1M':avg(m),'3M':avg(q),YTD:avg(y)};
+    }
+  });
+}
+
+// ── ALERTS ────────────────────────────────────────────────────────────────────
+function checkAlerts(){
+  if(!alertSettings.enabled)return;
+  triggeredAlerts=[];
+  THEMES.forEach(th=>{
+    th.tickers.forEach(tk=>{
+      const d=cache[tk];if(!d)return;
+      if(d.stale) return; // skip delisted/halted tickers
+      if(d.atrMA!=null&&Math.abs(d.atrMA)>=alertSettings.atrMA)
+        triggeredAlerts.push({ticker:tk,theme:th.name,type:'atr',msg:(d.atrMA>0?'ABOVE':'BELOW')+' 50MA by '+Math.abs(d.atrMA).toFixed(2)+'x ATR',val:d.atrMA});
+      if(d.volume&&d.avgVolume&&d.volume/d.avgVolume>=alertSettings.volMult)
+        triggeredAlerts.push({ticker:tk,theme:th.name,type:'vol',msg:'Volume '+((d.volume/d.avgVolume).toFixed(1))+'x avg',val:d.volume/d.avgVolume});
+    });
+  });
+  renderAlertBar();
+}
+
+function renderAlertBar(){
+  const bar=document.getElementById('abar');
+  if(!triggeredAlerts.length||!alertSettings.enabled){bar.classList.remove('show');return;}
+  bar.classList.add('show');bar.innerHTML='';
+  [...triggeredAlerts].sort((a,b)=>Math.abs(b.val)-Math.abs(a.val)).slice(0,8).forEach(a=>{
+    const item=document.createElement('div');item.className='alert-item';
+    const tk=document.createElement('span');tk.className='atk';tk.textContent=a.ticker;
+    tk.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+a.ticker,'_blank'));
+    const th=document.createElement('span');th.style.cssText='color:#aab;width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0';th.textContent=a.theme;
+    const msg=document.createElement('span');msg.className='amsg';msg.textContent='⚡ '+a.msg;
+    item.append(tk,th,msg);bar.appendChild(item);
+  });
+  if(triggeredAlerts.length>8){const m=document.createElement('div');m.style.cssText='font-size:10px;color:var(--text3);font-family:var(--mono)';m.textContent='+'+(triggeredAlerts.length-8)+' more — see Alerts tab';bar.appendChild(m);}
+}
+
+// ── AUTO REFRESH ──────────────────────────────────────────────────────────────
+function scheduleAutoRefresh(){
+  if(autoRefreshTimer)clearTimeout(autoRefreshTimer);
+  const now=new Date();
+  const et=new Date(now.toLocaleString('en-US',{timeZone:'America/New_York'}));
+  const h=et.getHours(),dow=et.getDay();
+  const isMarket=dow>=1&&dow<=5&&h>=9&&h<16;
+  if(!isMarket)return;
+  autoRefreshTimer=setTimeout(()=>{console.log('Auto-refresh at',new Date().toLocaleTimeString());doSync();},15*60*1000);
+}
+
+// ── PERSISTENCE ───────────────────────────────────────────────────────────────
+function saveCache(){
+  try{localStorage.setItem('tt_cache',JSON.stringify(cache));localStorage.setItem('tt_stats',JSON.stringify(stats));localStorage.setItem('tt_time',new Date().toISOString());localStorage.setItem('tt_alerts',JSON.stringify(alertSettings));}catch(e){}
+}
+function loadCache(){
+  try{
+    const k=localStorage.getItem('tt_key');if(k)document.getElementById('apiKey').value=k;
+    const al=localStorage.getItem('tt_alerts');if(al)alertSettings={...alertSettings,...JSON.parse(al)};
+    const tc=localStorage.getItem('tt_cache'),ts=localStorage.getItem('tt_stats'),tt=localStorage.getItem('tt_time');
+    if(tc&&ts){
+      cache=JSON.parse(tc);stats=JSON.parse(ts);
+      const mins=tt?Math.round((Date.now()-new Date(tt).getTime())/60000):null;
+      document.getElementById('main').innerHTML='<div class="state" style="color:var(--text2)">✓ Data from '+(mins!=null?mins+'min ago':'last session')+' — hit Sync to refresh</div>';
+      setTimeout(()=>{if(tab==='themes')renderMain();checkAlerts();scheduleAutoRefresh();},50);
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+function clearCache(){
+  ['tt_cache','tt_stats','tt_time'].forEach(k=>localStorage.removeItem(k));
+  cache={};stats={};triggeredAlerts=[];
+  document.getElementById('abar').classList.remove('show');
+  renderMain();
+}
+document.getElementById('apiKey').addEventListener('input',function(){localStorage.setItem('tt_key',this.value);});
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function setTab(t){
+  tab=t;drillId=null;
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('on'));
+  document.getElementById('tab-'+t).classList.add('on');
+  renderMain();
+}
+function setView(v){
+  view=v;drillId=null;
+  document.getElementById('vb-list').classList.toggle('on',v==='list');
+  document.getElementById('vb-heat').classList.toggle('on',v==='heat');
+  renderMain();
+}
+function setTF(el,t){
+  tf=t;document.querySelectorAll('.tf').forEach(b=>b.classList.remove('on'));el.classList.add('on');
+  drillId?renderDrill():renderMain();
+}
+function renderMain(){
+  // Hide onboarding once we have data or user navigates
+  const ob=document.getElementById('onboard');
+  if(ob) ob.style.display='none';
+  if(tab==='movers'){renderMovers();return;}
+  if(tab==='alerts'){renderAlertSettings();return;}
+  if(tab==='scan'){renderScan();return;}
+  if(tab==='positions'){renderPositions();return;}
+  if(drillId){renderDrill();return;}
+  view==='heat'?renderHeat():renderList();
+}
+
+// ── LIST ──────────────────────────────────────────────────────────────────────
+function getSorted(){
+  return[...THEMES].sort((a,b)=>{const av=stats[a.id]?.[tf]??null,bv=stats[b.id]?.[tf]??null;if(av==null&&bv==null)return 0;if(av==null)return 1;if(bv==null)return-1;return bv-av;});
+}
+function renderList(filter=''){
+  const main=document.getElementById('main');
+  const themes=filter?THEMES.filter(t=>t.name.toLowerCase().includes(filter)||t.tickers.some(tk=>tk.toLowerCase().includes(filter))):getSorted();
+  const maxAbs=Math.max(...THEMES.map(t=>Math.abs(stats[t.id]?.today??0)),0.01);
+  const TFS=['today','1W','1M','3M','YTD'];
+  const rs=computeRS();
+
+  const lv=document.createElement('div');lv.className='lv';
+  const hdr=document.createElement('div');hdr.className='lhdr';
+  const hchk=document.createElement('div');hchk.style.cssText='width:21px;flex-shrink:0';
+  const hname=document.createElement('div');hname.className='lhdr-name';hname.textContent='Theme';
+  const hbar=document.createElement('div');hbar.className='lhdr-bar';
+  hdr.append(hchk,hname,hbar);
+  TFS.forEach(t=>{
+    const h=document.createElement('div');h.className='lhdr-tf'+(tf===t?' on':'');h.textContent=t==='today'?'Today':t;
+    h.addEventListener('click',()=>{tf=t;document.querySelectorAll('.tf').forEach(b=>b.classList.toggle('on',b.textContent===(t==='today'?'Today':t)));renderList();});
+    hdr.appendChild(h);
+  });
+  const hrs=document.createElement('div');hrs.className='lhdr-rs';hrs.textContent='RS';
+  const hcnt=document.createElement('div');hcnt.className='lhdr-cnt';hcnt.textContent='#';
+  hdr.append(hrs,hcnt);
+
+  const body=document.createElement('div');
+  themes.forEach(th=>{
+    const s=stats[th.id]||{};const tv=s.today??null;
+    const bw=tv!=null?Math.round(Math.abs(tv)/maxAbs*100):0;
+    const bc=tv==null?'var(--bg4)':tv>=0?'var(--green)':'var(--red)';
+    const rsVal=rs[th.id]||50;
+    const rsColor=rsVal>=70?'var(--green)':rsVal<=30?'var(--red)':'var(--text3)';
+
+    const row=document.createElement('div');row.className='lrow'+(selected.has(th.id)?' sel':'');
+    const chk=document.createElement('input');chk.type='checkbox';chk.className='lchk';chk.checked=selected.has(th.id);
+    chk.addEventListener('change',()=>toggleSel(th.id,chk));chk.addEventListener('click',e=>e.stopPropagation());
+    const name=document.createElement('div');name.className='lname';name.textContent=th.name;
+    name.addEventListener('click',()=>openDrill(th.id));
+    const bw2=document.createElement('div');bw2.className='lbar-w';bw2.addEventListener('click',()=>openDrill(th.id));
+    const bar=document.createElement('div');bar.className='lbar';bar.style.cssText='width:'+bw+'%;background:'+bc;
+    bw2.appendChild(bar);row.append(chk,name,bw2);
+    TFS.forEach(t=>{const v=s[t]??null;const col=document.createElement('div');col.className='ltf '+pc(v);col.textContent=f2(v);col.addEventListener('click',()=>openDrill(th.id));row.appendChild(col);});
+    const rsEl=document.createElement('div');rsEl.className='lrs';rsEl.style.color=rsColor;rsEl.textContent=rsVal;
+    const cntEl=document.createElement('div');cntEl.className='lcnt';cntEl.textContent=th.tickers.length;
+    row.append(rsEl,cntEl);body.appendChild(row);
+  });
+  lv.append(hdr,body);main.innerHTML='';main.appendChild(lv);
+}
+
+// ── HEAT ─────────────────────────────────────────────────────────────────────
+function renderHeat(){
+  const main=document.getElementById('main');
+  const grid=document.createElement('div');grid.className='hgrid';
+  getSorted().forEach(th=>{
+    const v=stats[th.id]?.[tf]??null;
+    const cell=document.createElement('div');cell.className='hcell';cell.style.background=heatBg(v);
+    cell.innerHTML='<div class="hcell-name">'+th.name+'</div><div class="hcell-pct">'+f2(v)+'</div><div class="hcell-cnt">'+th.tickers.length+' tickers</div>';
+    cell.addEventListener('click',()=>openDrill(th.id));grid.appendChild(cell);
+  });
+  const hv=document.createElement('div');hv.className='hv';hv.appendChild(grid);
+  main.innerHTML='';main.appendChild(hv);
+}
+
+// ── DRILL ─────────────────────────────────────────────────────────────────────
+function openDrill(id){drillId=id;drillSort={col:'today',dir:'desc'};renderDrill();}
+function closeDrill(){drillId=null;renderMain();}
+function renderDrill(filter=''){
+  const th=THEMES.find(t=>t.id===drillId);if(!th)return;
+  const TFS=['today','1W','1M','3M','YTD'];
+  const cSz=Object.keys(cache).length;
+
+  let rows=th.tickers.filter(tk=>!filter||tk.toLowerCase().includes(filter.toLowerCase())).map(tk=>{const d=cache[tk]||{};return{ticker:tk,...d};});
+  rows.sort((a,b)=>{
+    let av,bv;
+    if(drillSort.col==='vol'){av=a.volume&&a.avgVolume?a.volume/a.avgVolume:null;bv=b.volume&&b.avgVolume?b.volume/b.avgVolume:null;}
+    else if(drillSort.col==='atrMA'){av=a.atrMA??null;bv=b.atrMA??null;}
+    else if(drillSort.col==='atr'){av=a.atr??null;bv=b.atr??null;}
+    else{av=a[drillSort.col]??null;bv=b[drillSort.col]??null;}
+    if(av==null&&bv==null)return 0;if(av==null)return 1;if(bv==null)return-1;
+    return drillSort.dir==='desc'?bv-av:av-bv;
+  });
+
+  const dv=document.createElement('div');dv.className='dv';
+  const dhdr=document.createElement('div');dhdr.className='dhdr';
+  const back=document.createElement('button');back.className='dback';back.textContent='← Back';back.addEventListener('click',closeDrill);
+  const title=document.createElement('div');title.className='dtitle';title.textContent=th.name;
+  const sub=document.createElement('div');sub.className='dsub';sub.textContent='('+th.tickers.length+')';
+  const status=document.createElement('span');status.style.cssText='font-size:10px;margin-left:4px;color:'+(cSz>0?'var(--green)':'var(--amber)');
+  status.textContent=cSz>0?'✓ '+cSz+' cached':'⚠ Sync first';
+  const dsi=document.createElement('input');dsi.className='dsi';dsi.placeholder='Filter...';dsi.style.marginLeft='auto';
+  dsi.addEventListener('input',()=>renderDrill(dsi.value));
+  dhdr.append(back,title,sub,status,dsi);
+
+  const tw=document.createElement('div');tw.className='tw';
+  const tbl=document.createElement('table');
+  const thead=document.createElement('thead');const hrow=document.createElement('tr');
+  const mkH=(label,col)=>{const h=document.createElement('th');h.textContent=label;if(drillSort.col===col)h.className=drillSort.dir;h.style.textAlign=col==='ticker'?'left':'right';h.addEventListener('click',()=>{drillSort.dir=drillSort.col===col&&drillSort.dir==='desc'?'asc':'desc';drillSort.col=col;renderDrill(filter);});return h;};
+  hrow.append(mkH('Ticker','ticker'),mkH('Price','price'),mkH('Vol ×','vol'),mkH('ATR','atr'),mkH('ATR/50MA','atrMA'));
+  TFS.forEach(col=>hrow.appendChild(mkH(col==='today'?'Today':col,col)));
+  thead.appendChild(hrow);tbl.appendChild(thead);
+
+  const tbody=document.createElement('tbody');
+  if(!rows.length){const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=10;td.style.cssText='text-align:center;padding:40px;color:var(--text3)';td.textContent='No tickers';tr.appendChild(td);tbody.appendChild(tr);}
+  else rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    const tdTk=document.createElement('td');const tkS=document.createElement('span');tkS.className='tk';tkS.textContent=r.ticker+(r.stale?' ⚠':'');tkS.title=r.stale?'No recent data — may be delisted or halted':'';tkS.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));tdTk.appendChild(tkS);tr.appendChild(tdTk);
+    const tdP=document.createElement('td');tdP.style.color='var(--text)';tdP.textContent=r.price!=null?'$'+Number(r.price).toFixed(2):'—';tr.appendChild(tdP);
+    const tdV=document.createElement('td');tdV.appendChild(volChip(r.volume,r.avgVolume));tr.appendChild(tdV);
+    const tdA=document.createElement('td');tdA.style.color='var(--text2)';tdA.textContent=r.atr!=null?'$'+r.atr.toFixed(2):'—';tr.appendChild(tdA);
+    const tdAM=document.createElement('td');tdAM.appendChild(atrBar(r.atrMA??null));tr.appendChild(tdAM);
+    TFS.forEach(col=>{const td=document.createElement('td');td.appendChild(miniBar(r[col]??null));tr.appendChild(td);});
+    tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody);tw.appendChild(tbl);
+  dv.append(dhdr,tw);document.getElementById('main').innerHTML='';document.getElementById('main').appendChild(dv);
+}
+
+// ── TOP MOVERS ────────────────────────────────────────────────────────────────
+function renderMovers(){
+  const main=document.getElementById('main');
+  const TFS=['today','1W','1M','3M','YTD'];
+  const allRows=[];
+  THEMES.forEach(th=>{th.tickers.forEach(tk=>{const d=cache[tk];if(!d||d[tf]==null)return;if(alertSettings.volFilter&&d.volume&&d.avgVolume&&d.volume/d.avgVolume<1.5)return;allRows.push({ticker:tk,theme:th.name,...d});});});
+
+  if(!allRows.length){main.innerHTML='<div class="state">No data — hit Sync first</div>';return;}
+  // Deduplicate — keep first occurrence (primary theme) per ticker
+  const seenM=new Set();
+  const uniqueRows=allRows.filter(r=>{if(seenM.has(r.ticker))return false;seenM.add(r.ticker);return true;});
+  uniqueRows.sort((a,b)=>(b[tf]??-999)-(a[tf]??-999));
+  allRows.length=0;allRows.push(...uniqueRows);
+  allRows.sort((a,b)=>(b[tf]??-999)-(a[tf]??-999));
+  const gainers=allRows.filter(r=>r[tf]>0).slice(0,25);
+  const losers=[...allRows].reverse().filter(r=>r[tf]<0).slice(0,25);
+
+  const pv=document.createElement('div');pv.className='pv';
+  const phdr=document.createElement('div');phdr.style.cssText='display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:10px';
+  const lbl=document.createElement('span');lbl.textContent='Timeframe:';lbl.style.cssText='font-size:12px;color:#fff;margin-right:4px';phdr.appendChild(lbl);
+  TFS.forEach(t=>{
+    const btn=document.createElement('button');
+    btn.style.cssText='background:'+(tf===t?'var(--blue)':'var(--bg4)')+';border:1px solid '+(tf===t?'var(--blue)':'var(--border2)')+';border-radius:3px;color:#fff'+';font-family:var(--mono);font-size:10px;padding:3px 8px;cursor:pointer';
+    btn.textContent=t==='today'?'Today':t;
+    btn.addEventListener('click',()=>{tf=t;document.querySelectorAll('.tf').forEach(b=>b.classList.toggle('on',b.textContent===(t==='today'?'Today':t)));renderMovers();});
+    phdr.appendChild(btn);
+  });
+  const sep=document.createElement('span');sep.style.cssText='margin:0 6px;color:#fff;font-size:12px';sep.textContent='|';
+  const vfBtn=document.createElement('button');
+  vfBtn.style.cssText='background:'+(alertSettings.volFilter?'var(--ad)':'var(--bg4)')+';border:1px solid '+(alertSettings.volFilter?'var(--amber)':'var(--border2)')+';border-radius:3px;color:'+(alertSettings.volFilter?'var(--amber)':'var(--text2)')+';font-family:var(--mono);font-size:10px;padding:3px 8px;cursor:pointer';
+  vfBtn.textContent='Vol >1.5x only';
+  vfBtn.addEventListener('click',()=>{alertSettings.volFilter=!alertSettings.volFilter;renderMovers();});
+  phdr.append(sep,vfBtn);pv.appendChild(phdr);
+
+  const cols=document.createElement('div');cols.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:16px';
+  const mkSec=(rows,isG)=>{
+    const sec=document.createElement('div');
+    const h=document.createElement('div');h.style.cssText='font-size:10px;color:'+(isG?'var(--green)':'var(--red)')+';letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);padding-bottom:6px;border-bottom:1px solid var(--border2);margin-bottom:4px;font-weight:500';
+    h.textContent=(isG?'▲ Top Gainers':'▼ Top Losers')+' — '+(tf==='today'?'Today':tf);sec.appendChild(h);
+    rows.forEach(r=>{
+      const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);gap:8px;cursor:pointer';
+      row.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
+      const tk=document.createElement('span');tk.style.cssText='width:52px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:11px;flex-shrink:0';tk.textContent=r.ticker;
+      const th2=document.createElement('span');th2.style.cssText='flex:1;font-size:11px;color:#aab;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';th2.textContent=r.theme;
+      const pct=document.createElement('span');pct.style.cssText='font-family:var(--mono);font-size:11px;font-weight:500;color:'+(isG?'var(--green)':'var(--red)')+';flex-shrink:0';pct.textContent=f2(r[tf]);
+      const vol=r.volume&&r.avgVolume?r.volume/r.avgVolume:null;
+      const volEl=document.createElement('span');volEl.style.cssText='font-family:var(--mono);font-size:10px;flex-shrink:0;width:36px;text-align:right';
+      volEl.style.color=vol>=2?'var(--green)':vol>=1.3?'var(--amber)':'#aab';volEl.textContent=vol?vol.toFixed(1)+'x':'';
+      row.append(tk,th2,pct,volEl);sec.appendChild(row);
+    });
+    return sec;
+  };
+  cols.append(mkSec(gainers,true),mkSec(losers,false));pv.appendChild(cols);
+  main.innerHTML='';main.appendChild(pv);
+}
+
+// ── ALERT SETTINGS ────────────────────────────────────────────────────────────
+function renderAlertSettings(){
+  const main=document.getElementById('main');
+  const asv=document.createElement('div');asv.className='asv';
+
+  const mkSec=title=>{const s=document.createElement('div');s.className='as-section';const t=document.createElement('div');t.className='as-title';t.textContent=title;s.appendChild(t);return s;};
+  const mkRow=(label,sub,ctrl)=>{const row=document.createElement('div');row.className='as-row';const ld=document.createElement('div');ld.className='as-label';ld.innerHTML='<div>'+label+'</div><div class="as-sub">'+sub+'</div>';row.append(ld,ctrl);return row;};
+
+  const s1=mkSec('Alert Settings');
+  const tog=document.createElement('div');tog.className='as-toggle';
+  const onB=document.createElement('button');onB.className='as-tog'+(alertSettings.enabled?' on':'');onB.textContent='Enabled';
+  const offB=document.createElement('button');offB.className='as-tog'+(!alertSettings.enabled?' on':'');offB.textContent='Disabled';
+  onB.addEventListener('click',()=>{alertSettings.enabled=true;onB.className='as-tog on';offB.className='as-tog';saveCache();checkAlerts();});
+  offB.addEventListener('click',()=>{alertSettings.enabled=false;onB.className='as-tog';offB.className='as-tog on';saveCache();document.getElementById('abar').classList.remove('show');});
+  tog.append(onB,offB);s1.appendChild(mkRow('Alert Notifications','Show alert bar when thresholds are crossed',tog));
+
+  const atrIn=document.createElement('input');atrIn.className='as-in';atrIn.type='number';atrIn.value=alertSettings.atrMA;atrIn.step='0.5';atrIn.min='0.5';
+  atrIn.addEventListener('change',()=>{alertSettings.atrMA=parseFloat(atrIn.value)||3;saveCache();checkAlerts();});
+  s1.appendChild(mkRow('ATR/50MA Threshold','Alert when price is ≥ this many ATRs from 50MA (default: 3.0)',atrIn));
+
+  const volIn=document.createElement('input');volIn.className='as-in';volIn.type='number';volIn.value=alertSettings.volMult;volIn.step='0.5';volIn.min='1';
+  volIn.addEventListener('change',()=>{alertSettings.volMult=parseFloat(volIn.value)||2;saveCache();checkAlerts();});
+  s1.appendChild(mkRow('Volume Threshold','Alert when volume ≥ this × average (default: 2.0)',volIn));
+  asv.appendChild(s1);
+
+  if(triggeredAlerts.length){
+    const s2=mkSec('Active Alerts ('+triggeredAlerts.length+')');
+    [...triggeredAlerts].sort((a,b)=>Math.abs(b.val)-Math.abs(a.val)).forEach(a=>{
+      const row=document.createElement('div');row.className='as-row';
+      const tk=document.createElement('span');tk.style.cssText='width:60px;color:var(--blue);font-family:var(--mono);font-weight:500;cursor:pointer;flex-shrink:0';tk.textContent=a.ticker;
+      tk.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+a.ticker,'_blank'));
+      const th2=document.createElement('span');th2.style.cssText='width:130px;font-size:11px;color:#aab;flex-shrink:0';th2.textContent=a.theme;
+      const msg=document.createElement('span');msg.style.color='var(--amber)';msg.textContent=a.msg;
+      row.append(tk,th2,msg);s2.appendChild(row);
+    });
+    asv.appendChild(s2);
+  } else {
+    const none=document.createElement('div');none.style.cssText='color:var(--text3);font-size:11px;margin-top:12px';
+    none.textContent=Object.keys(cache).length>0?'No alerts at current thresholds.':'Sync data first.';asv.appendChild(none);
+  }
+  main.innerHTML='';main.appendChild(asv);
+}
+
+
+// ── 50MA SCAN ─────────────────────────────────────────────────────────────────
+function renderScan(){
+  const main=document.getElementById('main');
+  const noData=Object.keys(cache).length===0;
+
+  // Controls
+  const wrap=document.createElement('div');
+  wrap.style.cssText='display:flex;flex-direction:column;height:100%;overflow:hidden';
+
+  const ctrl=document.createElement('div');
+  ctrl.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border2);background:var(--bg2);flex-shrink:0;flex-wrap:wrap';
+
+  const lbl=document.createElement('span');
+  lbl.style.cssText='font-size:12px;color:#fff;font-family:var(--mono)';
+  lbl.textContent='Within';
+
+  // Threshold input
+  const threshIn=document.createElement('input');
+  threshIn.type='number';threshIn.value='1';threshIn.min='0.1';threshIn.max='10';threshIn.step='0.1';
+  threshIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:55px;outline:none;text-align:right';
+  const lbl2=document.createElement('span');
+  lbl2.style.cssText='font-size:12px;color:#fff;font-family:var(--mono)';
+  lbl2.textContent='% of 50MA';
+
+  const sep=document.createElement('span');sep.style.cssText='color:var(--border2);margin:0 4px';sep.textContent='|';
+
+  // ATR% minimum filter
+  const lbl3=document.createElement('span');
+  lbl3.style.cssText='font-size:12px;color:#fff;font-family:var(--mono)';
+  lbl3.textContent='Min ATR%';
+  const atrPctIn=document.createElement('input');
+  atrPctIn.type='number';atrPctIn.value='4';atrPctIn.min='0';atrPctIn.max='50';atrPctIn.step='0.5';
+  atrPctIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:55px;outline:none;text-align:right';
+
+  const lbl4=document.createElement('span');
+  lbl4.style.cssText='font-size:12px;color:#fff;font-family:var(--mono)';
+  lbl4.textContent='%';
+  const sep2b=document.createElement('span');sep2b.style.cssText='color:var(--border2);margin:0 4px';sep2b.textContent='|';
+
+  // Min avg dollar volume filter
+  const lbl5=document.createElement('span');
+  lbl5.style.cssText='font-size:12px;color:#fff;font-family:var(--mono)';
+  lbl5.textContent='Min AvgVol $';
+  const dvolIn=document.createElement('input');
+  dvolIn.type='number';dvolIn.value='80';dvolIn.min='0';dvolIn.step='10';
+  dvolIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:65px;outline:none;text-align:right';
+  const lbl6=document.createElement('span');
+  lbl6.style.cssText='font-size:12px;color:#fff;font-family:var(--mono)';
+  lbl6.textContent='M/day';
+  const sep3=document.createElement('span');sep3.style.cssText='color:var(--border2);margin:0 4px';sep3.textContent='|';
+
+  // Volume filter toggle
+  const volToggle=document.createElement('button');
+  volToggle.dataset.on='0';
+  volToggle.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 8px;cursor:pointer';
+  volToggle.textContent='Vol >1.5x only';
+  volToggle.addEventListener('click',()=>{
+    const on=volToggle.dataset.on==='1';
+    volToggle.dataset.on=on?'0':'1';
+    volToggle.style.background=on?'var(--bg3)':'var(--ad)';
+    volToggle.style.borderColor=on?'var(--border2)':'var(--amber)';
+    volToggle.style.color=on?'var(--text2)':'var(--amber)';
+    rebuildScan();
+  });
+
+  const countEl=document.createElement('span');
+  countEl.id='scan-count';
+  countEl.style.cssText='font-size:12px;color:#fff;font-family:var(--mono);margin-left:auto';
+
+  // Wire all change handlers here after all elements are declared
+  const rebuildScan=()=>buildScanResults(parseFloat(threshIn.value)||1,volToggle.dataset.on==='1',parseFloat(atrPctIn.value)||0,parseFloat(dvolIn.value)||0,body);
+  threshIn.addEventListener('change', rebuildScan);
+  atrPctIn.addEventListener('change', rebuildScan);
+  dvolIn.addEventListener('change', rebuildScan);
+
+  ctrl.append(lbl,threshIn,lbl2,sep,lbl3,atrPctIn,lbl4,sep2b,lbl5,dvolIn,lbl6,sep3,volToggle,countEl);
+
+  // Table
+  const body=document.createElement('div');
+  body.style.cssText='flex:1;overflow-y:auto';
+
+  wrap.append(ctrl,body);
+  main.innerHTML='';main.appendChild(wrap);
+
+  if(noData){
+    body.innerHTML='<div class="state">No data — hit Sync first</div>';
+    return;
+  }
+  buildScanResults(1, false, 4, 80, body);
+}
+
+function buildScanResults(thresh, volOnly, minAtrPct, minDVol, body){
+  const results=[];
+  THEMES.forEach(th=>{
+    th.tickers.forEach(tk=>{
+      const d=cache[tk];
+      if(!d||d.stale||d.price==null||d.ma50==null) return;
+      const pctFromMA=((d.price-d.ma50)/d.ma50)*100;
+      if(Math.abs(pctFromMA)>thresh) return;
+      // ATR% filter — (ATR / Price) * 100 >= minAtrPct
+      const atrPct = (d.atr && d.price) ? (d.atr / d.price * 100) : null;
+      if(minAtrPct > 0 && (!atrPct || atrPct < minAtrPct)) return;
+      // Avg dollar volume filter: price × avgVolume / 1,000,000 >= minDVol
+      const avgDVol = (d.price && d.avgVolume) ? (d.price * d.avgVolume / 1e6) : null;
+      if(minDVol > 0 && (!avgDVol || avgDVol < minDVol)) return;
+      const volX=d.volume&&d.avgVolume?d.volume/d.avgVolume:null;
+      if(volOnly&&(!volX||volX<1.5)) return;
+      results.push({ticker:tk,theme:th.name,price:d.price,ma50:d.ma50,pctFromMA,
+        atr:d.atr,atrMA:d.atrMA,today:d.today,volX,avgDVol,...d});
+    });
+  });
+
+  // Deduplicate — keep entry closest to 50MA per ticker
+  const seenS=new Map();
+  results.forEach(r=>{
+    if(!seenS.has(r.ticker)||Math.abs(r.pctFromMA)<Math.abs(seenS.get(r.ticker).pctFromMA))
+      seenS.set(r.ticker,r);
+  });
+  const dedupedResults=[...seenS.values()];
+  results.length=0;results.push(...dedupedResults);
+  // Sort by closest to 50MA
+  results.sort((a,b)=>Math.abs(a.pctFromMA)-Math.abs(b.pctFromMA));
+
+  // Update count
+  const countEl=document.getElementById('scan-count');
+  if(countEl) countEl.textContent=results.length+' matches';
+
+  body.innerHTML='';
+
+  if(!results.length){
+    body.innerHTML='<div class="state" style="padding:30px;color:#aab">No tickers within '+thresh+'% of 50MA'+(volOnly?' with vol >1.5x':'')+'</div>';
+    return;
+  }
+
+  // Header
+  const hdr=document.createElement('div');
+  hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#ccc;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
+  hdr.innerHTML=
+    '<div style="width:60px;flex-shrink:0">Ticker</div>'+
+    '<div style="flex:1">Theme</div>'+
+    '<div style="width:75px;text-align:right;flex-shrink:0">Price</div>'+
+    '<div style="width:75px;text-align:right;flex-shrink:0">50MA</div>'+
+    '<div style="width:90px;text-align:right;flex-shrink:0">% from MA</div>'+
+    '<div style="width:65px;text-align:right;flex-shrink:0">ATR</div>'+
+    '<div style="width:65px;text-align:right;flex-shrink:0">ATR%</div>'+
+    '<div style="width:90px;text-align:right;flex-shrink:0">ATR/50MA</div>'+
+    '<div style="width:70px;text-align:right;flex-shrink:0">Vol ×</div>'+
+    '<div style="width:75px;text-align:right;flex-shrink:0">AvgVol $M</div>'+
+    '<div style="width:75px;text-align:right;flex-shrink:0">Today</div>';
+  body.appendChild(hdr);
+
+  results.forEach(r=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;padding:0 14px;height:34px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .08s';
+    row.addEventListener('mouseenter',()=>row.style.background='var(--bg3)');
+    row.addEventListener('mouseleave',()=>row.style.background='');
+    row.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
+
+    const absPct=Math.abs(r.pctFromMA);
+    const isAbove=r.pctFromMA>=0;
+    // Color: green=above MA, red=below MA, intensity by closeness
+    const pctCol=isAbove?'var(--green)':'var(--red)';
+
+    const tk=document.createElement('div');
+    tk.style.cssText='width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:11px;flex-shrink:0';
+    tk.textContent=r.ticker;
+
+    const th=document.createElement('div');
+    th.style.cssText='flex:1;font-size:11px;color:#aab;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+    th.textContent=r.theme;
+
+    const price=document.createElement('div');
+    price.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';
+    price.textContent='$'+r.price.toFixed(2);
+
+    const ma=document.createElement('div');
+    ma.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:#aab;flex-shrink:0';
+    ma.textContent='$'+r.ma50.toFixed(2);
+
+    const pct=document.createElement('div');
+    pct.style.cssText='width:90px;text-align:right;font-family:var(--mono);font-size:11px;font-weight:500;flex-shrink:0;color:'+pctCol;
+    pct.textContent=(isAbove?'+':'')+r.pctFromMA.toFixed(3)+'%';
+
+    const atr=document.createElement('div');
+    atr.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:11px;color:#aab;flex-shrink:0';
+    atr.textContent=r.atr?'$'+r.atr.toFixed(2):'—';
+
+    // ATR%
+    const atrPctEl=document.createElement('div');
+    atrPctEl.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:12px;flex-shrink:0';
+    const atrPctVal = (r.atr && r.price) ? (r.atr/r.price*100) : null;
+    atrPctEl.style.color = atrPctVal>=8?'var(--green)':atrPctVal>=4?'#fff':'#aab';
+    atrPctEl.textContent = atrPctVal ? atrPctVal.toFixed(1)+'%' : '—';
+
+    const atrMA=document.createElement('div');
+    atrMA.style.cssText='width:90px;text-align:right;flex-shrink:0';
+    atrMA.appendChild(atrBar(r.atrMA??null));
+
+    const vol=document.createElement('div');
+    vol.style.cssText='width:70px;text-align:right;flex-shrink:0';
+    vol.appendChild(volChip(r.volume,r.avgVolume));
+
+    const today=document.createElement('div');
+    today.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';
+    today.className=pc(r.today);today.textContent=f2(r.today);
+
+    // Avg dollar volume cell
+    const dvolEl=document.createElement('div');
+    dvolEl.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:12px;color:#aab;flex-shrink:0';
+    dvolEl.textContent=r.avgDVol!=null?'$'+r.avgDVol.toFixed(0)+'M':'—';
+    row.append(tk,th,price,ma,pct,atr,atrPctEl,atrMA,vol,dvolEl,today);
+    body.appendChild(row);
+  });
+}
+
+
+// ── POSITIONS ─────────────────────────────────────────────────────────────────
+function savePositions(){
+  // Positions are saved to the file via "Save & Download" button
+  // This just keeps them in memory for the current session
+}
+
+function downloadUpdatedFile(){
+  // Read the current HTML and inject updated positions
+  const script=document.currentScript;
+  fetch(window.location.href)
+    .then(r=>r.text())
+    .then(html=>{
+      const marker='let positions=';
+      const start=html.indexOf(marker);
+      const end=html.indexOf(';',start);
+      if(start<0){alert('Could not find positions marker in file.');return;}
+      const updated=html.slice(0,start)+marker+JSON.stringify(positions)+html.slice(end);
+      const blob=new Blob([updated],{type:'text/html'});
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='pulse_scanner.html';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    })
+    .catch(()=>{
+      // Fallback: build from current page source
+      const html=document.documentElement.outerHTML;
+      const marker='let positions=';
+      const start=html.indexOf(marker);
+      const end=html.indexOf(';',start);
+      if(start<0){alert('Could not find positions in file. Try saving manually.');return;}
+      const updated=html.slice(0,start)+marker+JSON.stringify(positions)+html.slice(end);
+      const blob=new Blob([updated],{type:'text/html'});
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='pulse_scanner.html';
+      a.click();
+    });
+}
+
+function renderPositions(){
+  const main=document.getElementById('main');
+  const TFS=['today','1W','1M','3M','YTD'];
+
+  const wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;height:100%;overflow:hidden';
+
+  // ── Add position controls ──
+  const ctrl=document.createElement('div');ctrl.className='pos-ctrl';
+
+  const tkIn=document.createElement('input');tkIn.className='pos-in';tkIn.placeholder='Ticker (e.g. NVDA)';tkIn.style.width='110px';tkIn.style.textTransform='uppercase';
+  const sharesIn=document.createElement('input');sharesIn.className='pos-in';sharesIn.placeholder='Shares';sharesIn.type='number';sharesIn.style.width='90px';sharesIn.min='0';
+  const entryIn=document.createElement('input');entryIn.className='pos-in';entryIn.placeholder='Entry $';entryIn.type='number';entryIn.style.width='90px';entryIn.step='0.01';entryIn.min='0';
+  const notesIn=document.createElement('input');notesIn.className='pos-in';notesIn.placeholder='Notes (optional)';notesIn.style.width='160px';
+
+  const addBtn=document.createElement('button');addBtn.className='pos-add';addBtn.textContent='+ Add Position';
+  addBtn.addEventListener('click',()=>{
+    const tk=tkIn.value.trim().toUpperCase();
+    if(!tk){tkIn.focus();return;}
+    const shares=parseFloat(sharesIn.value)||0;
+    const entry=parseFloat(entryIn.value)||0;
+    const notes=notesIn.value.trim();
+    const direction=dirToggle.dataset.dir||'long';
+    positions.push({ticker:tk,shares,entry,notes,direction,added:new Date().toISOString()});
+    savePositions();
+    tkIn.value='';sharesIn.value='';entryIn.value='';notesIn.value='';
+    renderPositions();
+  });
+
+  // Allow Enter key to add
+  [tkIn,sharesIn,entryIn,notesIn].forEach(el=>{
+    el.addEventListener('keydown',e=>{if(e.key==='Enter')addBtn.click();});
+  });
+
+  const lbl=document.createElement('span');lbl.style.cssText='font-size:10px;color:var(--text3);font-family:var(--mono);margin-right:4px';
+  lbl.textContent='Add:';
+
+  // Long/Short toggle
+  const dirToggle=document.createElement('button');
+  dirToggle.dataset.dir='long';
+  dirToggle.style.cssText='background:var(--gd);border:1px solid var(--green);border-radius:3px;color:var(--green);font-family:var(--mono);font-size:11px;padding:4px 10px;cursor:pointer;white-space:nowrap;min-width:60px';
+  dirToggle.textContent='LONG';
+  dirToggle.addEventListener('click',()=>{
+    const isLong=dirToggle.dataset.dir==='long';
+    dirToggle.dataset.dir=isLong?'short':'long';
+    dirToggle.textContent=isLong?'SHORT':'LONG';
+    dirToggle.style.background=isLong?'var(--rd)':'var(--gd)';
+    dirToggle.style.borderColor=isLong?'var(--red)':'var(--green)';
+    dirToggle.style.color=isLong?'var(--red)':'var(--green)';
+  });
+
+  const sep5=document.createElement('span');sep5.style.cssText='color:var(--text3);margin:0 6px';sep5.textContent='|';
+  const saveBtn=document.createElement('button');
+  saveBtn.style.cssText='background:var(--bd);border:1px solid var(--blue);border-radius:3px;color:var(--blue);font-family:var(--mono);font-size:11px;padding:4px 12px;cursor:pointer;white-space:nowrap';
+  saveBtn.textContent='⬇ Save & Download';
+  saveBtn.title='Downloads updated file with positions baked in — upload to GitHub to share';
+  saveBtn.addEventListener('click',()=>{
+    downloadUpdatedFile();
+    setTimeout(()=>{saveBtn.textContent='✓ Downloaded — upload to GitHub!';setTimeout(()=>saveBtn.textContent='⬇ Save & Download',3000);},500);
+  });
+  ctrl.append(lbl,tkIn,dirToggle,sharesIn,entryIn,notesIn,addBtn,sep5,saveBtn);
+
+  // ── Table ──
+  const tw=document.createElement('div');tw.style.cssText='flex:1;overflow-y:auto';
+
+  if(!positions.length){
+    tw.innerHTML='<div class="state">No positions yet<br><span style="font-size:10px;color:var(--text3)">Enter a ticker above and click + Add Position</span></div>';
+  } else {
+    const tbl=document.createElement('table');
+    const thead=document.createElement('thead');const hrow=document.createElement('tr');
+    const hdrs=['L/S','Ticker','Theme','Notes','Price','Entry $','Shares','Mkt Value','P&L $','P&L %','% from Entry','ATR/50MA','Vol ×',...TFS.map(t=>t==='today'?'Today':t),''];
+    hdrs.forEach((h,i)=>{
+      const th=document.createElement('th');th.textContent=h;
+      th.style.textAlign=(i===0||i===1||i===hdrs.length-1)?'left':'right';
+      hrow.appendChild(th);
+    });
+    thead.appendChild(hrow);tbl.appendChild(thead);
+
+    const tbody=document.createElement('tbody');
+    let totalValue=0,totalPnl=0;
+
+    positions.forEach((p,idx)=>{
+      const d=cache[p.ticker]||{};
+      const price=d.price||null;
+      const mktVal=price&&p.shares?price*p.shares:null;
+      const costBasis=p.entry&&p.shares?p.entry*p.shares:null;
+      const pnlDollar=mktVal&&costBasis?mktVal-costBasis:null;
+      const pnlPct=pnlDollar&&costBasis?((pnlDollar/costBasis)*100):null;
+      if(mktVal) totalValue+=mktVal;
+      if(pnlDollar) totalPnl+=pnlDollar;
+
+      const tr=document.createElement('tr');
+
+      // L/S badge
+      const tdDir=document.createElement('td');
+      const dirBadge=document.createElement('span');
+      const isLong=(p.direction||'long')==='long';
+      dirBadge.textContent=isLong?'L':'S';
+      dirBadge.style.cssText='display:inline-block;padding:1px 6px;border-radius:3px;font-family:var(--mono);font-size:10px;font-weight:600;'+(isLong?'background:var(--gd);color:var(--green);border:1px solid var(--green)':'background:var(--rd);color:var(--red);border:1px solid var(--red)');
+      tdDir.appendChild(dirBadge);tr.appendChild(tdDir);
+
+      // Ticker
+      const tdTk=document.createElement('td');
+      const tkS=document.createElement('span');tkS.className='tk';tkS.textContent=p.ticker;
+      tkS.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+p.ticker,'_blank'));
+      tdTk.appendChild(tkS);tr.appendChild(tdTk);
+
+      // Theme
+      const tdTheme=document.createElement('td');
+      const themeName=THEMES.find(t=>t.tickers.includes(p.ticker))?.name||'—';
+      tdTheme.style.cssText='font-size:10px;color:var(--text3);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+      tdTheme.textContent=themeName;
+      tr.appendChild(tdTheme);
+
+      // Notes
+      const tdN=document.createElement('td');tdN.style.cssText='font-size:10px;color:var(--text3);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+      tdN.textContent=p.notes||'';tr.appendChild(tdN);
+
+      // Price
+      const tdP=document.createElement('td');tdP.style.cssText='text-align:right;color:var(--text)';
+      tdP.textContent=price!=null?'$'+price.toFixed(2):'—';tr.appendChild(tdP);
+
+      // Entry
+      const tdE=document.createElement('td');tdE.style.cssText='text-align:right;color:var(--text2)';
+      tdE.textContent=p.entry?'$'+p.entry.toFixed(2):'—';tr.appendChild(tdE);
+
+      // Shares
+      const tdSh=document.createElement('td');tdSh.style.cssText='text-align:right;color:var(--text2)';
+      tdSh.textContent=p.shares?p.shares.toLocaleString():'—';tr.appendChild(tdSh);
+
+      // Market Value
+      const tdMv=document.createElement('td');tdMv.style.cssText='text-align:right;font-weight:500';
+      tdMv.textContent=mktVal!=null?'$'+mktVal.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}):'—';
+      tr.appendChild(tdMv);
+
+      // P&L $
+      const tdPnl=document.createElement('td');tdPnl.style.cssText='text-align:right;font-weight:500;font-family:var(--mono)';
+      if(pnlDollar!=null){
+        tdPnl.style.color=pnlDollar>=0?'var(--green)':'var(--red)';
+        tdPnl.textContent=(pnlDollar>=0?'+':'')+pnlDollar.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+      } else tdPnl.textContent='—';
+      tr.appendChild(tdPnl);
+
+      // P&L %
+      const tdPnlP=document.createElement('td');tdPnlP.style.cssText='text-align:right;font-family:var(--mono)';
+      if(pnlPct!=null){
+        tdPnlP.style.color=pnlPct>=0?'var(--green)':'var(--red)';
+        tdPnlP.textContent=(pnlPct>=0?'+':'')+pnlPct.toFixed(2)+'%';
+      } else tdPnlP.textContent='—';
+      tr.appendChild(tdPnlP);
+
+      // % Move from Entry = (price - entry) / entry * 100, flipped for shorts
+      const tdMoveFrom=document.createElement('td');tdMoveFrom.style.cssText='text-align:right;font-family:var(--mono);font-size:11px;font-weight:500';
+      if(price!=null&&p.entry){
+        const rawMove=((price-p.entry)/p.entry)*100;
+        const adjMove=isLong?rawMove:-rawMove; // shorts: price up = bad
+        tdMoveFrom.style.color=adjMove>=0?'var(--green)':'var(--red)';
+        tdMoveFrom.textContent=(adjMove>=0?'+':'')+adjMove.toFixed(2)+'%';
+      } else {tdMoveFrom.textContent='—';tdMoveFrom.style.color='var(--text3)';}
+      tr.appendChild(tdMoveFrom);
+
+      // ATR/50MA
+      const tdAM=document.createElement('td');tdAM.appendChild(atrBar(d.atrMA??null));tr.appendChild(tdAM);
+
+      // Vol x
+      const tdV=document.createElement('td');tdV.appendChild(volChip(d.volume,d.avgVolume));tr.appendChild(tdV);
+
+      // TF columns
+      TFS.forEach(t=>{const td=document.createElement('td');td.appendChild(miniBar(d[t]??null));tr.appendChild(td);});
+
+      // Delete button
+      const tdDel=document.createElement('td');
+      const delBtn=document.createElement('button');delBtn.className='pos-del';delBtn.textContent='✕';delBtn.title='Remove position';
+      delBtn.addEventListener('click',()=>{positions.splice(idx,1);savePositions();renderPositions();});
+      tdDel.appendChild(delBtn);tr.appendChild(tdDel);
+
+      tbody.appendChild(tr);
+    });
+
+    // Totals row
+    if(positions.length>1){
+      const tfoot=document.createElement('tfoot');
+      const trow=document.createElement('tr');
+      trow.style.cssText='border-top:2px solid var(--border2)';
+      const cols=hdrs.length;
+      for(let i=0;i<cols;i++){
+        const td=document.createElement('td');
+        td.style.cssText='padding:8px 10px;font-family:var(--mono);font-size:11px';
+        if(i===0){td.textContent='TOTAL';td.style.fontWeight='600';td.style.color='var(--text)';}
+        else if(i===5){td.style.textAlign='right';td.style.fontWeight='600';td.textContent=totalValue?'$'+totalValue.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}):'—';}
+        else if(i===6){
+          td.style.textAlign='right';td.style.fontWeight='600';
+          td.style.color=totalPnl>=0?'var(--green)':'var(--red)';
+          td.textContent=totalValue?(totalPnl>=0?'+':'')+totalPnl.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}):'—';
+        }
+        else if(i===7){
+          const totalPct=totalValue&&totalPnl?((totalPnl/(totalValue-totalPnl))*100):null;
+          td.style.textAlign='right';td.style.fontWeight='600';
+          if(totalPct!=null){td.style.color=totalPct>=0?'var(--green)':'var(--red)';td.textContent=(totalPct>=0?'+':'')+totalPct.toFixed(2)+'%';}
+        }
+        trow.appendChild(td);
+      }
+      tfoot.appendChild(trow);tbl.appendChild(tfoot);
+    }
+
+    tbl.appendChild(tbody);tw.appendChild(tbl);
+  }
+
+  wrap.append(ctrl,tw);
+  main.innerHTML='';main.appendChild(wrap);
+}
+
+// ── MULTI-SELECT ──────────────────────────────────────────────────────────────
+function toggleSel(id,chk){chk.checked?selected.add(id):selected.delete(id);updateSelBar();}
+function updateSelBar(){
+  const bar=document.getElementById('sbar');
+  if(!selected.size){bar.classList.remove('show');return;}
+  bar.classList.add('show');
+  document.getElementById('stks').textContent=[...new Set([...selected].flatMap(id=>THEMES.find(t=>t.id===id).tickers))].join(', ');
+}
+function copyTickers(){
+  const tks=[...new Set([...selected].flatMap(id=>THEMES.find(t=>t.id===id).tickers))];
+  navigator.clipboard.writeText(tks.join(', ')).then(()=>{const b=event.target;b.textContent='Copied!';setTimeout(()=>b.textContent='Copy',1500);});
+}
+function dlCSV(){
+  const rows=[['Theme','Ticker','Today%','1W%','1M%','3M%','YTD%','Price','Volume','AvgVolume','ATR','ATR_50MA']];
+  [...selected].forEach(id=>{const th=THEMES.find(t=>t.id===id);th.tickers.forEach(tk=>{const c=cache[tk]||{};rows.push([th.name,tk,c.today??'',c['1W']??'',c['1M']??'',c['3M']??'',c.YTD??'',c.price??'',c.volume??'',c.avgVolume??'',c.atr??'',c.atrMA??'']);});});
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(rows.map(r=>r.join(',')).join('\n'));a.download='themes.csv';a.click();
+}
+function clearSel(){selected.clear();updateSelBar();if(!drillId&&tab==='themes')renderList();}
+
+// ── SEARCH ────────────────────────────────────────────────────────────────────
+function onSearch(q){
+  if(drillId)return;
+  if(!q){renderMain();return;}
+  const ql=q.toLowerCase();
+  // If 2+ chars, check if it matches any ticker symbol first
+  const tickerMatch=q.length>=2&&THEMES.some(t=>t.tickers.some(tk=>tk.toLowerCase().includes(ql)));
+  if(tickerMatch){
+    renderTickerSearch(ql);
+  } else {
+    renderList(ql);
+  }
+}
+
+function renderTickerSearch(q){
+  const main=document.getElementById('main');
+  const TFS=['today','1W','1M','3M','YTD'];
+  const results=[];
+  THEMES.forEach(th=>{
+    th.tickers.forEach(tk=>{
+      if(tk.toLowerCase().includes(q)||th.name.toLowerCase().includes(q)){
+        const d=cache[tk]||{};
+        results.push({ticker:tk,theme:th.name,...d});
+      }
+    });
+  });
+  // Deduplicate by ticker
+  const seen=new Set();
+  const unique=results.filter(r=>{if(seen.has(r.ticker))return false;seen.add(r.ticker);return true;});
+
+  if(!unique.length){
+    main.innerHTML='<div class="state">No tickers or themes found for "'+q.toUpperCase()+'"</div>';
+    return;
+  }
+
+  const dv=document.createElement('div');dv.className='dv';
+  const dhdr=document.createElement('div');dhdr.className='dhdr';
+  const title=document.createElement('div');title.className='dtitle';
+  title.textContent='Search: "'+q.toUpperCase()+'" — '+unique.length+' result'+(unique.length!==1?'s':'');
+  dhdr.appendChild(title);
+
+  const tw=document.createElement('div');tw.className='tw';
+  const tbl=document.createElement('table');
+  const thead=document.createElement('thead');const hrow=document.createElement('tr');
+  ['Ticker','Theme','Price','Vol ×','ATR/50MA',...TFS.map(t=>t==='today'?'Today':t)].forEach((lbl,i)=>{
+    const th=document.createElement('th');th.textContent=lbl;
+    th.style.textAlign=i<2?'left':'right';hrow.appendChild(th);
+  });
+  thead.appendChild(hrow);tbl.appendChild(thead);
+
+  const tbody=document.createElement('tbody');
+  unique.forEach(r=>{
+    const tr=document.createElement('tr');
+    const tdTk=document.createElement('td');
+    const tkS=document.createElement('span');tkS.className='tk';tkS.textContent=r.ticker;
+    tkS.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
+    tdTk.appendChild(tkS);tr.appendChild(tdTk);
+    const tdTh=document.createElement('td');tdTh.style.cssText='font-size:11px;color:var(--text3)';
+    tdTh.textContent=r.theme;tr.appendChild(tdTh);
+    const tdP=document.createElement('td');tdP.style.cssText='text-align:right;color:var(--text)';
+    tdP.textContent=r.price!=null?'$'+Number(r.price).toFixed(2):'—';tr.appendChild(tdP);
+    const tdV=document.createElement('td');tdV.appendChild(volChip(r.volume,r.avgVolume));tr.appendChild(tdV);
+    const tdAM=document.createElement('td');tdAM.appendChild(atrBar(r.atrMA??null));tr.appendChild(tdAM);
+    TFS.forEach(t=>{const td=document.createElement('td');td.appendChild(miniBar(r[t]??null));tr.appendChild(td);});
+    tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody);tw.appendChild(tbl);
+  dv.append(dhdr,tw);
+  main.innerHTML='';main.appendChild(dv);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+if(!loadCache())renderMain();
+</script>
+</body>
+</html>
