@@ -117,6 +117,10 @@ tr:hover td{background:var(--bg3)}
 ::-webkit-scrollbar{width:6px;height:10px}::-webkit-scrollbar-track{background:var(--bg3);border-radius:4px}
 ::-webkit-scrollbar-thumb{background:var(--text3);border-radius:4px}
 ::-webkit-scrollbar-thumb:hover{background:var(--text2)}
+.tt{position:fixed;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:8px 10px;max-width:320px;font-size:12px;color:var(--text2);z-index:9999;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.4);display:none;line-height:1.4}
+.tt-formula{margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--text3)}
+[data-tt]{cursor:help}
+[data-tt]:focus{outline:1px dotted var(--text3);outline-offset:2px}
 </style>
 </head>
 <body>
@@ -388,6 +392,7 @@ function renderSectors(){
   const hvol2=document.createElement('div');hvol2.className='lhdr-tf';hvol2.style.cssText='width:52px;text-align:right;font-size:9px;color:#ccc;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);flex-shrink:0';hvol2.textContent='ATR%';
   const hrs=document.createElement('div');hrs.className='lhdr-rs';hrs.textContent='RS';
   const hcnt=document.createElement('div');hcnt.className='lhdr-cnt';hcnt.textContent='#';
+  setTT(hvol2,'vol_pct'); setTT(hrs,'rs');
   hdr.append(hvol2,hrs,hcnt);
 
   const body=document.createElement('div');
@@ -508,6 +513,58 @@ function heatBg(v){
   if(v>=5)return'#005c34';if(v>=3)return'#007840';if(v>=1)return'#009152';
   if(v>=0)return'#004d28';if(v>=-1)return'#5c000f';if(v>=-3)return'#7a0018';
   if(v>=-5)return'#990022';return'#b8002a';
+}
+
+// ── TOOLTIPS ─────────────────────────────────────────────────────────────────
+const TOOLTIPS={
+  vol_x:{def:"Today's share volume vs. yesterday's. 1.5× = 50% more shares traded today than yesterday.",formula:"vol × = today's volume ÷ yesterday's volume"},
+  atr:{def:"Average True Range over the last 14 days, in dollars — how much a share typically moves in a day. $0.63 means typical daily swings of ~$0.63.",formula:"ATR = 14-day Wilder smoothing of daily true range"},
+  vol_pct:{def:"Average daily price range (ATR) as a % of price — measures typical volatility. 4% means typical daily swings around ~4% of the stock's price.",formula:"vol % = ATR ÷ price × 100"},
+  atr_ma:{def:"How far current price has stretched from its 50-day moving average, measured in ATR units. +3.0 means price is 3 ATRs above the 50MA (extended); −2.0 means 2 ATRs below.",formula:"ATR/50MA = (price − 50-day MA) ÷ ATR"},
+  rs:{def:"Relative Strength rank, 1–98 — how strong this theme's performance is across 5 timeframes vs. all other themes. 50 = median, 80+ = strong, 20− = weak.",formula:"RS = weighted rank of [today×2, 1W×2, 1M×1.5, 3M×1, YTD×0.5], normalized 1–98"}
+};
+
+let ttPop=null;
+function showTooltip(target,key){
+  const c=TOOLTIPS[key]; if(!c||!target) return;
+  if(!ttPop){
+    ttPop=document.createElement('div');
+    ttPop.className='tt';
+    ttPop.innerHTML='<div class="tt-def"></div><div class="tt-formula"></div>';
+    document.body.appendChild(ttPop);
+  }
+  ttPop.querySelector('.tt-def').textContent=c.def;
+  ttPop.querySelector('.tt-formula').textContent=c.formula;
+  ttPop.style.display='block';
+  const r=target.getBoundingClientRect();
+  const pr=ttPop.getBoundingClientRect();
+  const vh=window.innerHeight, vw=window.innerWidth;
+  let top=r.bottom+6;
+  if(top+pr.height>vh-8) top=Math.max(8,r.top-pr.height-6);
+  let left=r.left+(r.width-pr.width)/2;
+  if(left<8) left=8;
+  if(left+pr.width>vw-8) left=vw-pr.width-8;
+  ttPop.style.top=top+'px';
+  ttPop.style.left=left+'px';
+}
+function hideTooltip(){ if(ttPop) ttPop.style.display='none'; }
+window.addEventListener('scroll',hideTooltip,{passive:true,capture:true});
+window.addEventListener('resize',hideTooltip,{passive:true});
+
+function setTT(el,key){
+  if(!el||!TOOLTIPS[key]||el.dataset.ttWired==='1') return;
+  el.dataset.tt=key;
+  el.dataset.ttWired='1';
+  el.tabIndex=0;
+  el.addEventListener('mouseenter',()=>showTooltip(el,key));
+  el.addEventListener('focus',()=>showTooltip(el,key));
+  el.addEventListener('mouseleave',hideTooltip);
+  el.addEventListener('blur',hideTooltip);
+  el.addEventListener('click',hideTooltip);
+}
+
+function wireTooltips(root){
+  (root||document).querySelectorAll('[data-tt]:not([data-tt-wired])').forEach(el=>setTT(el,el.dataset.tt));
 }
 
 function computeRS(){
@@ -751,6 +808,7 @@ function renderList(filter=''){
   const hvol=document.createElement('div');hvol.className='lhdr-tf';hvol.style.cssText='width:52px;text-align:right;font-size:9px;color:#ccc;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);flex-shrink:0';hvol.textContent='Vol %';
   const hrs=document.createElement('div');hrs.className='lhdr-rs';hrs.textContent='RS';
   const hcnt=document.createElement('div');hcnt.className='lhdr-cnt';hcnt.textContent='#';
+  setTT(hvol,'vol_pct'); setTT(hrs,'rs');
   hdr.append(hvol,hrs,hcnt);
 
   const body=document.createElement('div');
@@ -834,8 +892,8 @@ function renderDrill(filter=''){
   const tw=document.createElement('div');tw.className='tw';
   const tbl=document.createElement('table');
   const thead=document.createElement('thead');const hrow=document.createElement('tr');
-  const mkH=(label,col)=>{const h=document.createElement('th');h.textContent=label;if(drillSort.col===col)h.className=drillSort.dir;h.style.textAlign=col==='ticker'?'left':'right';h.addEventListener('click',()=>{drillSort.dir=drillSort.col===col&&drillSort.dir==='desc'?'asc':'desc';drillSort.col=col;renderDrill(filter);});return h;};
-  hrow.append(mkH('Ticker','ticker'),mkH('Price','price'),mkH('Vol ×','vol'),mkH('ATR','atr'),mkH('Vol %','atrPct'),mkH('ATR/50MA','atrMA'));
+  const mkH=(label,col,tt)=>{const h=document.createElement('th');h.textContent=label;if(drillSort.col===col)h.className=drillSort.dir;h.style.textAlign=col==='ticker'?'left':'right';h.addEventListener('click',()=>{drillSort.dir=drillSort.col===col&&drillSort.dir==='desc'?'asc':'desc';drillSort.col=col;renderDrill(filter);});if(tt)setTT(h,tt);return h;};
+  hrow.append(mkH('Ticker','ticker'),mkH('Price','price'),mkH('Vol ×','vol','vol_x'),mkH('ATR','atr','atr'),mkH('Vol %','atrPct','vol_pct'),mkH('ATR/50MA','atrMA','atr_ma'));
   TFS.forEach(col=>hrow.appendChild(mkH(col==='today'?'Today':col,col)));
   thead.appendChild(hrow);tbl.appendChild(thead);
 
@@ -1135,13 +1193,14 @@ function buildScanResults(thresh, volOnly, minAtrPct, minDVol, direction, body){
     '<div style="width:75px;text-align:right;flex-shrink:0">Price</div>'+
     '<div style="width:75px;text-align:right;flex-shrink:0">50MA</div>'+
     '<div style="width:90px;text-align:right;flex-shrink:0">% from MA</div>'+
-    '<div style="width:65px;text-align:right;flex-shrink:0">ATR</div>'+
-    '<div style="width:65px;text-align:right;flex-shrink:0">Vol %</div>'+
-    '<div style="width:90px;text-align:right;flex-shrink:0">ATR/50MA</div>'+
-    '<div style="width:70px;text-align:right;flex-shrink:0">Vol ×</div>'+
+    '<div data-tt="atr" style="width:65px;text-align:right;flex-shrink:0">ATR</div>'+
+    '<div data-tt="vol_pct" style="width:65px;text-align:right;flex-shrink:0">Vol %</div>'+
+    '<div data-tt="atr_ma" style="width:90px;text-align:right;flex-shrink:0">ATR/50MA</div>'+
+    '<div data-tt="vol_x" style="width:70px;text-align:right;flex-shrink:0">Vol ×</div>'+
     '<div style="width:75px;text-align:right;flex-shrink:0">AvgVol $M</div>'+
     '<div style="width:75px;text-align:right;flex-shrink:0">Today</div>';
   body.appendChild(hdr);
+  wireTooltips(hdr);
 
   results.forEach(r=>{
     const row=document.createElement('div');
@@ -1345,8 +1404,8 @@ function renderPositions(){
       {label:'Entry Date',col:'entry_date'},{label:'Notes',col:null},{label:'Price',col:'price'},{label:'Entry $',col:'entry'},
       {label:'Shares',col:'shares'},{label:'Mkt Value',col:'mktVal'},
       {label:'P&L $',col:'pnlDollar'},{label:'P&L %',col:'pnlPct'},
-      {label:'% from Entry',col:'pctFromEntry'},{label:'ATR/50MA',col:'atrMA'},
-      {label:'Vol ×',col:'volX'},...TFS.map(t=>({label:t==='today'?'Today':t,col:t})),
+      {label:'% from Entry',col:'pctFromEntry'},{label:'ATR/50MA',col:'atrMA',tt:'atr_ma'},
+      {label:'Vol ×',col:'volX',tt:'vol_x'},...TFS.map(t=>({label:t==='today'?'Today':t,col:t})),
       {label:'',col:null}
     ];
     hdrs.forEach((h,i)=>{
@@ -1365,6 +1424,7 @@ function renderPositions(){
       } else {
         th.textContent=h.label;
       }
+      if(h.tt) setTT(th,h.tt);
       hrow.appendChild(th);
     });
     thead.appendChild(hrow);tbl.appendChild(thead);
@@ -1774,12 +1834,13 @@ function buildGaps(minGap, minDVol, volOnly, body){
     '<div style="flex:1">Theme</div>'+
     '<div style="width:90px;text-align:right;flex-shrink:0">Gap %</div>'+
     '<div style="width:75px;text-align:right;flex-shrink:0">Price</div>'+
-    '<div style="width:80px;text-align:right;flex-shrink:0">ATR/50MA</div>'+
-    '<div style="width:70px;text-align:right;flex-shrink:0">Vol ×</div>'+
+    '<div data-tt="atr_ma" style="width:80px;text-align:right;flex-shrink:0">ATR/50MA</div>'+
+    '<div data-tt="vol_x" style="width:70px;text-align:right;flex-shrink:0">Vol ×</div>'+
     '<div style="width:80px;text-align:right;flex-shrink:0">AvgVol $M</div>'+
     '<div style="width:75px;text-align:right;flex-shrink:0">1W</div>'+
     '<div style="width:75px;text-align:right;flex-shrink:0">1M</div>';
   body.appendChild(hdr);
+  wireTooltips(hdr);
 
   const gapSession=getMarketSession();
   const mkSection=(title,rows,isUp)=>{
@@ -2007,15 +2068,16 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
   hdr.innerHTML=
     '<div style="width:60px;flex-shrink:0">Ticker</div>'+
     '<div style="flex:1">Theme</div>'+
-    '<div style="width:100px;text-align:right;flex-shrink:0">ATR/50MA</div>'+
+    '<div data-tt="atr_ma" style="width:100px;text-align:right;flex-shrink:0">ATR/50MA</div>'+
     '<div style="width:75px;text-align:right;flex-shrink:0">Price</div>'+
-    '<div style="width:70px;text-align:right;flex-shrink:0">Vol %</div>'+
-    '<div style="width:70px;text-align:right;flex-shrink:0">Vol ×</div>'+
+    '<div data-tt="vol_pct" style="width:70px;text-align:right;flex-shrink:0">Vol %</div>'+
+    '<div data-tt="vol_x" style="width:70px;text-align:right;flex-shrink:0">Vol ×</div>'+
     '<div style="width:80px;text-align:right;flex-shrink:0">AvgVol $M</div>'+
     '<div style="width:80px;text-align:right;flex-shrink:0">Today</div>'+
     '<div style="width:75px;text-align:right;flex-shrink:0">1W</div>'+
     '<div style="width:75px;text-align:right;flex-shrink:0">1M</div>';
   body.appendChild(hdr);
+  wireTooltips(hdr);
 
   results.forEach(r=>{
     const isAbove=r.atrMA>0;
