@@ -514,6 +514,58 @@ function heatBg(v){
   if(v>=-5)return'#990022';return'#b8002a';
 }
 
+// ── TOOLTIPS ─────────────────────────────────────────────────────────────────
+const TOOLTIPS={
+  vol_x:{def:"Today's share volume vs. yesterday's. 1.5× = 50% more shares traded today than yesterday.",formula:"vol × = today's volume ÷ yesterday's volume"},
+  atr:{def:"Average True Range over the last 14 days, in dollars — how much a share typically moves in a day. $0.63 means typical daily swings of ~$0.63.",formula:"ATR = 14-day Wilder smoothing of daily true range"},
+  vol_pct:{def:"Average daily price range (ATR) as a % of price — measures typical volatility. 4% means typical daily swings around ~4% of the stock's price.",formula:"vol % = ATR ÷ price × 100"},
+  atr_ma:{def:"How far current price has stretched from its 50-day moving average, measured in ATR units. +3.0 means price is 3 ATRs above the 50MA (extended); −2.0 means 2 ATRs below.",formula:"ATR/50MA = (price − 50-day MA) ÷ ATR"},
+  rs:{def:"Relative Strength rank, 1–98 — how strong this theme's performance is across 5 timeframes vs. all other themes. 50 = median, 80+ = strong, 20− = weak.",formula:"RS = weighted rank of [today×2, 1W×2, 1M×1.5, 3M×1, YTD×0.5], normalized 1–98"}
+};
+
+let ttPop=null;
+function showTooltip(target,key){
+  const c=TOOLTIPS[key]; if(!c||!target) return;
+  if(!ttPop){
+    ttPop=document.createElement('div');
+    ttPop.className='tt';
+    ttPop.innerHTML='<div class="tt-def"></div><div class="tt-formula"></div>';
+    document.body.appendChild(ttPop);
+  }
+  ttPop.querySelector('.tt-def').textContent=c.def;
+  ttPop.querySelector('.tt-formula').textContent=c.formula;
+  ttPop.style.display='block';
+  const r=target.getBoundingClientRect();
+  const pr=ttPop.getBoundingClientRect();
+  const vh=window.innerHeight, vw=window.innerWidth;
+  let top=r.bottom+6;
+  if(top+pr.height>vh-8) top=Math.max(8,r.top-pr.height-6);
+  let left=r.left+(r.width-pr.width)/2;
+  if(left<8) left=8;
+  if(left+pr.width>vw-8) left=vw-pr.width-8;
+  ttPop.style.top=top+'px';
+  ttPop.style.left=left+'px';
+}
+function hideTooltip(){ if(ttPop) ttPop.style.display='none'; }
+window.addEventListener('scroll',hideTooltip,{passive:true,capture:true});
+window.addEventListener('resize',hideTooltip,{passive:true});
+
+function setTT(el,key){
+  if(!el||!TOOLTIPS[key]||el.dataset.ttWired==='1') return;
+  el.dataset.tt=key;
+  el.dataset.ttWired='1';
+  el.tabIndex=0;
+  el.addEventListener('mouseenter',()=>showTooltip(el,key));
+  el.addEventListener('focus',()=>showTooltip(el,key));
+  el.addEventListener('mouseleave',hideTooltip);
+  el.addEventListener('blur',hideTooltip);
+  el.addEventListener('click',hideTooltip);
+}
+
+function wireTooltips(root){
+  (root||document).querySelectorAll('[data-tt]:not([data-tt-wired])').forEach(el=>setTT(el,el.dataset.tt));
+}
+
 function computeRS(){
   const TFS=['today','1W','1M','3M','YTD'];
   const W={today:2,'1W':2,'1M':1.5,'3M':1,'YTD':0.5};
