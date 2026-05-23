@@ -2068,15 +2068,16 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
   hdr.innerHTML=
     '<div style="width:60px;flex-shrink:0">Ticker</div>'+
     '<div style="flex:1">Theme</div>'+
-    '<div style="width:100px;text-align:right;flex-shrink:0">ATR/50MA</div>'+
+    '<div data-tt="atr_ma" style="width:100px;text-align:right;flex-shrink:0">ATR/50MA</div>'+
     '<div style="width:75px;text-align:right;flex-shrink:0">Price</div>'+
-    '<div style="width:70px;text-align:right;flex-shrink:0">Vol %</div>'+
-    '<div style="width:70px;text-align:right;flex-shrink:0">Vol ×</div>'+
+    '<div data-tt="vol_pct" style="width:70px;text-align:right;flex-shrink:0">Vol %</div>'+
+    '<div data-tt="vol_x" style="width:70px;text-align:right;flex-shrink:0">Vol ×</div>'+
     '<div style="width:80px;text-align:right;flex-shrink:0">AvgVol $M</div>'+
     '<div style="width:80px;text-align:right;flex-shrink:0">Today</div>'+
     '<div style="width:75px;text-align:right;flex-shrink:0">1W</div>'+
     '<div style="width:75px;text-align:right;flex-shrink:0">1M</div>';
   body.appendChild(hdr);
+  wireTooltips(hdr);
 
   results.forEach(r=>{
     const isAbove=r.atrMA>0;
