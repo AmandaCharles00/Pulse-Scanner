@@ -392,6 +392,7 @@ function renderSectors(){
   const hvol2=document.createElement('div');hvol2.className='lhdr-tf';hvol2.style.cssText='width:52px;text-align:right;font-size:9px;color:#ccc;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);flex-shrink:0';hvol2.textContent='ATR%';
   const hrs=document.createElement('div');hrs.className='lhdr-rs';hrs.textContent='RS';
   const hcnt=document.createElement('div');hcnt.className='lhdr-cnt';hcnt.textContent='#';
+  setTT(hvol2,'vol_pct'); setTT(hrs,'rs');
   hdr.append(hvol2,hrs,hcnt);
 
   const body=document.createElement('div');
