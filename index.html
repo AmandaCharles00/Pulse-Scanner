@@ -890,8 +890,8 @@ function renderDrill(filter=''){
   const tw=document.createElement('div');tw.className='tw';
   const tbl=document.createElement('table');
   const thead=document.createElement('thead');const hrow=document.createElement('tr');
-  const mkH=(label,col)=>{const h=document.createElement('th');h.textContent=label;if(drillSort.col===col)h.className=drillSort.dir;h.style.textAlign=col==='ticker'?'left':'right';h.addEventListener('click',()=>{drillSort.dir=drillSort.col===col&&drillSort.dir==='desc'?'asc':'desc';drillSort.col=col;renderDrill(filter);});return h;};
-  hrow.append(mkH('Ticker','ticker'),mkH('Price','price'),mkH('Vol ×','vol'),mkH('ATR','atr'),mkH('Vol %','atrPct'),mkH('ATR/50MA','atrMA'));
+  const mkH=(label,col,tt)=>{const h=document.createElement('th');h.textContent=label;if(drillSort.col===col)h.className=drillSort.dir;h.style.textAlign=col==='ticker'?'left':'right';h.addEventListener('click',()=>{drillSort.dir=drillSort.col===col&&drillSort.dir==='desc'?'asc':'desc';drillSort.col=col;renderDrill(filter);});if(tt)setTT(h,tt);return h;};
+  hrow.append(mkH('Ticker','ticker'),mkH('Price','price'),mkH('Vol ×','vol','vol_x'),mkH('ATR','atr','atr'),mkH('Vol %','atrPct','vol_pct'),mkH('ATR/50MA','atrMA','atr_ma'));
   TFS.forEach(col=>hrow.appendChild(mkH(col==='today'?'Today':col,col)));
   thead.appendChild(hrow);tbl.appendChild(thead);
 
