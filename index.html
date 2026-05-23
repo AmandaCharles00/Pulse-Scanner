@@ -808,6 +808,7 @@ function renderList(filter=''){
   const hvol=document.createElement('div');hvol.className='lhdr-tf';hvol.style.cssText='width:52px;text-align:right;font-size:9px;color:#ccc;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);flex-shrink:0';hvol.textContent='Vol %';
   const hrs=document.createElement('div');hrs.className='lhdr-rs';hrs.textContent='RS';
   const hcnt=document.createElement('div');hcnt.className='lhdr-cnt';hcnt.textContent='#';
+  setTT(hvol,'vol_pct'); setTT(hrs,'rs');
   hdr.append(hvol,hrs,hcnt);
 
   const body=document.createElement('div');
