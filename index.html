@@ -1404,8 +1404,8 @@ function renderPositions(){
       {label:'Entry Date',col:'entry_date'},{label:'Notes',col:null},{label:'Price',col:'price'},{label:'Entry $',col:'entry'},
       {label:'Shares',col:'shares'},{label:'Mkt Value',col:'mktVal'},
       {label:'P&L $',col:'pnlDollar'},{label:'P&L %',col:'pnlPct'},
-      {label:'% from Entry',col:'pctFromEntry'},{label:'ATR/50MA',col:'atrMA'},
-      {label:'Vol ×',col:'volX'},...TFS.map(t=>({label:t==='today'?'Today':t,col:t})),
+      {label:'% from Entry',col:'pctFromEntry'},{label:'ATR/50MA',col:'atrMA',tt:'atr_ma'},
+      {label:'Vol ×',col:'volX',tt:'vol_x'},...TFS.map(t=>({label:t==='today'?'Today':t,col:t})),
       {label:'',col:null}
     ];
     hdrs.forEach((h,i)=>{
@@ -1424,6 +1424,7 @@ function renderPositions(){
       } else {
         th.textContent=h.label;
       }
+      if(h.tt) setTT(th,h.tt);
       hrow.appendChild(th);
     });
     thead.appendChild(hrow);tbl.appendChild(thead);
