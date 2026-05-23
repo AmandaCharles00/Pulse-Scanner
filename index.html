@@ -2447,7 +2447,7 @@ async function removeFromWatchlist(ticker){
 
 // ── TOOLTIPS ─────────────────────────────────────────────────────────────────
 const COLUMN_TIPS = {
-  "Vol x":     "Today's volume divided by yesterday's volume. Values above 1.5x (amber) or 2x (green) indicate elevated activity.",
+  "Vol ×":     "Today's volume divided by yesterday's volume. Values above 1.5x (amber) or 2x (green) indicate elevated activity.",
   "ATR":       "14-period Average True Range in dollars. Measures the average daily price movement range over the last 14 trading days.",
   "Vol %":     "ATR divided by Price x 100. Shows daily volatility as a percentage of price — useful for comparing stocks at different price levels.",
   "ATR/50MA":  "(Price minus 50-day MA) divided by ATR. How many ATR units price is above (+) or below (-) the 50-day moving average. Matches the TradingView companion script.",
@@ -2474,17 +2474,27 @@ function mkH(label, col){
   const tip=COLUMN_TIPS[label];
   if(tip){
     h.style.cursor='help';
-    h.style.position='relative';
     const inner=document.createElement('span');
     inner.style.cssText='border-bottom:1px dashed var(--text3);padding-bottom:1px';
     inner.textContent=label+(drillSort.col===col?(drillSort.dir==='desc'?' ▼':' ▲'):'');
-    // Custom tooltip div
+    // Tooltip div uses position:fixed so it isn't clipped by the .main/.dv/.tw overflow chain
     const tipDiv=document.createElement('div');
-    tipDiv.style.cssText='display:none;position:absolute;bottom:130%;left:50%;transform:translateX(-50%);background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:8px 10px;font-size:11px;font-family:var(--sans);line-height:1.5;width:220px;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.5);font-weight:400;text-align:left;white-space:normal;pointer-events:none';
+    tipDiv.style.cssText='display:none;position:fixed;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:8px 10px;font-size:11px;font-family:var(--sans);line-height:1.5;width:220px;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.5);font-weight:400;text-align:left;white-space:normal;pointer-events:none';
     tipDiv.textContent=tip;
     h.appendChild(inner);
     h.appendChild(tipDiv);
-    h.addEventListener('mouseenter',()=>tipDiv.style.display='block');
+    h.addEventListener('mouseenter',()=>{
+      const r=h.getBoundingClientRect();
+      tipDiv.style.display='block';
+      const pr=tipDiv.getBoundingClientRect();
+      let top=r.top-pr.height-6;
+      if(top<8) top=r.bottom+6;
+      let left=r.left+(r.width-pr.width)/2;
+      if(left<8) left=8;
+      if(left+pr.width>window.innerWidth-8) left=window.innerWidth-pr.width-8;
+      tipDiv.style.top=top+'px';
+      tipDiv.style.left=left+'px';
+    });
     h.addEventListener('mouseleave',()=>tipDiv.style.display='none');
   } else {
     h.textContent=label+(drillSort.col===col?(drillSort.dir==='desc'?' ▼':' ▲'):'');
