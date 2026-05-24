@@ -323,6 +323,22 @@ async function deletePositionFromSupabase(id){
 }
 
 
+
+// ── SECTOR → THEME MAPPING ────────────────────────────────────────────────────
+const SECTOR_THEMES = {
+  'xlk': ['semis','memory','optics','edge_ai','cloud','cyber','comp_hw','robotics'],
+  'xlf': ['banks','insurance','asset_mgmt','fintech','fin_data'],
+  'xlv': ['biotech','glp1','med_devices','pharma','hospitals'],
+  'xly': ['cons_cyc','ev','restaurants','luxury','res_const'],
+  'xlp': ['cons_disc','cons_staples'],
+  'xle': ['oil_ep','oil_drill'],
+  'xli': ['defense','aerospace','logistics','build_mat','robotics'],
+  'xlb': ['chemicals','ind_metals','mining','agriculture'],
+  'xlre': ['reit_office','re_dev'],
+  'xlu': ['util_indep','nuclear','clean_e'],
+  'xlc': ['adtech','space'],
+  'igv': ['saas','cloud','cyber'],
+};
 // ── SECTORS ──────────────────────────────────────────────────────────────────
 const SECTORS=[
   {id:'xlk',name:'Technology',etf:'XLK',tickers:['AAPL','MSFT','NVDA','AVGO','AMD','ORCL','CRM','AMAT','KLAC','LRCX','ADBE','NOW','INTU','QCOM','TXN','MU','ARM','ANET','MRVL','ADI']},
@@ -436,6 +452,24 @@ function renderSectors(){
     const cntEl=document.createElement('div');cntEl.className='lcnt';cntEl.textContent=s.tickers.length;
     row.append(atrEl2,rsEl,cntEl);
     body.appendChild(row);
+
+    // Theme sub-list
+    const themeIds=SECTOR_THEMES[s.id]||[];
+    if(themeIds.length){
+      const subRow=document.createElement('div');
+      subRow.style.cssText='display:flex;align-items:center;padding:3px 14px 5px 50px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:4px';
+      themeIds.forEach(tid=>{
+        const th=THEMES.find(t=>t.id===tid);
+        if(!th) return;
+        const chip=document.createElement('span');
+        const tv=stats[tid]?.[tf]??null;
+        chip.style.cssText='font-size:9px;font-family:var(--mono);padding:1px 6px;border-radius:2px;border:1px solid var(--border2);color:'+(tv==null?'var(--text3)':tv>=0?'var(--green)':'var(--red)')+';background:'+(tv==null?'transparent':tv>=0?'var(--gd)':'var(--rd)')+';cursor:pointer;white-space:nowrap';
+        chip.textContent=th.name+(tv!=null?(tv>=0?' +':' ')+tv.toFixed(1)+'%':'');
+        chip.addEventListener('click',()=>openDrill(tid));
+        subRow.appendChild(chip);
+      });
+      body.appendChild(subRow);
+    }
   });
 
   lv.append(hdr,body);main.innerHTML='';main.appendChild(lv);
