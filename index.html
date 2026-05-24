@@ -442,7 +442,7 @@ function renderSectors(){
 }
 let cache={},stats={},view='list',tf='today',tab='sectors';
 let drillId=null,drillSort={col:'today',dir:'desc'},selected=new Set();
-let syncing=false,autoRefreshTimer=null;
+let syncing=false,autoRefreshTimer=null,drillFilter='';
 let alertSettings={atrMA:3.0,volMult:2.0,enabled:true,volFilter:false};
 let triggeredAlerts=[];
 let posSort={col:"pctFromEntry",dir:"desc"};
@@ -811,7 +811,7 @@ function renderHeat(){
 // ── DRILL ─────────────────────────────────────────────────────────────────────
 function openDrill(id){drillId=id;drillSort={col:'today',dir:'desc'};renderDrill();}
 function closeDrill(){drillId=null;renderMain();}
-function renderDrill(filter=''){
+function renderDrill(filter=''){drillFilter=filter;
   const th=THEMES.find(t=>t.id===drillId);if(!th)return;
   const TFS=['today','1W','1M','3M','YTD'];
   const cSz=Object.keys(cache).length;
@@ -2596,7 +2596,7 @@ function mkH(label, col){
     h.textContent=label+(drillSort.col===col?(drillSort.dir==='desc'?' ▼':' ▲'):'');
   }
   h.style.textAlign=col==='ticker'?'left':'right';
-  h.addEventListener('click',()=>{drillSort.dir=drillSort.col===col&&drillSort.dir==='desc'?'asc':'desc';drillSort.col=col;renderDrill(filter);});
+  h.addEventListener('click',()=>{drillSort.dir=drillSort.col===col&&drillSort.dir==='desc'?'asc':'desc';drillSort.col=col;renderDrill(drillFilter);});
   return h;
 }
 
