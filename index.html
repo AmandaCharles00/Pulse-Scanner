@@ -822,6 +822,7 @@ function renderDrill(filter=''){drillFilter=filter;
     if(drillSort.col==='vol'){av=a.volume&&a.avgVolume?a.volume/a.avgVolume:null;bv=b.volume&&b.avgVolume?b.volume/b.avgVolume:null;}
     else if(drillSort.col==='atrMA'){av=a.atrMA??null;bv=b.atrMA??null;}
     else if(drillSort.col==='atr'){av=a.atr??null;bv=b.atr??null;}
+    else if(drillSort.col==='atrPct'){av=(a.atr&&a.price)?a.atr/a.price*100:null;bv=(b.atr&&b.price)?b.atr/b.price*100:null;}
     else{av=a[drillSort.col]??null;bv=b[drillSort.col]??null;}
     if(av==null&&bv==null)return 0;if(av==null)return 1;if(bv==null)return-1;
     return drillSort.dir==='desc'?bv-av:av-bv;
@@ -2568,13 +2569,14 @@ function withTooltip(el, tipText){
 function mkH(label, col){
   const h=document.createElement('th');
   const tip=COLUMN_TIPS[label];
+  let tipDiv=null;
   if(tip){
     h.style.cursor='help';
     const inner=document.createElement('span');
     inner.style.cssText='border-bottom:1px dashed var(--text3);padding-bottom:1px';
     inner.textContent=label+(drillSort.col===col?(drillSort.dir==='desc'?' ▼':' ▲'):'');
     // Tooltip div uses position:fixed so it isn't clipped by the .main/.dv/.tw overflow chain
-    const tipDiv=document.createElement('div');
+    tipDiv=document.createElement('div');
     tipDiv.style.cssText='display:none;position:fixed;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:8px 10px;font-size:11px;font-family:var(--sans);line-height:1.5;width:220px;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.5);font-weight:400;text-align:left;white-space:normal;pointer-events:none';
     tipDiv.textContent=tip;
     h.appendChild(inner);
@@ -2596,7 +2598,14 @@ function mkH(label, col){
     h.textContent=label+(drillSort.col===col?(drillSort.dir==='desc'?' ▼':' ▲'):'');
   }
   h.style.textAlign=col==='ticker'?'left':'right';
-  h.addEventListener('click',()=>{drillSort.dir=drillSort.col===col&&drillSort.dir==='desc'?'asc':'desc';drillSort.col=col;renderDrill(drillFilter);});
+  // Sort click always fires regardless of tooltip
+  h.addEventListener('click',()=>{
+    if(tipDiv) tipDiv.style.display='none';
+    drillSort.dir=drillSort.col===col&&drillSort.dir==='desc'?'asc':'desc';
+    drillSort.col=col;
+    // Update sort indicators on all headers
+    renderDrill(drillFilter);
+  });
   return h;
 }
 
