@@ -600,7 +600,7 @@ async function doSync(){
   const workers=Array.from({length:12},async()=>{while(idx2<tasks.length)await tasks[idx2++]();});
   await Promise.all(workers);
 
-  buildStats();buildSectorStats();checkAlerts();saveCache();
+  buildStats();buildSectorStats();checkAlerts();checkAndPlayAlert();saveCache();
   syncing=false;btn.textContent='⟳ Sync';btn.classList.remove('busy');
   renderMain();scheduleAutoRefresh();
 }
@@ -680,6 +680,7 @@ function loadCache(){
   try{
     const k=localStorage.getItem('tt_key');if(k)document.getElementById('apiKey').value=k;
     const al=localStorage.getItem('tt_alerts');if(al)alertSettings={...alertSettings,...JSON.parse(al)};
+    const sl=localStorage.getItem('tt_sound');if(sl!==null)soundEnabled=sl==='1';
     const tc=localStorage.getItem('tt_cache'),ts=localStorage.getItem('tt_stats'),tt=localStorage.getItem('tt_time');
     if(tc&&ts){
       cache=JSON.parse(tc);stats=JSON.parse(ts);
@@ -938,6 +939,22 @@ function renderAlertSettings(){
   onB.addEventListener('click',()=>{alertSettings.enabled=true;onB.className='as-tog on';offB.className='as-tog';saveCache();checkAlerts();});
   offB.addEventListener('click',()=>{alertSettings.enabled=false;onB.className='as-tog';offB.className='as-tog on';saveCache();document.getElementById('abar').classList.remove('show');});
   tog.append(onB,offB);s1.appendChild(mkRow('Alert Notifications','Show alert bar when thresholds are crossed',tog));
+
+  // Sound toggle
+  const soundTog=document.createElement('div');soundTog.className='as-toggle';
+  const soundOnB=document.createElement('button');soundOnB.className='as-tog'+(soundEnabled?' on':'');soundOnB.textContent='🔔 Sound On';
+  const soundOffB=document.createElement('button');soundOffB.className='as-tog'+(!soundEnabled?' on':'');soundOffB.textContent='🔕 Sound Off';
+  soundOnB.addEventListener('click',()=>{
+    soundEnabled=true;soundOnB.className='as-tog on';soundOffB.className='as-tog';
+    playAlertChime(); // preview sound
+    localStorage.setItem('tt_sound','1');
+  });
+  soundOffB.addEventListener('click',()=>{
+    soundEnabled=false;soundOnB.className='as-tog';soundOffB.className='as-tog on';
+    localStorage.setItem('tt_sound','0');
+  });
+  soundTog.append(soundOnB,soundOffB);
+  s1.appendChild(mkRow('Alert Sound','Play a chime when new alerts are triggered after Sync',soundTog));
 
   const atrIn=document.createElement('input');atrIn.className='as-in';atrIn.type='number';atrIn.value=alertSettings.atrMA;atrIn.step='0.5';atrIn.min='0.5';
   atrIn.addEventListener('change',()=>{alertSettings.atrMA=parseFloat(atrIn.value)||3;saveCache();checkAlerts();});
@@ -2582,6 +2599,46 @@ function mkH(label, col){
   h.addEventListener('click',()=>{drillSort.dir=drillSort.col===col&&drillSort.dir==='desc'?'asc':'desc';drillSort.col=col;renderDrill(filter);});
   return h;
 }
+
+// ── SOUND ALERTS ─────────────────────────────────────────────────────────────
+let audioCtx=null;
+let soundEnabled=true;
+let lastAlertCount=0;
+
+function getAudioCtx(){
+  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playAlertChime(){
+  if(!soundEnabled) return;
+  try{
+    const ctx=getAudioCtx();
+    // Play a short 3-note ascending chime
+    const notes=[523.25, 659.25, 783.99]; // C5, E5, G5
+    notes.forEach((freq,i)=>{
+      const osc=ctx.createOscillator();
+      const gain=ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type='sine';
+      osc.frequency.setValueAtTime(freq,ctx.currentTime+i*0.12);
+      gain.gain.setValueAtTime(0,ctx.currentTime+i*0.12);
+      gain.gain.linearRampToValueAtTime(0.18,ctx.currentTime+i*0.12+0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*0.12+0.35);
+      osc.start(ctx.currentTime+i*0.12);
+      osc.stop(ctx.currentTime+i*0.12+0.35);
+    });
+  }catch(e){console.warn('Audio error:',e);}
+}
+
+function checkAndPlayAlert(){
+  const newCount=triggeredAlerts.length;
+  if(newCount>lastAlertCount&&newCount>0){
+    playAlertChime();
+  }
+  lastAlertCount=newCount;
+}
 // ── MULTI-SELECT ──────────────────────────────────────────────────────────────
 function toggleSel(id,chk){chk.checked?selected.add(id):selected.delete(id);updateSelBar();}
 function updateSelBar(){
@@ -2661,7 +2718,7 @@ function renderTickerSearch(q){
   const tw=document.createElement('div');tw.className='tw';
   const tbl=document.createElement('table');
   const thead=document.createElement('thead');const hrow=document.createElement('tr');
-  ['Ticker','Theme','Price','Vol ×','ATR/50MA',...TFS.map(t=>t==='today'?'Today':t)].forEach((lbl,i)=>{
+  ['Ticker','Theme','Price','Vol ×','ATR','Vol %','ATR/50MA',...TFS.map(t=>t==='today'?'Today':t)].forEach((lbl,i)=>{
     const th=document.createElement('th');th.textContent=lbl;
     th.style.textAlign=i<2?'left':'right';hrow.appendChild(th);
   });
@@ -2679,6 +2736,9 @@ function renderTickerSearch(q){
     const tdP=document.createElement('td');tdP.style.cssText='text-align:right;color:#fff;font-family:var(--mono);font-size:11px';
     tdP.textContent=r.price!=null?'$'+Number(r.price).toFixed(2):'—';tr.appendChild(tdP);
     const tdV=document.createElement('td');tdV.appendChild(volChip(r.volume,r.avgVolume));tr.appendChild(tdV);
+    const tdATR=document.createElement('td');tdATR.style.cssText='text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2)';tdATR.textContent=r.atr!=null?'$'+r.atr.toFixed(2):'—';tr.appendChild(tdATR);
+    const atrPctV=(r.atr&&r.price)?(r.atr/r.price*100):null;
+    const tdVP=document.createElement('td');tdVP.style.cssText='text-align:right;font-family:var(--mono);font-size:11px';tdVP.style.color=atrPctV>=8?'var(--green)':atrPctV>=4?'#fff':'var(--text2)';tdVP.textContent=atrPctV?atrPctV.toFixed(1)+'%':'—';tr.appendChild(tdVP);
     const tdAM=document.createElement('td');tdAM.appendChild(atrBar(r.atrMA??null));tr.appendChild(tdAM);
     TFS.forEach(t=>{const td=document.createElement('td');td.appendChild(miniBar(r[t]??null));tr.appendChild(td);});
     tbody.appendChild(tr);
