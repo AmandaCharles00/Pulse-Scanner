@@ -477,7 +477,7 @@ function renderSectors(){
 let cache={},stats={},view='list',tf='today',tab='sectors';
 let drillId=null,drillSort={col:'today',dir:'desc'},selected=new Set();
 let syncing=false,autoRefreshTimer=null,drillFilter='';
-let alertSettings={atrMA:3.0,volMult:2.0,enabled:true,volFilter:false};
+let alertSettings={atrMA:5.0,volMult:2.0,enabled:true,volFilter:false};
 let triggeredAlerts=[];
 let posSort={col:"pctFromEntry",dir:"desc"};
 let positions=[{"ticker": "VIAV", "shares": 0, "entry": 25.66, "notes": "OG entry 1.15.26; added back at 38.22 on 4.15.26, avg 25.66", "direction": "long"}, {"ticker": "WDC", "shares": 0, "entry": 191.25, "notes": "", "direction": "long"}, {"ticker": "LWLG", "shares": 0, "entry": 6.85, "notes": "", "direction": "long"}, {"ticker": "VRT", "shares": 0, "entry": 176.0, "notes": "", "direction": "long"}, {"ticker": "COHR", "shares": 0, "entry": 252.58, "notes": "OG entry 1.20.26; added back at 313.66 on 4.27.26, avg 252.58", "direction": "long"}, {"ticker": "BE", "shares": 0, "entry": 150.9, "notes": "", "direction": "long"}, {"ticker": "NOK", "shares": 0, "entry": 7.1, "notes": "", "direction": "long"}, {"ticker": "POWL", "shares": 0, "entry": 183.65, "notes": "", "direction": "long"}, {"ticker": "CGON", "shares": 0, "entry": 50.65, "notes": "", "direction": "long"}, {"ticker": "GLW", "shares": 0, "entry": 131.27, "notes": "", "direction": "long"}, {"ticker": "BB", "shares": 0, "entry": 3.89, "notes": "", "direction": "long"}, {"ticker": "MU", "shares": 0, "entry": 410.65, "notes": "", "direction": "long"}, {"ticker": "LITE", "shares": 0, "entry": 739.87, "notes": "", "direction": "long"}, {"ticker": "KEYS", "shares": 0, "entry": 294.63, "notes": "", "direction": "long"}, {"ticker": "WULF", "shares": 0, "entry": 17.54, "notes": "", "direction": "long"}, {"ticker": "TSLA", "shares": 0, "entry": 360.58, "notes": "", "direction": "long"}, {"ticker": "JAZZ", "shares": 0, "entry": 189.15, "notes": "", "direction": "long"}, {"ticker": "SQM", "shares": 0, "entry": 86.1, "notes": "", "direction": "long"}, {"ticker": "CCJ", "shares": 0, "entry": 122.1, "notes": "", "direction": "long"}, {"ticker": "SSRM", "shares": 0, "entry": 30.47, "notes": "", "direction": "long"}, {"ticker": "UAMY", "shares": 0, "entry": 10.6, "notes": "", "direction": "long"}, {"ticker": "LULU", "shares": 0, "entry": 159.8, "notes": "", "direction": "short"}, {"ticker": "DPZ", "shares": 0, "entry": 352.86, "notes": "", "direction": "short"}, {"ticker": "TER", "shares": 0, "entry": 322.22, "notes": "", "direction": "short"}]; // [{ticker, shares, entry, notes}]
@@ -671,10 +671,11 @@ function checkAlerts(){
       // $80M/day avg dollar volume filter
       const avgDVolA=(d.price&&d.avgVolume)?(d.price*d.avgVolume/1e6):null;
       if(!avgDVolA||avgDVolA<80) return;
+      const alertTime=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
       if(d.atrMA!=null&&Math.abs(d.atrMA)>=alertSettings.atrMA)
-        triggeredAlerts.push({ticker:tk,theme:th.name,type:'atr',msg:(d.atrMA>0?'ABOVE':'BELOW')+' 50MA by '+Math.abs(d.atrMA).toFixed(2)+'x ATR',val:d.atrMA});
+        triggeredAlerts.push({ticker:tk,theme:th.name,type:'atr',msg:(d.atrMA>0?'ABOVE':'BELOW')+' 50MA by '+Math.abs(d.atrMA).toFixed(2)+'x ATR',val:d.atrMA,time:alertTime});
       if(d.volume&&d.avgVolume&&d.volume/d.avgVolume>=alertSettings.volMult)
-        triggeredAlerts.push({ticker:tk,theme:th.name,type:'vol',msg:'Volume '+((d.volume/d.avgVolume).toFixed(1))+'x avg',val:d.volume/d.avgVolume});
+        triggeredAlerts.push({ticker:tk,theme:th.name,type:'vol',msg:'Volume '+((d.volume/d.avgVolume).toFixed(1))+'x avg',val:d.volume/d.avgVolume,time:alertTime});
     });
   });
   renderAlertBar();
@@ -690,7 +691,8 @@ function renderAlertBar(){
     tk.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+a.ticker,'_blank'));
     const th=document.createElement('span');th.style.cssText='color:#aab;width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0';th.textContent=a.theme;
     const msg=document.createElement('span');msg.className='amsg';msg.textContent='⚡ '+a.msg;
-    item.append(tk,th,msg);bar.appendChild(item);
+    const ts=document.createElement('span');ts.style.cssText='color:var(--text3);font-size:9px;font-family:var(--mono);flex-shrink:0;margin-left:6px';ts.textContent=a.time||'';
+    item.append(tk,th,msg,ts);bar.appendChild(item);
   });
   if(triggeredAlerts.length>8){const m=document.createElement('div');m.style.cssText='font-size:10px;color:var(--text3);font-family:var(--mono)';m.textContent='+'+(triggeredAlerts.length-8)+' more — see Alerts tab';bar.appendChild(m);}
 }
@@ -993,7 +995,7 @@ function renderAlertSettings(){
 
   const atrIn=document.createElement('input');atrIn.className='as-in';atrIn.type='number';atrIn.value=alertSettings.atrMA;atrIn.step='0.5';atrIn.min='0.5';
   atrIn.addEventListener('change',()=>{alertSettings.atrMA=parseFloat(atrIn.value)||3;saveCache();checkAlerts();});
-  s1.appendChild(mkRow('ATR/50MA Threshold','Alert when price is ≥ this many ATRs from 50MA (default: 3.0)',atrIn));
+  s1.appendChild(mkRow('ATR/50MA Threshold','Alert when price is ≥ this many ATRs from 50MA (default: 5.0)',atrIn));
 
   const volIn=document.createElement('input');volIn.className='as-in';volIn.type='number';volIn.value=alertSettings.volMult;volIn.step='0.5';volIn.min='1';
   volIn.addEventListener('change',()=>{alertSettings.volMult=parseFloat(volIn.value)||2;saveCache();checkAlerts();});
@@ -1008,7 +1010,8 @@ function renderAlertSettings(){
       tk.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+a.ticker,'_blank'));
       const th2=document.createElement('span');th2.style.cssText='width:130px;font-size:11px;color:#aab;flex-shrink:0';th2.textContent=a.theme;
       const msg=document.createElement('span');msg.style.color='var(--amber)';msg.textContent=a.msg;
-      row.append(tk,th2,msg);s2.appendChild(row);
+      const ts2=document.createElement('span');ts2.style.cssText='color:var(--text3);font-size:9px;font-family:var(--mono);flex-shrink:0;margin-left:auto';ts2.textContent=a.time||'';
+      row.append(tk,th2,msg,ts2);s2.appendChild(row);
     });
     asv.appendChild(s2);
   } else {
