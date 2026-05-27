@@ -691,7 +691,7 @@ function renderAlertBar(){
     tk.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+a.ticker,'_blank'));
     const th=document.createElement('span');th.style.cssText='color:#aab;width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0';th.textContent=a.theme;
     const msg=document.createElement('span');msg.className='amsg';msg.textContent='⚡ '+a.msg;
-    const ts=document.createElement('span');ts.style.cssText='color:var(--text3);font-size:9px;font-family:var(--mono);flex-shrink:0;margin-left:6px';ts.textContent=a.time||'';
+    const ts=document.createElement('span');ts.style.cssText='color:#fff;font-size:10px;font-family:var(--mono);flex-shrink:0;margin-left:8px;opacity:0.7';ts.textContent=a.time||'';
     item.append(tk,th,msg,ts);bar.appendChild(item);
   });
   if(triggeredAlerts.length>8){const m=document.createElement('div');m.style.cssText='font-size:10px;color:var(--text3);font-family:var(--mono)';m.textContent='+'+(triggeredAlerts.length-8)+' more — see Alerts tab';bar.appendChild(m);}
@@ -715,7 +715,13 @@ function saveCache(){
 function loadCache(){
   try{
     const k=localStorage.getItem('tt_key');if(k)document.getElementById('apiKey').value=k;
-    const al=localStorage.getItem('tt_alerts');if(al)alertSettings={...alertSettings,...JSON.parse(al)};
+    const al=localStorage.getItem('tt_alerts');
+    if(al){
+      const saved=JSON.parse(al);
+      // Only restore if saved threshold is at least our minimum default
+      if(saved.atrMA&&saved.atrMA<5.0) delete saved.atrMA;
+      alertSettings={...alertSettings,...saved};
+    }
     const sl=localStorage.getItem('tt_sound');if(sl!==null)soundEnabled=sl==='1';
     const tc=localStorage.getItem('tt_cache'),ts=localStorage.getItem('tt_stats'),tt=localStorage.getItem('tt_time');
     if(tc&&ts){
@@ -1010,7 +1016,7 @@ function renderAlertSettings(){
       tk.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+a.ticker,'_blank'));
       const th2=document.createElement('span');th2.style.cssText='width:130px;font-size:11px;color:#aab;flex-shrink:0';th2.textContent=a.theme;
       const msg=document.createElement('span');msg.style.color='var(--amber)';msg.textContent=a.msg;
-      const ts2=document.createElement('span');ts2.style.cssText='color:var(--text3);font-size:9px;font-family:var(--mono);flex-shrink:0;margin-left:auto';ts2.textContent=a.time||'';
+      const ts2=document.createElement('span');ts2.style.cssText='color:#fff;font-size:10px;font-family:var(--mono);flex-shrink:0;margin-left:auto;opacity:0.7';ts2.textContent=a.time||'';
       row.append(tk,th2,msg,ts2);s2.appendChild(row);
     });
     asv.appendChild(s2);
