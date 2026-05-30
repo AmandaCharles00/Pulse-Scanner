@@ -728,7 +728,7 @@ function getThemesWithWatchlist(){
 function buildStats(){
   THEMES.forEach(th=>{
     const e=cache[th.etf];
-    if(e&&(e.today!=null||e['1W']!=null)){stats[th.id]={today:e.today,'1W':e['1W'],'1M':e['1M'],'3M':e['3M'],YTD:e.YTD};}
+    if(e&&(e.today!=null||e['1W']!=null)){stats[th.id]={today:e.today,'1W':e['1W'],'1M':e['1M'],'3M':e['3M'],'6M':e['6M']??null,YTD:e.YTD};}
     else{
       const t=[],w=[],m=[],q=[],sm=[],y=[];
       th.tickers.forEach(tk=>{const c=cache[tk];if(!c)return;if(c.today!=null)t.push(c.today);if(c['1W']!=null)w.push(c['1W']);if(c['1M']!=null)m.push(c['1M']);if(c['3M']!=null)q.push(c['3M']);if(c['6M']!=null)sm.push(c['6M']);if(c.YTD!=null)y.push(c.YTD);});
