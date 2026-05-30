@@ -363,11 +363,11 @@ function buildSectorStats(){
   SECTORS.forEach(s=>{
     const e=cache[s.etf];
     if(e&&(e.today!=null||e['1W']!=null)){
-      sectorStats[s.id]={today:e.today,'1W':e['1W'],'1M':e['1M'],'3M':e['3M'],YTD:e.YTD};
+      sectorStats[s.id]={today:e.today,'1W':e['1W'],'1M':e['1M'],'3M':e['3M'],'6M':e['6M']||null,YTD:e.YTD};
     } else {
-      const t=[],w=[],m=[],q=[],y=[];
-      s.tickers.forEach(tk=>{const c2=cache[tk];if(!c2)return;if(c2.today!=null)t.push(c2.today);if(c2['1W']!=null)w.push(c2['1W']);if(c2['1M']!=null)m.push(c2['1M']);if(c2['3M']!=null)q.push(c2['3M']);if(c2.YTD!=null)y.push(c2.YTD);});
-      sectorStats[s.id]={today:avg(t),'1W':avg(w),'1M':avg(m),'3M':avg(q),YTD:avg(y)};
+      const t=[],w=[],m=[],q=[],sm=[],y=[];
+      s.tickers.forEach(tk=>{const c2=cache[tk];if(!c2)return;if(c2.today!=null)t.push(c2.today);if(c2['1W']!=null)w.push(c2['1W']);if(c2['1M']!=null)m.push(c2['1M']);if(c2['3M']!=null)q.push(c2['3M']);if(c2['6M']!=null)sm.push(c2['6M']);if(c2.YTD!=null)y.push(c2.YTD);});
+      sectorStats[s.id]={today:avg(t),'1W':avg(w),'1M':avg(m),'3M':avg(q),'6M':avg(sm),YTD:avg(y)};
     }
   });
 }
