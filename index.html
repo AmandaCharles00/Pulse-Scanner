@@ -489,7 +489,7 @@ function renderSectors(){
     const themeIds=SECTOR_THEMES[s.id]||[];
     if(themeIds.length){
       const subRow=document.createElement('div');
-      subRow.style.cssText='display:flex;align-items:center;padding:3px 14px 5px 50px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:4px';
+      subRow.style.cssText='display:flex;align-items:center;padding:4px 14px 6px 14px;flex-wrap:wrap;gap:4px;background:var(--bg3)';
       // Sort theme chips by current timeframe performance
       const sortedThemeIds=[...themeIds].sort((a,b)=>{
         const av=stats[a]?.[tf]??null;
@@ -938,7 +938,7 @@ function renderHeat(){
   const main=document.getElementById('main');
   // Timeframe selector inside heat view
   const tfBar=document.createElement('div');
-  tfBar.style.cssText='display:flex;gap:4px;padding:8px 14px;background:var(--bg2);border-bottom:1px solid var(--border2);flex-shrink:0';
+  tfBar.style.cssText='display:flex;gap:4px;padding:8px 14px;background:var(--bg2);border-bottom:2px solid var(--blue);flex-shrink:0;z-index:5';
   ['today','1W','1M','3M','6M','YTD'].forEach(t=>{
     const btn=document.createElement('button');
     btn.style.cssText='background:'+(tf===t?'var(--blue)':'var(--bg3)')+';border:1px solid '+(tf===t?'var(--blue)':'var(--border2)')+';border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 10px;cursor:pointer';
@@ -946,7 +946,7 @@ function renderHeat(){
     btn.addEventListener('click',()=>{tf=t;renderHeat();});
     tfBar.appendChild(btn);
   });
-  const hv2=document.createElement('div');hv2.style.cssText='display:flex;flex-direction:column;height:100%;overflow:hidden';
+  const hv2=document.createElement('div');hv2.style.cssText='display:flex;flex-direction:column;width:100%;height:100%;overflow:hidden';
   const grid=document.createElement('div');grid.className='hgrid';
   getSorted().forEach(th=>{
     const v=stats[th.id]?.[tf]??null;
