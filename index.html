@@ -450,10 +450,10 @@ function renderSectors(){
     const name=document.createElement('div');name.className='lname';name.textContent=s.name;
     name.style.cursor='default';name.style.fontSize='14px';name.style.fontWeight='500';name.style.color='#fff';
 
-    // Pulse heartbeat SVG
+    // Pulse heartbeat SVG — amplitude normalized to global maxAbs so worst performer is most dramatic
     const pulseW=document.createElement('div');pulseW.style.cssText='width:110px;height:28px;flex-shrink:0;display:flex;align-items:center;margin-right:4px;overflow:hidden';
     const pulseCol=tv==null?'#3a4455':tv>=0?'var(--green)':'var(--red)';
-    const amp=tv!=null?Math.min(Math.abs(tv)*1.8,12):2;const mid=14;const pw=110;
+    const amp=tv!=null?Math.min((Math.abs(tv)/maxAbs)*12,12):1;const mid=14;const pw=110;
     const pp='M0,'+mid+' L'+(pw*0.12)+','+mid+' L'+(pw*0.18)+','+(mid-amp*0.3)+' L'+(pw*0.24)+','+(mid+amp)+' L'+(pw*0.30)+','+(mid-amp*1.2)+' L'+(pw*0.36)+','+(mid+amp*0.6)+' L'+(pw*0.42)+','+mid+' L'+(pw*0.58)+','+mid+' L'+(pw*0.64)+','+(mid-amp*0.3)+' L'+(pw*0.70)+','+(mid+amp)+' L'+(pw*0.76)+','+(mid-amp*1.2)+' L'+(pw*0.82)+','+(mid+amp*0.6)+' L'+(pw*0.88)+','+mid+' L'+pw+','+mid;
     pulseW.innerHTML='<svg width="'+pw+'" height="28" viewBox="0 0 '+pw+' 28" xmlns="http://www.w3.org/2000/svg"><path d="'+pp+'" stroke="'+pulseCol+'" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="'+(tv!=null?'0.9':'0.25')+'"/></svg>';
     row.append(etfBadge,name,pulseW);
