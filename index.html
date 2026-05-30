@@ -480,7 +480,7 @@ function renderSectors(){
     // Theme chips
     const themeIds=SECTOR_THEMES[s.id]||[];
     if(themeIds.length){
-      const subRow=document.createElement('div');subRow.style.cssText='display:flex;align-items:center;padding:4px 14px 6px 14px;flex-wrap:wrap;gap:4px;background:var(--bg3);border-top:1px solid var(--border)';
+      const subRow=document.createElement('div');subRow.style.cssText='display:flex;align-items:center;padding:4px 14px 6px 50px;flex-wrap:wrap;gap:4px;background:var(--bg3);border-top:1px solid var(--border)';
       const sortedIds=[...themeIds].sort((a,b)=>{const av=stats[a]?.[tf]??null,bv=stats[b]?.[tf]??null;if(av==null&&bv==null)return 0;if(av==null)return 1;if(bv==null)return-1;return bv-av;});
       sortedIds.forEach(tid=>{
         const th2=THEMES.find(t=>t.id===tid);if(!th2)return;
