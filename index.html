@@ -641,10 +641,26 @@ async function doSync(){
         for(let i=1;i<bars.length;i++){const b=bars[i],pc2=bars[i-1].c;if(b.h!=null&&b.l!=null&&pc2!=null){const tr=Math.max(b.h-b.l,Math.abs(b.h-pc2),Math.abs(b.l-pc2));allTRs.push(Math.min(tr,b.c*0.30));}}  // cap at 30% to catch large gap moves, exclude splits
         let atr14=allTRs.slice(0,14).reduce((s,v)=>s+v,0)/14;
         for(let i=14;i<allTRs.length;i++)atr14=(atr14*13+allTRs[i])/14;
-        const ma50arr=bars.slice(-50).map(b=>b.c).filter(v=>v!=null);
-        const ma50=ma50arr.length>=50?+(ma50arr.reduce((s,v)=>s+v,0)/ma50arr.length).toFixed(2):null;
-        const ma20arr=bars.slice(-20).map(b=>b.c).filter(v=>v!=null);
-        const ma20=ma20arr.length>=20?+(ma20arr.reduce((s,v)=>s+v,0)/ma20arr.length).toFixed(2):null;
+        // EMA calculation — needs enough bars to seed properly
+        const closes=bars.map(b=>b.c).filter(v=>v!=null);
+        // EMA 50
+        let ema50=null;
+        if(closes.length>=50){
+          const k50=2/(50+1);
+          ema50=closes.slice(0,50).reduce((s,v)=>s+v,0)/50; // seed with SMA of first 50
+          for(let i=50;i<closes.length;i++) ema50=closes[i]*k50+ema50*(1-k50);
+          ema50=+ema50.toFixed(2);
+        }
+        const ma50=ema50;
+        // EMA 20
+        let ema20=null;
+        if(closes.length>=20){
+          const k20=2/(20+1);
+          ema20=closes.slice(0,20).reduce((s,v)=>s+v,0)/20; // seed with SMA of first 20
+          for(let i=20;i<closes.length;i++) ema20=closes[i]*k20+ema20*(1-k20);
+          ema20=+ema20.toFixed(2);
+        }
+        const ma20=ema20;
         cache[ticker].atr=+atr14.toFixed(2);cache[ticker].ma50=ma50;cache[ticker].ma20=ma20;
         cache[ticker].atrMA=(ma50!=null&&atr14>0)?+((last-ma50)/atr14).toFixed(2):null;
         cache[ticker].atrMA20=(ma20!=null&&atr14>0)?+((last-ma20)/atr14).toFixed(2):null;
