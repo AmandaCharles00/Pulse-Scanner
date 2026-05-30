@@ -502,6 +502,8 @@ let syncing=false,autoRefreshTimer=null,drillFilter='';
 let alertSettings={atrMA:3.0,volMult:2.0,enabled:true,volFilter:false};
 let triggeredAlerts=[];
 let posSort={col:"pctFromEntry",dir:"desc"};
+let scan50Sort={col:'pctFromMA',dir:'asc'};   // default: closest to MA first (abs asc)
+let scan20Sort={col:'pctFromMA',dir:'asc'};
 let positions=[{"ticker": "VIAV", "shares": 0, "entry": 25.66, "notes": "OG entry 1.15.26; added back at 38.22 on 4.15.26, avg 25.66", "direction": "long"}, {"ticker": "WDC", "shares": 0, "entry": 191.25, "notes": "", "direction": "long"}, {"ticker": "LWLG", "shares": 0, "entry": 6.85, "notes": "", "direction": "long"}, {"ticker": "VRT", "shares": 0, "entry": 176.0, "notes": "", "direction": "long"}, {"ticker": "COHR", "shares": 0, "entry": 252.58, "notes": "OG entry 1.20.26; added back at 313.66 on 4.27.26, avg 252.58", "direction": "long"}, {"ticker": "BE", "shares": 0, "entry": 150.9, "notes": "", "direction": "long"}, {"ticker": "NOK", "shares": 0, "entry": 7.1, "notes": "", "direction": "long"}, {"ticker": "POWL", "shares": 0, "entry": 183.65, "notes": "", "direction": "long"}, {"ticker": "CGON", "shares": 0, "entry": 50.65, "notes": "", "direction": "long"}, {"ticker": "GLW", "shares": 0, "entry": 131.27, "notes": "", "direction": "long"}, {"ticker": "BB", "shares": 0, "entry": 3.89, "notes": "", "direction": "long"}, {"ticker": "MU", "shares": 0, "entry": 410.65, "notes": "", "direction": "long"}, {"ticker": "LITE", "shares": 0, "entry": 739.87, "notes": "", "direction": "long"}, {"ticker": "KEYS", "shares": 0, "entry": 294.63, "notes": "", "direction": "long"}, {"ticker": "WULF", "shares": 0, "entry": 17.54, "notes": "", "direction": "long"}, {"ticker": "TSLA", "shares": 0, "entry": 360.58, "notes": "", "direction": "long"}, {"ticker": "JAZZ", "shares": 0, "entry": 189.15, "notes": "", "direction": "long"}, {"ticker": "SQM", "shares": 0, "entry": 86.1, "notes": "", "direction": "long"}, {"ticker": "CCJ", "shares": 0, "entry": 122.1, "notes": "", "direction": "long"}, {"ticker": "SSRM", "shares": 0, "entry": 30.47, "notes": "", "direction": "long"}, {"ticker": "UAMY", "shares": 0, "entry": 10.6, "notes": "", "direction": "long"}, {"ticker": "LULU", "shares": 0, "entry": 159.8, "notes": "", "direction": "short"}, {"ticker": "DPZ", "shares": 0, "entry": 352.86, "notes": "", "direction": "short"}, {"ticker": "TER", "shares": 0, "entry": 322.22, "notes": "", "direction": "short"}]; // [{ticker, shares, entry, notes}]
 
 const f2=v=>v==null?'—':(v>0?'+':'')+v.toFixed(2)+'%';
@@ -1191,7 +1193,7 @@ function renderScan(){
   mkDirBtn('▲ Above MA','above','var(--green)','var(--gd)');
   dirToggle.append(...dirBtns);
 
-  const rebuildScan=()=>buildScanResults(parseFloat(threshIn.value)||1,volToggle.dataset.on==='1',parseFloat(atrPctIn.value)||0,parseFloat(dvolIn.value)||0,dirToggle.dataset.dir||'all',body);
+  const rebuildScan=()=>{scan50Sort={col:'pctFromMA',dir:'asc'};buildScanResults(parseFloat(threshIn.value)||1,volToggle.dataset.on==='1',parseFloat(atrPctIn.value)||0,parseFloat(dvolIn.value)||0,dirToggle.dataset.dir||'all',body);};
   threshIn.addEventListener('change', rebuildScan);
   atrPctIn.addEventListener('change', rebuildScan);
   dvolIn.addEventListener('change', rebuildScan);
@@ -1246,8 +1248,18 @@ function buildScanResults(thresh, volOnly, minAtrPct, minDVol, direction, body){
   });
   const dedupedResults=[...seenS.values()];
   results.length=0;results.push(...dedupedResults);
-  // Sort by closest to 50MA
-  results.sort((a,b)=>Math.abs(a.pctFromMA)-Math.abs(b.pctFromMA));
+
+  // Apply current sort
+  results.sort((a,b)=>{
+    if(scan50Sort.col==='pctFromMA'){
+      // special: 'asc' = closest to MA (abs ascending), 'desc' = furthest (abs descending), 'raw_asc/raw_desc' = signed
+      if(scan50Sort.dir==='asc') return Math.abs(a.pctFromMA)-Math.abs(b.pctFromMA);
+      if(scan50Sort.dir==='desc') return Math.abs(b.pctFromMA)-Math.abs(a.pctFromMA);
+      if(scan50Sort.dir==='raw_asc') return a.pctFromMA-b.pctFromMA;
+      if(scan50Sort.dir==='raw_desc') return b.pctFromMA-a.pctFromMA;
+    }
+    return 0;
+  });
 
   // Update count
   const countEl=document.getElementById('scan-count');
@@ -1260,21 +1272,47 @@ function buildScanResults(thresh, volOnly, minAtrPct, minDVol, direction, body){
     return;
   }
 
+  // Helper: sortable header cell
+  const mkSortHdr50=(label,col,width,extra='')=>{
+    const d=document.createElement('div');
+    const isActive=scan50Sort.col===col;
+    let arrow='';
+    if(isActive){
+      arrow=scan50Sort.dir==='asc'||scan50Sort.dir==='raw_asc'?' ▲':' ▼';
+    }
+    d.style.cssText='width:'+width+';text-align:right;flex-shrink:0;cursor:pointer;user-select:none;'+(isActive?'color:var(--blue);':'')+extra;
+    d.textContent=label+arrow;
+    d.addEventListener('click',()=>{
+      if(scan50Sort.col===col){
+        // cycle: asc → desc → raw_asc → raw_desc → asc
+        const cycle={asc:'desc',desc:'raw_asc',raw_asc:'raw_desc',raw_desc:'asc'};
+        scan50Sort.dir=cycle[scan50Sort.dir]||'asc';
+      } else {
+        scan50Sort.col=col;scan50Sort.dir='asc';
+      }
+      buildScanResults(thresh,volOnly,minAtrPct,minDVol,direction,body);
+    });
+    return d;
+  };
+
   // Header
   const hdr=document.createElement('div');
   hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#ccc;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
-  hdr.innerHTML=
-    '<div style="width:60px;flex-shrink:0">Ticker</div>'+
-    '<div style="flex:1">Theme</div>'+
-    '<div style="width:75px;text-align:right;flex-shrink:0">Price</div>'+
-    '<div style="width:75px;text-align:right;flex-shrink:0">50MA</div>'+
-    '<div style="width:90px;text-align:right;flex-shrink:0">% from MA</div>'+
-    '<div style="width:65px;text-align:right;flex-shrink:0">ATR</div>'+
-    '<div style="width:65px;text-align:right;flex-shrink:0">Vol %</div>'+
-    '<div style="width:90px;text-align:right;flex-shrink:0">ATR/50MA</div>'+
-    '<div style="width:70px;text-align:right;flex-shrink:0">Vol ×</div>'+
-    '<div style="width:75px;text-align:right;flex-shrink:0">AvgVol $M</div>'+
-    '<div style="width:75px;text-align:right;flex-shrink:0">Today</div>';
+  const h50Static=(t,w,extra='')=>{const d=document.createElement('div');d.style.cssText='width:'+w+';text-align:right;flex-shrink:0;'+extra;d.textContent=t;return d;};
+  const h50Left=(t,w)=>{const d=document.createElement('div');d.style.cssText='width:'+w+';flex-shrink:0';d.textContent=t;return d;};
+  hdr.append(
+    h50Left('Ticker','60px'),
+    (()=>{const d=document.createElement('div');d.style.cssText='flex:1';d.textContent='Theme';return d;})(),
+    h50Static('Price','75px'),
+    h50Static('50MA','75px'),
+    mkSortHdr50('% from MA','pctFromMA','90px'),
+    h50Static('ATR','65px'),
+    h50Static('Vol %','65px'),
+    h50Static('ATR/50MA','90px'),
+    h50Static('Vol ×','70px'),
+    h50Static('AvgVol $M','75px'),
+    h50Static('Today','75px')
+  );
   body.appendChild(hdr);
 
   results.forEach(r=>{
@@ -2706,7 +2744,7 @@ function render20MAScan(){
   mkDir20('▼ Below 20MA','below','var(--red)','var(--rd)');mkDir20('▲ Above 20MA','above','var(--green)','var(--gd)');
   dirToggle20.append(...dir20Btns);
   const countEl=document.createElement('span');countEl.id='scan20-count';countEl.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono);margin-left:auto';
-  const rebuild20=()=>build20MAScan(parseFloat(threshIn.value)||2,parseFloat(atrPctIn.value)||0,parseFloat(dvolIn.value)||80,dirToggle20.dataset.dir||'all',body);
+  const rebuild20=()=>{scan20Sort={col:'pctFromMA',dir:'asc'};build20MAScan(parseFloat(threshIn.value)||2,parseFloat(atrPctIn.value)||0,parseFloat(dvolIn.value)||80,dirToggle20.dataset.dir||'all',body);};
   threshIn.addEventListener('change',rebuild20);atrPctIn.addEventListener('change',rebuild20);dvolIn.addEventListener('change',rebuild20);
   ctrl.append(lbl,threshIn,lbl2,sep1,lbl3,atrPctIn,lbl4,sep2,lbl5,dvolIn,lbl6,sep3,dirLbl,dirToggle20,countEl);
   const body=document.createElement('div');body.style.cssText='flex:1;overflow-y:auto';
@@ -2727,12 +2765,52 @@ function build20MAScan(thresh,minAtrPct,minDVol,direction,body){
     seen.add(tk);results.push({ticker:tk,theme:th.name,price:d.price,ma20:d.ma20,pctFromMA,atr:d.atr,atrPct,atrMA20:d.atrMA20,today:d.today,avgDVol,...d});
   });});
   const seenS=new Map();results.forEach(r=>{if(!seenS.has(r.ticker)||Math.abs(r.pctFromMA)<Math.abs(seenS.get(r.ticker).pctFromMA))seenS.set(r.ticker,r);});
-  const deduped=[...seenS.values()].sort((a,b)=>Math.abs(a.pctFromMA)-Math.abs(b.pctFromMA));
+  const deduped=[...seenS.values()];
+
+  // Apply current sort
+  deduped.sort((a,b)=>{
+    if(scan20Sort.col==='pctFromMA'){
+      if(scan20Sort.dir==='asc') return Math.abs(a.pctFromMA)-Math.abs(b.pctFromMA);
+      if(scan20Sort.dir==='desc') return Math.abs(b.pctFromMA)-Math.abs(a.pctFromMA);
+      if(scan20Sort.dir==='raw_asc') return a.pctFromMA-b.pctFromMA;
+      if(scan20Sort.dir==='raw_desc') return b.pctFromMA-a.pctFromMA;
+    }
+    return 0;
+  });
+
   const countEl=document.getElementById('scan20-count');if(countEl)countEl.textContent=deduped.length+' matches';
   body.innerHTML='';
   if(!deduped.length){body.innerHTML='<div class="state" style="padding:30px;color:var(--text3)">No tickers within '+thresh+'% of 20MA</div>';return;}
+
+  // Helper: sortable header cell for 20MA scan
+  const mkSortHdr20=(label,col,width)=>{
+    const d=document.createElement('div');
+    const isActive=scan20Sort.col===col;
+    let arrow='';
+    if(isActive){arrow=scan20Sort.dir==='asc'||scan20Sort.dir==='raw_asc'?' ▲':' ▼';}
+    d.style.cssText='width:'+width+';text-align:right;flex-shrink:0;cursor:pointer;user-select:none;'+(isActive?'color:var(--blue);':'');
+    d.textContent=label+arrow;
+    d.addEventListener('click',()=>{
+      if(scan20Sort.col===col){
+        const cycle={asc:'desc',desc:'raw_asc',raw_asc:'raw_desc',raw_desc:'asc'};
+        scan20Sort.dir=cycle[scan20Sort.dir]||'asc';
+      } else {
+        scan20Sort.col=col;scan20Sort.dir='asc';
+      }
+      build20MAScan(thresh,minAtrPct,minDVol,direction,body);
+    });
+    return d;
+  };
+
   const hdr=document.createElement('div');hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#ccc;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
-  hdr.innerHTML='<div style="width:60px;flex-shrink:0">Ticker</div><div style="flex:1">Theme</div><div style="width:75px;text-align:right;flex-shrink:0">Price</div><div style="width:75px;text-align:right;flex-shrink:0">20MA</div><div style="width:90px;text-align:right;flex-shrink:0">% from 20MA</div><div style="width:65px;text-align:right;flex-shrink:0">ATR</div><div style="width:65px;text-align:right;flex-shrink:0">ATR%</div><div style="width:90px;text-align:right;flex-shrink:0">ATR/20MA</div><div style="width:70px;text-align:right;flex-shrink:0">Vol x</div><div style="width:75px;text-align:right;flex-shrink:0">AvgVol $M</div><div style="width:75px;text-align:right;flex-shrink:0">Today</div>';
+  const h20s=(t,w)=>{const d=document.createElement('div');d.style.cssText='width:'+w+';text-align:right;flex-shrink:0';d.textContent=t;return d;};
+  hdr.append(
+    (()=>{const d=document.createElement('div');d.style.cssText='width:60px;flex-shrink:0';d.textContent='Ticker';return d;})(),
+    (()=>{const d=document.createElement('div');d.style.cssText='flex:1';d.textContent='Theme';return d;})(),
+    h20s('Price','75px'),h20s('20MA','75px'),
+    mkSortHdr20('% from 20MA','pctFromMA','90px'),
+    h20s('ATR','65px'),h20s('ATR%','65px'),h20s('ATR/20MA','90px'),h20s('Vol x','70px'),h20s('AvgVol $M','75px'),h20s('Today','75px')
+  );
   body.appendChild(hdr);
   deduped.forEach(r=>{
     const isAbove=r.pctFromMA>=0;const pctCol=isAbove?'var(--green)':'var(--red)';
