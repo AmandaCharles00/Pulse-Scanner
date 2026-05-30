@@ -1014,7 +1014,7 @@ function renderMovers(){
       const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);gap:8px;cursor:pointer';
       row.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
       const tk=document.createElement('span');tk.style.cssText='width:52px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:11px;flex-shrink:0';tk.textContent=r.ticker;
-      const th2=document.createElement('span');th2.style.cssText='flex:1;font-size:11px;color:#aab;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';th2.textContent=r.theme;
+      const th2=document.createElement('span');th2.style.cssText='flex:1;font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';th2.textContent=r.theme;
       const pct=document.createElement('span');pct.style.cssText='font-family:var(--mono);font-size:11px;font-weight:500;color:'+(isG?'var(--green)':'var(--red)')+';flex-shrink:0';pct.textContent=f2(r[tf]);
       const vol=r.volume&&r.avgVolume?r.volume/r.avgVolume:null;
       const volEl=document.createElement('span');volEl.style.cssText='font-family:var(--mono);font-size:10px;flex-shrink:0;width:36px;text-align:right';
@@ -1278,15 +1278,15 @@ function buildScanResults(thresh, volOnly, minAtrPct, minDVol, direction, body){
     tk.textContent=r.ticker;
 
     const th=document.createElement('div');
-    th.style.cssText='flex:1;font-size:11px;color:#aab;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+    th.style.cssText='flex:1;font-size:11px;color:#cdd6e8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
     th.textContent=r.theme;
 
     const price=document.createElement('div');
-    price.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';
+    price.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:#fff;flex-shrink:0';
     price.textContent='$'+r.price.toFixed(2);
 
     const ma=document.createElement('div');
-    ma.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:#aab;flex-shrink:0';
+    ma.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';
     ma.textContent='$'+r.ma50.toFixed(2);
 
     const pct=document.createElement('div');
@@ -1294,7 +1294,7 @@ function buildScanResults(thresh, volOnly, minAtrPct, minDVol, direction, body){
     pct.textContent=(isAbove?'+':'')+r.pctFromMA.toFixed(3)+'%';
 
     const atr=document.createElement('div');
-    atr.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:11px;color:#aab;flex-shrink:0';
+    atr.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';
     atr.textContent=r.atr?'$'+r.atr.toFixed(2):'—';
 
     // ATR%
@@ -1543,7 +1543,7 @@ function renderPositions(){
       // Theme
       const tdTheme=document.createElement('td');
       // themeName from rowData destructuring
-      tdTheme.style.cssText='font-size:11px;color:var(--blue);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+      tdTheme.style.cssText='font-size:12px;color:var(--blue);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
       tdTheme.textContent=themeName;
       tr.appendChild(tdTheme);
 
@@ -1928,7 +1928,7 @@ function buildGaps(minGap, minDVol, volOnly, body){
       tk.textContent=r.ticker;
 
       const th=document.createElement('div');
-      th.style.cssText='flex:1;font-size:10px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+      th.style.cssText='flex:1;font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
       th.textContent=r.theme;
 
       const gap=document.createElement('div');
@@ -1948,7 +1948,7 @@ function buildGaps(minGap, minDVol, volOnly, body){
       vol.appendChild(volChip(r.volume,r.avgVolume));
 
       const dvol=document.createElement('div');
-      dvol.style.cssText='width:80px;text-align:right;font-family:var(--mono);font-size:11px;color:#aab;flex-shrink:0';
+      dvol.style.cssText='width:80px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';
       dvol.textContent=r.avgDVol!=null?'$'+r.avgDVol.toFixed(0)+'M':'—';
 
       const w1=document.createElement('div');
@@ -2148,7 +2148,7 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
     tk.textContent=r.ticker;
 
     const th=document.createElement('div');
-    th.style.cssText='flex:1;font-size:10px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+    th.style.cssText='flex:1;font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
     th.textContent=r.theme;
 
     const atrMA=document.createElement('div');
@@ -2169,7 +2169,7 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
     vol.appendChild(volChip(r.volume,r.avgVolume));
 
     const dvol=document.createElement('div');
-    dvol.style.cssText='width:80px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text3);flex-shrink:0';
+    dvol.style.cssText='width:80px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';
     dvol.textContent=r.avgDVol?'$'+r.avgDVol.toFixed(0)+'M':'—';
 
     const today=document.createElement('div');
@@ -2724,15 +2724,15 @@ function build20MAScan(thresh,minAtrPct,minDVol,direction,body){
     row.addEventListener('mouseenter',()=>row.style.background='var(--bg3)');row.addEventListener('mouseleave',()=>row.style.background='');
     row.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
     const tk=document.createElement('div');tk.style.cssText='width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:11px;flex-shrink:0';tk.textContent=r.ticker;
-    const th=document.createElement('div');th.style.cssText='flex:1;font-size:11px;color:#aab;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';th.textContent=r.theme;
-    const price=document.createElement('div');price.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';price.textContent='$'+r.price.toFixed(2);
-    const ma=document.createElement('div');ma.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:#aab;flex-shrink:0';ma.textContent='$'+r.ma20.toFixed(2);
+    const th=document.createElement('div');th.style.cssText='flex:1;font-size:11px;color:#cdd6e8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';th.textContent=r.theme;
+    const price=document.createElement('div');price.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:#fff;flex-shrink:0';price.textContent='$'+r.price.toFixed(2);
+    const ma=document.createElement('div');ma.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';ma.textContent='$'+r.ma20.toFixed(2);
     const pct=document.createElement('div');pct.style.cssText='width:90px;text-align:right;font-family:var(--mono);font-size:11px;font-weight:500;flex-shrink:0;color:'+pctCol;pct.textContent=(isAbove?'+':'')+r.pctFromMA.toFixed(3)+'%';
-    const atr=document.createElement('div');atr.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:11px;color:#aab;flex-shrink:0';atr.textContent=r.atr?'$'+r.atr.toFixed(2):'—';
+    const atr=document.createElement('div');atr.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';atr.textContent=r.atr?'$'+r.atr.toFixed(2):'—';
     const atrPctEl=document.createElement('div');atrPctEl.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:12px;flex-shrink:0';atrPctEl.style.color=r.atrPct>=8?'var(--green)':r.atrPct>=4?'#fff':'#aab';atrPctEl.textContent=r.atrPct?r.atrPct.toFixed(1)+'%':'—';
     const atrMA20El=document.createElement('div');atrMA20El.style.cssText='width:90px;text-align:right;flex-shrink:0';atrMA20El.appendChild(atrBar(r.atrMA20??null));
     const vol=document.createElement('div');vol.style.cssText='width:70px;text-align:right;flex-shrink:0';vol.appendChild(volChip(r.volume,r.avgVolume));
-    const dvol=document.createElement('div');dvol.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:12px;color:#aab;flex-shrink:0';dvol.textContent=r.avgDVol?'$'+r.avgDVol.toFixed(0)+'M':'—';
+    const dvol=document.createElement('div');dvol.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--text2);flex-shrink:0';dvol.textContent=r.avgDVol?'$'+r.avgDVol.toFixed(0)+'M':'—';
     const today=document.createElement('div');today.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';today.className=pc(r.today);today.textContent=f2(r.today);
     row.append(tk,th,price,ma,pct,atr,atrPctEl,atrMA20El,vol,dvol,today);body.appendChild(row);
   });
@@ -2802,9 +2802,9 @@ function buildEarningsSetup(minGap,maThresh,minAtrPct,minDVol,gapDir,body){
     row.addEventListener('mouseenter',()=>row.style.background='var(--bg3)');row.addEventListener('mouseleave',()=>row.style.background='');
     row.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
     const tk=document.createElement('div');tk.style.cssText='width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:11px;flex-shrink:0';tk.textContent=r.ticker;
-    const th=document.createElement('div');th.style.cssText='flex:1;font-size:10px;color:#aab;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';th.textContent=r.theme;
+    const th=document.createElement('div');th.style.cssText='flex:1;font-size:11px;color:#cdd6e8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';th.textContent=r.theme;
     const price=document.createElement('div');price.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:#fff;flex-shrink:0';price.textContent='$'+r.price.toFixed(2);
-    const gapDate=document.createElement('div');gapDate.style.cssText='width:80px;text-align:right;font-family:var(--mono);font-size:10px;color:#aab;flex-shrink:0';gapDate.textContent=r.gap.date;
+    const gapDate=document.createElement('div');gapDate.style.cssText='width:80px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';gapDate.textContent=r.gap.date;
     const gapPct=document.createElement('div');gapPct.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;font-weight:500;flex-shrink:0;color:'+(isGapUp?'var(--green)':'var(--red)');gapPct.textContent=(isGapUp?'+':'')+r.gap.pct.toFixed(1)+'%';
     const pct20=document.createElement('div');pct20.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';pct20.style.color=r.pctFrom20<1?'var(--green)':r.pctFrom20<2?'var(--amber)':'var(--text2)';pct20.textContent=r.pctFrom20.toFixed(2)+'%';
     const pct50=document.createElement('div');pct50.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';pct50.style.color=r.pctFrom50!=null?(r.pctFrom50<1?'var(--green)':r.pctFrom50<2?'var(--amber)':'var(--text2)'):'var(--text3)';pct50.textContent=r.pctFrom50!=null?r.pctFrom50.toFixed(2)+'%':'—';
@@ -2907,7 +2907,7 @@ function renderTickerSearch(q){
     const tkS=document.createElement('span');tkS.className='tk';tkS.textContent=r.ticker;
     tkS.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
     tdTk.appendChild(tkS);tr.appendChild(tdTk);
-    const tdTh=document.createElement('td');tdTh.style.cssText='font-size:11px;color:var(--text3)';
+    const tdTh=document.createElement('td');tdTh.style.cssText='font-size:11px;color:var(--text2)';
     tdTh.textContent=r.theme;tr.appendChild(tdTh);
     const tdP=document.createElement('td');tdP.style.cssText='text-align:right;color:#fff;font-family:var(--mono);font-size:11px';
     tdP.textContent=r.price!=null?'$'+Number(r.price).toFixed(2):'—';tr.appendChild(tdP);
