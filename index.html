@@ -431,6 +431,12 @@ function renderSectors(){
   const hcnt=document.createElement('div');hcnt.className='lhdr-cnt';hcnt.textContent='#';
   hdr.append(hvol2,hrs,hcnt);
 
+  // Compute actual min/max across sorted sectors for heartbeat normalization
+  const sectorTVals=sorted.map(s=>sectorStats[s.id]?.today??null).filter(v=>v!=null);
+  const sectorMin=sectorTVals.length?Math.min(...sectorTVals):-1;
+  const sectorMax=sectorTVals.length?Math.max(...sectorTVals):1;
+  const sectorRange=Math.max(sectorMax-sectorMin,0.01);
+
   const body=document.createElement('div');
   sorted.forEach(s=>{
     const st=sectorStats[s.id]||{};const tv=st.today??null;
@@ -454,8 +460,8 @@ function renderSectors(){
     const pulseW=document.createElement('div');pulseW.style.cssText='width:110px;height:28px;flex-shrink:0;display:flex;align-items:center;margin-right:4px;overflow:hidden';
     const pulseCol=tv==null?'#3a4455':tv>=0?'var(--green)':'var(--red)';
     const pw=110,ph=28,mid=ph/2;
-    // Health score: worst negative=0 (flatline), zero=0.5 (weak pulse), best positive=1 (strong pulse)
-    const health=tv==null?0.15:Math.max(0,(tv+maxAbs)/(2*maxAbs));
+    // Health score: worst in visible list=0 (flatline), best=1 (strong pulse), always uses full range
+    const health=tv==null?0.1:Math.max(0,Math.min(1,(tv-sectorMin)/sectorRange));
     const amp=health*11; // 0=flat, 11=max spike
     const pp='M0,'+mid+' L'+(pw*0.12)+','+mid
       +' L'+(pw*0.18)+','+(mid-amp*0.3).toFixed(1)
@@ -500,7 +506,7 @@ function renderSectors(){
       sortedIds.forEach(tid=>{
         const th2=THEMES.find(t=>t.id===tid);if(!th2)return;
         const chip=document.createElement('span');const tv2=stats[tid]?.[tf]??null;
-        chip.style.cssText='font-size:9px;font-family:var(--mono);padding:1px 6px;border-radius:2px;border:1px solid var(--border2);color:'+(tv2==null?'var(--text3)':tv2>=0?'var(--green)':'var(--red)')+';background:'+(tv2==null?'transparent':tv2>=0?'var(--gd)':'var(--rd)')+';cursor:pointer;white-space:nowrap';
+        chip.style.cssText='font-size:9px;font-family:var(--mono);padding:1px 6px;border-radius:2px;border:1px solid '+(tv2==null?'var(--border2)':tv2>=0?'rgba(0,201,122,0.5)':'rgba(255,61,85,0.5)')+';color:'+(tv2==null?'var(--text3)':tv2>=0?'var(--green)':'var(--red)')+';background:'+(tv2==null?'transparent':tv2>=0?'var(--gd)':'var(--rd)')+';cursor:pointer;white-space:nowrap';
         chip.textContent=th2.name+(tv2!=null?(tv2>=0?' +':' ')+tv2.toFixed(1)+'%':'');
         chip.addEventListener('click',()=>openDrill(tid));subRow.appendChild(chip);
       });
