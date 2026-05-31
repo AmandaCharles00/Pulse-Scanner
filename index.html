@@ -693,18 +693,16 @@ async function doSync(){
         cache[ticker].atr=+atr14.toFixed(2);cache[ticker].ma50=ma50;cache[ticker].ma20=ma20;
         cache[ticker].atrMA=(ma50!=null&&atr14>0)?+((last-ma50)/atr14).toFixed(2):null;
         cache[ticker].atrMA20=(ma20!=null&&atr14>0)?+((last-ma20)/atr14).toFixed(2):null;
-        // True daily volatility — stddev of last 20 daily close-to-close % changes
-        const last20=bars.slice(-21);
-        if(last20.length>=2){
-          const dailyChgs=[];
-          for(let i=1;i<last20.length;i++){
-            const prev=last20[i-1].c,cur=last20[i].c;
-            if(prev&&cur)dailyChgs.push((cur-prev)/prev*100);
+        // True daily volatility — matches Finviz "Volatility Month": avg of |daily % changes| over last 20 days
+        const last21=bars.slice(-21);
+        if(last21.length>=2){
+          const absDailyChgs=[];
+          for(let i=1;i<last21.length;i++){
+            const prev=last21[i-1].c,cur=last21[i].c;
+            if(prev&&cur)absDailyChgs.push(Math.abs((cur-prev)/prev*100));
           }
-          if(dailyChgs.length>=2){
-            const mean=dailyChgs.reduce((s,v)=>s+v,0)/dailyChgs.length;
-            const variance=dailyChgs.reduce((s,v)=>s+(v-mean)**2,0)/(dailyChgs.length-1);
-            cache[ticker].dailyVol=+Math.sqrt(variance).toFixed(2);
+          if(absDailyChgs.length>=1){
+            cache[ticker].dailyVol=+(absDailyChgs.reduce((s,v)=>s+v,0)/absDailyChgs.length).toFixed(2);
           }
         }
         // Weekly MAs — aggregate daily bars into weekly candles, compute EMA 20W and 50W
