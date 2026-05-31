@@ -489,8 +489,8 @@ function renderSectors(){
     });
 
     // ATR% avg
-    const atrPcts2=s.tickers.map(tk=>{const d=cache[tk];return(d&&d.atr&&d.price)?(d.atr/d.price*100):null;}).filter(v=>v!=null);
-    const avgAtr2=atrPcts2.length?+(atrPcts2.reduce((a,b)=>a+b,0)/atrPcts2.length).toFixed(1):null;
+    const atrPcts2=s.tickers.map(tk=>{const d=cache[tk];return d?.dailyVol??null;}).filter(v=>v!=null);
+    const avgAtr2=atrPcts2.length?+(atrPcts2.reduce((a,b)=>a+b,0)/atrPcts2.length).toFixed(2):null;
     const atrEl2=document.createElement('div');
     atrEl2.style.cssText='width:52px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';
     atrEl2.style.color=avgAtr2>=8?'var(--green)':avgAtr2>=4?'var(--text)':'var(--text3)';
@@ -693,6 +693,20 @@ async function doSync(){
         cache[ticker].atr=+atr14.toFixed(2);cache[ticker].ma50=ma50;cache[ticker].ma20=ma20;
         cache[ticker].atrMA=(ma50!=null&&atr14>0)?+((last-ma50)/atr14).toFixed(2):null;
         cache[ticker].atrMA20=(ma20!=null&&atr14>0)?+((last-ma20)/atr14).toFixed(2):null;
+        // True daily volatility — stddev of last 20 daily close-to-close % changes
+        const last20=bars.slice(-21);
+        if(last20.length>=2){
+          const dailyChgs=[];
+          for(let i=1;i<last20.length;i++){
+            const prev=last20[i-1].c,cur=last20[i].c;
+            if(prev&&cur)dailyChgs.push((cur-prev)/prev*100);
+          }
+          if(dailyChgs.length>=2){
+            const mean=dailyChgs.reduce((s,v)=>s+v,0)/dailyChgs.length;
+            const variance=dailyChgs.reduce((s,v)=>s+(v-mean)**2,0)/(dailyChgs.length-1);
+            cache[ticker].dailyVol=+Math.sqrt(variance).toFixed(2);
+          }
+        }
         // Weekly MAs — aggregate daily bars into weekly candles, compute EMA 20W and 50W
         const weeklyCloses=[];
         let wk=null;
@@ -956,12 +970,12 @@ function renderList(filter=''){
     bw2.appendChild(bar);row.append(chk,nameWrap,bw2);
     TFS.forEach(t=>{const v=s[t]??null;const col=document.createElement('div');col.className='ltf '+pc(v);col.textContent=f2(v);col.addEventListener('click',()=>openDrill(th.id));row.appendChild(col);});
     // Average ATR% across theme tickers
-    const atrPcts=th.tickers.map(tk=>{const d=cache[tk];return(d&&d.atr&&d.price)?(d.atr/d.price*100):null;}).filter(v=>v!=null);
-    const avgAtrPct=atrPcts.length?+(atrPcts.reduce((a,b)=>a+b,0)/atrPcts.length).toFixed(1):null;
+    const atrPcts=th.tickers.map(tk=>{const d=cache[tk];return d?.dailyVol??null;}).filter(v=>v!=null);
+    const avgAtrPct=atrPcts.length?+(atrPcts.reduce((a,b)=>a+b,0)/atrPcts.length).toFixed(2):null;
     const atrPctEl=document.createElement('div');
     atrPctEl.style.cssText='width:52px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';
-    atrPctEl.style.color=avgAtrPct>=8?'var(--green)':avgAtrPct>=4?'var(--text)':'var(--text3)';
-    atrPctEl.textContent=avgAtrPct!=null?avgAtrPct.toFixed(1)+'%':'—';
+    atrPctEl.style.color=avgAtrPct>=2.5?'var(--green)':avgAtrPct>=1.5?'var(--text)':'var(--text3)';
+    atrPctEl.textContent=avgAtrPct!=null?avgAtrPct.toFixed(2)+'%':'—';
 
     const rsEl=document.createElement('div');rsEl.className='lrs';rsEl.style.color=rsColor;rsEl.textContent=rsVal;
     const cntEl=document.createElement('div');cntEl.className='lcnt';cntEl.textContent=th.tickers.length;
@@ -983,8 +997,8 @@ function renderHeat(){
   getSorted().forEach(th=>{
     const v=stats[th.id]?.[tf]??null;
     const cell=document.createElement('div');cell.className='hcell';cell.style.background=heatBg(v);
-    const atrPctsH=th.tickers.map(tk=>{const d=cache[tk];return(d&&d.atr&&d.price)?(d.atr/d.price*100):null;}).filter(v=>v!=null);
-    const avgAtrH=atrPctsH.length?+(atrPctsH.reduce((a,b)=>a+b,0)/atrPctsH.length).toFixed(1):null;
+    const atrPctsH=th.tickers.map(tk=>{const d=cache[tk];return d?.dailyVol??null;}).filter(v=>v!=null);
+    const avgAtrH=atrPctsH.length?+(atrPctsH.reduce((a,b)=>a+b,0)/atrPctsH.length).toFixed(2):null;
     cell.innerHTML='<div class="hcell-name">'+th.name+'</div><div class="hcell-pct">'+f2(v)+'</div><div class="hcell-cnt">'+th.tickers.length+' tickers'+(avgAtrH?' · '+avgAtrH+'% ATR':'')+'</div>';
     cell.addEventListener('click',()=>openDrill(th.id));grid.appendChild(cell);
   });
@@ -1000,7 +1014,7 @@ function renderDrill(filter=''){drillFilter=filter;
   const TFS=['today','1W','1M','3M','6M','YTD'];
   const cSz=Object.keys(cache).length;
 
-  let rows=th.tickers.filter(tk=>!filter||tk.toLowerCase().includes(filter.toLowerCase())).map(tk=>{const d=cache[tk]||{};const atrPct=d.atr&&d.price?(d.atr/d.price*100):null;return{ticker:tk,atrPct,...d};});
+  let rows=th.tickers.filter(tk=>!filter||tk.toLowerCase().includes(filter.toLowerCase())).map(tk=>{const d=cache[tk]||{};return{ticker:tk,...d};});
   rows.sort((a,b)=>{
     let av,bv;
     if(drillSort.col==='vol'){av=a.volume&&a.avgVolume?a.volume/a.avgVolume:null;bv=b.volume&&b.avgVolume?b.volume/b.avgVolume:null;}
@@ -1040,9 +1054,9 @@ function renderDrill(filter=''){drillFilter=filter;
     const tdA=document.createElement('td');tdA.style.color='var(--text2)';tdA.textContent=r.atr!=null?'$'+r.atr.toFixed(2):'—';tr.appendChild(tdA);
     // ATR% = ATR / Price * 100
     const tdAP=document.createElement('td');
-    const atrPctVal=r.atr&&r.price?(r.atr/r.price*100):null;
-    tdAP.style.color=atrPctVal>=8?'var(--green)':atrPctVal>=4?'var(--text)':'var(--text2)';
-    tdAP.textContent=atrPctVal?atrPctVal.toFixed(1)+'%':'—';
+    const atrPctVal=r.dailyVol??null;
+    tdAP.style.color=atrPctVal>=2.5?'var(--green)':atrPctVal>=1.5?'var(--text)':'var(--text2)';
+    tdAP.textContent=atrPctVal!=null?atrPctVal.toFixed(2)+'%':'—';
     tr.appendChild(tdAP);
     const tdAM=document.createElement('td');tdAM.appendChild(atrBar(r.atrMA??null));tr.appendChild(tdAM);
     TFS.forEach(col=>{const td=document.createElement('td');td.appendChild(miniBar(r[col]??null));tr.appendChild(td);});
@@ -1364,7 +1378,7 @@ function buildScanResults(thresh, volOnly, minAtrPct, minDVol, direction, scanTF
       if(Math.abs(pctFromMA)>thresh) return;
       if(direction==='below'&&pctFromMA>=0) return;
       if(direction==='above'&&pctFromMA<0) return;
-      const atrPct = (d.atr && d.price) ? (d.atr / d.price * 100) : null;
+      const atrPct = d.dailyVol??null;
       if(minAtrPct > 0 && (!atrPct || atrPct < minAtrPct)) return;
       const avgDVol = (d.price && d.avgVolume) ? (d.price * d.avgVolume / 1e6) : null;
       if(minDVol > 0 && (!avgDVol || avgDVol < minDVol)) return;
@@ -1486,12 +1500,12 @@ function buildScanResults(thresh, volOnly, minAtrPct, minDVol, direction, scanTF
     atr.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';
     atr.textContent=r.atr?'$'+r.atr.toFixed(2):'—';
 
-    // ATR%
+    // Vol % — true daily volatility (20-day stddev of daily % changes)
     const atrPctEl=document.createElement('div');
     atrPctEl.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:12px;flex-shrink:0';
-    const atrPctVal = (r.atr && r.price) ? (r.atr/r.price*100) : null;
-    atrPctEl.style.color = atrPctVal>=8?'var(--green)':atrPctVal>=4?'#fff':'#aab';
-    atrPctEl.textContent = atrPctVal ? atrPctVal.toFixed(1)+'%' : '—';
+    const atrPctVal = r.dailyVol??null;
+    atrPctEl.style.color = atrPctVal>=2.5?'var(--green)':atrPctVal>=1.5?'#fff':'#aab';
+    atrPctEl.textContent = atrPctVal!=null ? atrPctVal.toFixed(2)+'%' : '—';
 
     const atrMA=document.createElement('div');
     atrMA.style.cssText='width:90px;text-align:right;flex-shrink:0';
@@ -1689,7 +1703,7 @@ function renderPositions(){
       const pctFromEntry=rawMove!=null?(isLong?rawMove:-rawMove):null;
       const themeName=THEMES.find(t=>t.tickers.includes(p.ticker))?.name||'—';
       const volX=d.volume&&d.avgVolume?d.volume/d.avgVolume:null;
-      const volPct=(d.atr&&d.price)?(d.atr/d.price*100):null;
+      const volPct=d.dailyVol??null;
       return {p,idx,d,price,mktVal,costBasis,pnlDollar,pnlPct,isLong,pctFromEntry,themeName,volX,volPct,entry_date:p.entry_date||'',
         atrMA:d.atrMA,entry:p.entry,shares:p.shares,ticker:p.ticker,theme:themeName};
     });
@@ -1808,8 +1822,8 @@ function renderPositions(){
       // Vol %
       const tdVP=document.createElement('td');
       tdVP.style.cssText='text-align:right;font-family:var(--mono);font-size:11px';
-      tdVP.style.color=volPct>=8?'var(--green)':volPct>=4?'#fff':'var(--text2)';
-      tdVP.textContent=volPct?volPct.toFixed(1)+'%':'—';
+      tdVP.style.color=volPct>=2.5?'var(--green)':volPct>=1.5?'#fff':'var(--text2)';
+      tdVP.textContent=volPct?volPct.toFixed(2)+'%':'—';
       tr.appendChild(tdVP);
 
       // Vol x
@@ -2041,7 +2055,7 @@ function buildGaps(minGap, minDVol, volOnly, body){
 
       // Filter: must have today's volume > average (vol spike confirmation)
       const volX=d.volume&&d.avgVolume?d.volume/d.avgVolume:null;
-      const volPct=(d.atr&&d.price)?(d.atr/d.price*100):null;
+      const volPct=d.dailyVol??null;
       if(volOnly&&(!volX||volX<1.0)) return;
 
       // Exclude OTC tickers
@@ -2282,7 +2296,7 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
       if(Math.abs(d.atrMA)<minAtr) return;
 
       // Min Vol%
-      const volPct=(d.atr&&d.price)?(d.atr/d.price*100):null;
+      const volPct=d.dailyVol??null;
       if(minVolPct>0&&(!volPct||volPct<minVolPct)) return;
 
       // Min avg dollar volume
@@ -2350,8 +2364,8 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
 
     const vp=document.createElement('div');
     vp.style.cssText='width:70px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';
-    vp.style.color=r.volPct>=8?'var(--green)':r.volPct>=4?'#fff':'var(--text3)';
-    vp.textContent=r.volPct?r.volPct.toFixed(1)+'%':'—';
+    vp.style.color=r.volPct>=2.5?'var(--green)':r.volPct>=1.5?'#fff':'var(--text3)';
+    vp.textContent=r.volPct?r.volPct.toFixed(2)+'%':'—';
 
     const vol=document.createElement('div');
     vol.style.cssText='width:70px;text-align:right;flex-shrink:0';
@@ -2921,9 +2935,9 @@ function build20MAScan(thresh,minAtrPct,minDVol,direction,scanTF,body){
     const pctFromMA=((d.price-d[maKey])/d[maKey])*100;
     if(Math.abs(pctFromMA)>thresh)return;
     if(direction==='below'&&pctFromMA>=0)return;if(direction==='above'&&pctFromMA<0)return;
-    const atrPct=(d.atr&&d.price)?(d.atr/d.price*100):null;if(minAtrPct>0&&(!atrPct||atrPct<minAtrPct))return;
+    const atrPct=d.dailyVol??null;if(minAtrPct>0&&(!atrPct||atrPct<minAtrPct))return;
     const avgDVol=(d.price&&d.avgVolume)?(d.price*d.avgVolume/1e6):null;if(minDVol>0&&(!avgDVol||avgDVol<minDVol))return;
-    seen.add(tk);results.push({ticker:tk,theme:th.name,price:d.price,ma20:d[maKey],pctFromMA,atr:d.atr,atrPct,atrMA20:d[atrMAKey],today:d.today,avgDVol,...d});
+    seen.add(tk);results.push({ticker:tk,theme:th.name,price:d.price,ma20:d[maKey],pctFromMA,atr:d.atr,atrPct:d.dailyVol,atrMA20:d[atrMAKey],today:d.today,avgDVol,...d});
   });});
   const seenS=new Map();results.forEach(r=>{if(!seenS.has(r.ticker)||Math.abs(r.pctFromMA)<Math.abs(seenS.get(r.ticker).pctFromMA))seenS.set(r.ticker,r);});
   const deduped=[...seenS.values()];
@@ -3039,10 +3053,10 @@ function buildEarningsSetup(minGap,maThresh,minAtrPct,minDVol,gapDir,body){
     if(egap.isGapUp&&d.price<egap.midpoint)return;if(!egap.isGapUp&&d.price>egap.midpoint)return;
     if(!d.ma20)return;const pctFrom20=Math.abs((d.price-d.ma20)/d.price*100);if(pctFrom20>maThresh)return;
     const pctFrom50=d.ma50?Math.abs((d.price-d.ma50)/d.price*100):null;
-    const atrPct=(d.atr&&d.price)?(d.atr/d.price*100):null;if(minAtrPct>0&&(!atrPct||atrPct<minAtrPct))return;
+    const atrPct=d.dailyVol??null;if(minAtrPct>0&&(!atrPct||atrPct<minAtrPct))return;
     const avgDVol=(d.price&&d.avgVolume)?(d.price*d.avgVolume/1e6):null;if(minDVol>0&&(!avgDVol||avgDVol<minDVol))return;
     seen.add(tk);
-    results.push({ticker:tk,theme:th.name,price:d.price,ma20:d.ma20,ma50:d.ma50,pctFrom20,pctFrom50:pctFrom50??null,gap:egap,atr:d.atr,atrPct,atrMA:d.atrMA,today:d.today,avgDVol,volX:d.volume&&d.avgVolume?d.volume/d.avgVolume:null,...d});
+    results.push({ticker:tk,theme:th.name,price:d.price,ma20:d.ma20,ma50:d.ma50,pctFrom20,pctFrom50:pctFrom50??null,gap:egap,atr:d.atr,atrPct:d.dailyVol,atrMA:d.atrMA,today:d.today,avgDVol,volX:d.volume&&d.avgVolume?d.volume/d.avgVolume:null,...d});
   });});
   results.sort((a,b)=>b.gap.date.localeCompare(a.gap.date)||Math.abs(b.gap.pct)-Math.abs(a.gap.pct));
   const countEl=document.getElementById('earnings-count');if(countEl)countEl.textContent=results.length+' matches';
@@ -3173,9 +3187,9 @@ function renderTickerSearch(q){
     tdA.textContent=r.atr!=null?'$'+r.atr.toFixed(2):'—';tr.appendChild(tdA);
     // Vol % (ATR/Price)
     const tdVpct=document.createElement('td');tdVpct.style.cssText='text-align:right;font-family:var(--mono);font-size:11px';
-    const atrPct=(r.atr&&r.price)?(r.atr/r.price*100):null;
-    tdVpct.style.color=atrPct>=8?'var(--green)':atrPct>=4?'#fff':'var(--text2)';
-    tdVpct.textContent=atrPct!=null?atrPct.toFixed(1)+'%':'—';tr.appendChild(tdVpct);
+    const atrPct=r.dailyVol??null;
+    tdVpct.style.color=atrPct>=2.5?'var(--green)':atrPct>=1.5?'#fff':'var(--text2)';
+    tdVpct.textContent=atrPct!=null?atrPct.toFixed(2)+'%':'—';tr.appendChild(tdVpct);
     // ATR/50MA
     const tdAM=document.createElement('td');tdAM.appendChild(atrBar(r.atrMA??null));tr.appendChild(tdAM);
     TFS.forEach(t=>{const td=document.createElement('td');td.appendChild(miniBar(r[t]??null));tr.appendChild(td);});
