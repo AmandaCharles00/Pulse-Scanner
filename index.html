@@ -449,10 +449,12 @@ function renderSectors(){
     const row=document.createElement('div');
     row.style.cssText='display:flex;align-items:center;padding:0 14px;height:38px;cursor:default';
 
-    // ETF badge
+    // ETF badge — clickable link to TradingView
     const etfBadge=document.createElement('div');
-    etfBadge.style.cssText='width:32px;font-family:var(--mono);font-size:10px;color:var(--text2);flex-shrink:0;margin-right:4px';
+    etfBadge.style.cssText='width:32px;font-family:var(--mono);font-size:10px;color:var(--blue);flex-shrink:0;margin-right:4px;cursor:pointer;text-decoration:none';
     etfBadge.textContent=s.etf;
+    etfBadge.title='Open '+s.etf+' on TradingView';
+    if(s.etf)etfBadge.addEventListener('click',e=>{e.stopPropagation();window.open('https://www.tradingview.com/chart/?symbol='+s.etf,'_blank');});
 
     const name=document.createElement('div');name.className='lname';name.textContent=s.name;
     name.style.cursor='default';name.style.fontSize='14px';name.style.fontWeight='500';name.style.color='#fff';
@@ -506,10 +508,23 @@ function renderSectors(){
       const sortedIds=[...themeIds].sort((a,b)=>{const av=stats[a]?.[tf]??null,bv=stats[b]?.[tf]??null;if(av==null&&bv==null)return 0;if(av==null)return 1;if(bv==null)return-1;return bv-av;});
       sortedIds.forEach(tid=>{
         const th2=THEMES.find(t=>t.id===tid);if(!th2)return;
-        const chip=document.createElement('span');const tv2=stats[tid]?.[tf]??null;
+        const tv2=stats[tid]?.[tf]??null;
+        const chipWrap=document.createElement('span');chipWrap.style.cssText='display:inline-flex;align-items:center;gap:2px';
+        const chip=document.createElement('span');
         chip.style.cssText='font-size:9px;font-family:var(--mono);padding:1px 6px;border-radius:2px;border:1px solid '+(tv2==null?'var(--border2)':tv2>=0?'rgba(0,201,122,0.5)':'rgba(255,61,85,0.5)')+';color:'+(tv2==null?'var(--text3)':tv2>=0?'var(--green)':'var(--red)')+';background:'+(tv2==null?'transparent':tv2>=0?'var(--gd)':'var(--rd)')+';cursor:pointer;white-space:nowrap';
         chip.textContent=th2.name+(tv2!=null?(tv2>=0?' +':' ')+tv2.toFixed(1)+'%':'');
-        chip.addEventListener('click',()=>openDrill(tid));subRow.appendChild(chip);
+        chip.addEventListener('click',()=>openDrill(tid));
+        chipWrap.appendChild(chip);
+        // ETF ticker badge — only show if ETF exists and isn't a stock already in the chip name
+        if(th2.etf){
+          const etfTag=document.createElement('span');
+          etfTag.style.cssText='font-size:8px;font-family:var(--mono);padding:1px 4px;border-radius:2px;border:1px solid rgba(45,140,255,0.35);color:var(--blue);background:var(--bd);cursor:pointer;white-space:nowrap;opacity:0.8';
+          etfTag.textContent=th2.etf;
+          etfTag.title='Open '+th2.etf+' on TradingView';
+          etfTag.addEventListener('click',e=>{e.stopPropagation();window.open('https://www.tradingview.com/chart/?symbol='+th2.etf,'_blank');});
+          chipWrap.appendChild(etfTag);
+        }
+        subRow.appendChild(chipWrap);
       });
       rowWrap.appendChild(subRow);
     }
