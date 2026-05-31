@@ -876,7 +876,7 @@ function getSorted(){
 function renderList(filter=''){
   const main=document.getElementById('main');
   const themes=filter?THEMES.filter(t=>t.name.toLowerCase().includes(filter)||t.tickers.some(tk=>tk.toLowerCase().includes(filter))):getSorted();
-  const maxAbs=Math.max(...THEMES.map(t=>Math.abs(stats[t.id]?.today??0)),0.01);
+  const maxAbs=Math.max(...THEMES.map(t=>Math.abs(stats[t.id]?.[tf]??0)),0.01);
   const TFS=['today','1W','1M','3M','6M','YTD'];
   const rs=computeRS();
 
@@ -900,8 +900,9 @@ function renderList(filter=''){
   const body=document.createElement('div');
   themes.forEach(th=>{
     const s=stats[th.id]||{};const tv=s.today??null;
-    const bw=tv!=null?Math.round(Math.abs(tv)/maxAbs*100):0;
-    const bc=tv==null?'var(--bg4)':tv>=0?'var(--green)':'var(--red)';
+    const tfv=s[tf]??null; // selected timeframe value — drives bar color and width
+    const bw=tfv!=null?Math.round(Math.abs(tfv)/maxAbs*100):0;
+    const bc=tfv==null?'var(--bg4)':tfv>=0?'var(--green)':'var(--red)';
     const rsVal=rs[th.id]||50;
     const rsColor=rsVal>=70?'var(--green)':rsVal<=30?'var(--red)':'var(--text3)';
 
