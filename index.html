@@ -3149,7 +3149,7 @@ function renderTickerSearch(q){
   const tw=document.createElement('div');tw.className='tw';
   const tbl=document.createElement('table');
   const thead=document.createElement('thead');const hrow=document.createElement('tr');
-  ['Ticker','Theme','Price','Vol ×','ATR/50MA',...TFS.map(t=>t==='today'?'Today':t)].forEach((lbl,i)=>{
+  ['Ticker','Theme','Price','Vol ×','ATR','Vol %','ATR/50MA',...TFS.map(t=>t==='today'?'Today':t)].forEach((lbl,i)=>{
     const th=document.createElement('th');th.textContent=lbl;
     th.style.textAlign=i<2?'left':'right';hrow.appendChild(th);
   });
@@ -3159,7 +3159,8 @@ function renderTickerSearch(q){
   unique.forEach(r=>{
     const tr=document.createElement('tr');
     const tdTk=document.createElement('td');
-    const tkS=document.createElement('span');tkS.className='tk';tkS.textContent=r.ticker;
+    const tkS=document.createElement('span');tkS.className='tk';tkS.textContent=r.ticker+(r.stale?' ⚠':'');
+    tkS.title=r.stale?'No recent data — may be delisted or halted':'';
     tkS.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
     tdTk.appendChild(tkS);tr.appendChild(tdTk);
     const tdTh=document.createElement('td');tdTh.style.cssText='font-size:11px;color:var(--text2)';
@@ -3167,6 +3168,15 @@ function renderTickerSearch(q){
     const tdP=document.createElement('td');tdP.style.cssText='text-align:right;color:#fff;font-family:var(--mono);font-size:11px';
     tdP.textContent=r.price!=null?'$'+Number(r.price).toFixed(2):'—';tr.appendChild(tdP);
     const tdV=document.createElement('td');tdV.appendChild(volChip(r.volume,r.avgVolume));tr.appendChild(tdV);
+    // ATR $
+    const tdA=document.createElement('td');tdA.style.cssText='text-align:right;color:var(--text2);font-family:var(--mono);font-size:11px';
+    tdA.textContent=r.atr!=null?'$'+r.atr.toFixed(2):'—';tr.appendChild(tdA);
+    // Vol % (ATR/Price)
+    const tdVpct=document.createElement('td');tdVpct.style.cssText='text-align:right;font-family:var(--mono);font-size:11px';
+    const atrPct=(r.atr&&r.price)?(r.atr/r.price*100):null;
+    tdVpct.style.color=atrPct>=8?'var(--green)':atrPct>=4?'#fff':'var(--text2)';
+    tdVpct.textContent=atrPct!=null?atrPct.toFixed(1)+'%':'—';tr.appendChild(tdVpct);
+    // ATR/50MA
     const tdAM=document.createElement('td');tdAM.appendChild(atrBar(r.atrMA??null));tr.appendChild(tdAM);
     TFS.forEach(t=>{const td=document.createElement('td');td.appendChild(miniBar(r[t]??null));tr.appendChild(td);});
     tbody.appendChild(tr);
