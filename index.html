@@ -310,7 +310,8 @@ async function addPositionToSupabase(p){
   try{
     const data=await supaFetch('POST','/rest/v1/positions',[{
       ticker:p.ticker, shares:p.shares, entry:p.entry,
-      notes:p.notes, direction:p.direction
+      notes:p.notes, direction:p.direction,
+      entry_date:p.entry_date||null
     }]);
     if(data&&data[0]) return data[0].id;
   }catch(e){console.warn('Supabase add error:',e);}
@@ -1813,7 +1814,7 @@ function renderPositions(){
       const isLong=(p.direction||'long')==='long';
       const rawMove=price&&p.entry?((price-p.entry)/p.entry*100):null;
       const pctFromEntry=rawMove!=null?(isLong?rawMove:-rawMove):null;
-      const themeName=THEMES.find(t=>t.tickers.includes(p.ticker))?.name||'—';
+      const themeName=getThemesWithWatchlist().find(t=>t.tickers.includes(p.ticker))?.name||'—';
       const volX=d.volume&&d.avgVolume?d.volume/d.avgVolume:null;
       const volPct=d.dailyVol??null;
       return {p,idx,d,price,mktVal,costBasis,pnlDollar,pnlPct,isLong,pctFromEntry,themeName,volX,volPct,entry_date:p.entry_date||'',
@@ -3318,6 +3319,18 @@ function savePositions(){
     localStorage.setItem('tt_positions',JSON.stringify(positions));
     localStorage.setItem('tt_pos_ver', String(positions.length));
   }catch(e){}
+  // Also sync any positions with IDs back to Supabase to persist entry_date and other edits
+  positions.forEach(p=>{
+    if(p.id){
+      supaFetch('PATCH','/rest/v1/positions?id=eq.'+p.id,{
+        entry_date:p.entry_date||null,
+        shares:p.shares,
+        entry:p.entry,
+        notes:p.notes,
+        direction:p.direction
+      }).catch(e=>console.warn('Supabase sync error:',e));
+    }
+  });
 }
 
 function loadSharedPositions(){
