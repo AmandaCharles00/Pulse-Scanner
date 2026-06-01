@@ -641,7 +641,7 @@ async function doSync(){
       const r=await fetch('https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?tickers='+encodeURIComponent(batch)+'&apiKey='+key);
       const d=await r.json();
       (d.tickers||[]).forEach(t=>{
-        cache[t.ticker]={today:t.todaysChangePerc!=null?+(t.todaysChangePerc).toFixed(2):null,price:t.day?.c||t.prevDay?.c||null,volume:t.day?.v||null,avgVolume:t.prevDay?.v||null,'1W':null,'1M':null,'3M':null,YTD:null,atr:null,ma50:null,atrMA:null};
+        cache[t.ticker]={today:t.todaysChangePerc!=null?+(t.todaysChangePerc).toFixed(2):null,price:t.last?.price||t.day?.c||t.prevDay?.c||null,volume:t.day?.v||null,avgVolume:t.prevDay?.v||null,'1W':null,'1M':null,'3M':null,YTD:null,atr:null,ma50:null,atrMA:null};
       });
     }catch(e){}
   }
