@@ -1140,29 +1140,37 @@ async function loadNotes(container){
 function renderNote(note,i,container){
   const idx=i%NOTE_COLORS.length;
   const card=document.createElement('div');
-  card.style.cssText='background:'+NOTE_COLORS[idx]+';border:1px solid '+NOTE_BORDERS[idx]+';border-radius:6px;padding:10px 12px;width:200px;flex-shrink:0;position:relative;display:flex;flex-direction:column;gap:5px;box-shadow:0 2px 8px rgba(0,0,0,0.3)';
+  card.style.cssText='background:'+NOTE_COLORS[idx]+';border:1px solid '+NOTE_BORDERS[idx]+';border-radius:6px;padding:10px 12px;width:210px;flex-shrink:0;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 8px rgba(0,0,0,0.3)';
 
-  // Header — author + ticker + time
-  const hdr=document.createElement('div');
-  hdr.style.cssText='display:flex;align-items:center;gap:6px;flex-wrap:wrap';
+  // Row 1 — author + delete
+  const topRow=document.createElement('div');
+  topRow.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:6px';
   const author=document.createElement('span');
-  author.style.cssText='font-size:10px;font-family:var(--mono);color:'+NOTE_BORDERS[idx].replace('0.4','0.9')+';font-weight:500';
+  author.style.cssText='font-size:11px;font-family:var(--mono);color:'+NOTE_BORDERS[idx].replace('0.4','0.9')+';font-weight:500';
   author.textContent=note.author||'Anonymous';
-  hdr.appendChild(author);
+  topRow.appendChild(author);
+  const del=document.createElement('button');
+  del.style.cssText='background:transparent;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0';
+  del.textContent='✕';del.title='Delete note';
+  del.addEventListener('mouseenter',()=>del.style.color='var(--red)');
+  del.addEventListener('mouseleave',()=>del.style.color='var(--text3)');
+  del.addEventListener('click',async()=>{
+    if(!confirm('Delete this note?'))return;
+    await supaFetch('DELETE','/rest/v1/pulse_notes?id=eq.'+note.id);
+    loadNotes(container);
+  });
+  topRow.appendChild(del);
+  card.appendChild(topRow);
+
+  // Row 2 — ticker badge
   if(note.ticker){
     const tk=document.createElement('span');
-    tk.style.cssText='font-size:9px;font-family:var(--mono);padding:1px 5px;border-radius:2px;background:rgba(45,140,255,0.15);border:1px solid rgba(45,140,255,0.35);color:var(--blue);cursor:pointer';
+    tk.style.cssText='display:inline-block;font-size:13px;font-family:var(--mono);font-weight:600;padding:3px 9px;border-radius:3px;background:rgba(45,140,255,0.18);border:1px solid rgba(45,140,255,0.45);color:var(--blue);cursor:pointer;width:fit-content';
     tk.textContent=note.ticker;
     tk.title='Open on TradingView';
     tk.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+note.ticker,'_blank'));
-    hdr.appendChild(tk);
+    card.appendChild(tk);
   }
-  const ts=document.createElement('span');
-  ts.style.cssText='font-size:9px;color:var(--text3);font-family:var(--mono);margin-left:auto';
-  const d=new Date(note.created_at);
-  ts.textContent=d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
-  hdr.appendChild(ts);
-  card.appendChild(hdr);
 
   // Note text
   const txt=document.createElement('div');
@@ -1170,21 +1178,13 @@ function renderNote(note,i,container){
   txt.textContent=note.text;
   card.appendChild(txt);
 
-  // Delete button — only show for notes by current author
-  const savedAuthor=localStorage.getItem('pulse_author')||'';
-  if(savedAuthor&&note.author===savedAuthor){
-    const del=document.createElement('button');
-    del.style.cssText='position:absolute;top:6px;right:8px;background:transparent;border:none;color:var(--text3);font-size:11px;cursor:pointer;padding:0;line-height:1';
-    del.textContent='✕';del.title='Delete note';
-    del.addEventListener('mouseenter',()=>del.style.color='var(--red)');
-    del.addEventListener('mouseleave',()=>del.style.color='var(--text3)');
-    del.addEventListener('click',async()=>{
-      if(!confirm('Delete this note?'))return;
-      await supaFetch('DELETE','/rest/v1/pulse_notes?id=eq.'+note.id);
-      loadNotes(container);
-    });
-    card.appendChild(del);
-  }
+  // Timestamp — readable, own line at bottom
+  const d=new Date(note.created_at);
+  const ts=document.createElement('div');
+  ts.style.cssText='font-size:10px;color:var(--text3);font-family:var(--mono);border-top:1px solid rgba(255,255,255,0.07);padding-top:5px;margin-top:2px';
+  ts.textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
+  card.appendChild(ts);
+
   return card;
 }
 
