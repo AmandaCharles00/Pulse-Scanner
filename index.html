@@ -8,7 +8,7 @@
 :root{
   --bg:#0d0f14;--bg2:#12151c;--bg3:#181c26;--bg4:#1e2330;
   --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);
-  --text:#cdd6e8;--text2:#6b7a90;--text3:#3a4455;
+  --text:#cdd6e8;--text2:#a0aec0;--text3:#8899b0;
   --green:#00c97a;--gd:rgba(0,201,122,0.13);
   --red:#ff3d55;--rd:rgba(255,61,85,0.13);
   --blue:#2d8cff;--bd:rgba(45,140,255,0.15);
@@ -25,12 +25,12 @@ body{display:flex;flex-direction:column}
 .tab:hover{color:var(--text)}.tab.on{color:var(--blue);border-bottom-color:var(--blue)}
 .right{margin-left:auto;display:flex;align-items:center;gap:5px}
 .si{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-size:12px;padding:3px 8px;width:130px;outline:none}
-.si:focus{border-color:var(--blue);color:var(--text)}.si::placeholder{color:var(--text3)}
+.si:focus{border-color:var(--blue);color:var(--text)}.si::placeholder{color:var(--text2)}
 .vtg{display:flex;border:1px solid var(--border2);border-radius:3px;overflow:hidden}
 .vb{background:var(--bg3);border:none;color:#fff;padding:4px 9px;cursor:pointer;font-size:12px;font-family:var(--mono)}
 .vb:hover{background:var(--bg4)}.vb.on{background:var(--bd);color:var(--blue)}
 .ki{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:10px;padding:3px 7px;width:190px;outline:none}
-.ki:focus{border-color:var(--blue)}.ki::placeholder{color:var(--text3)}
+.ki:focus{border-color:var(--blue)}.ki::placeholder{color:var(--text2)}
 .sbtn{background:var(--gd);border:1px solid var(--green);border-radius:3px;color:var(--green);font-family:var(--mono);font-size:11px;padding:3px 10px;cursor:pointer;white-space:nowrap}
 .sbtn:hover{background:rgba(0,201,122,0.22)}.sbtn.busy{opacity:0.5;cursor:default}
 .xbtn{background:transparent;border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 8px;cursor:pointer}
@@ -53,12 +53,12 @@ body{display:flex;flex-direction:column}
 .main{flex:1;overflow:hidden;display:flex;flex-direction:column}
 .lv{flex:1;overflow-y:auto}
 .lhdr{display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5}
-.lhdr-name{flex:1;font-size:9px;color:#ccc;letter-spacing:.07em;text-transform:uppercase}
+.lhdr-name{flex:1;font-size:9px;color:#d0d8e8;letter-spacing:.07em;text-transform:uppercase}
 .lhdr-bar{width:110px;flex-shrink:0}
-.lhdr-tf{width:70px;text-align:right;font-size:9px;color:#ccc;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);flex-shrink:0;cursor:pointer}
+.lhdr-tf{width:70px;text-align:right;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);flex-shrink:0;cursor:pointer}
 .lhdr-tf:hover,.lhdr-tf.on{color:var(--blue)}
-.lhdr-rs{width:32px;text-align:right;font-size:9px;color:#ccc;font-family:var(--mono);flex-shrink:0}
-.lhdr-cnt{width:26px;text-align:right;font-size:9px;color:#ccc;flex-shrink:0}
+.lhdr-rs{width:32px;text-align:right;font-size:9px;color:#d0d8e8;font-family:var(--mono);flex-shrink:0}
+.lhdr-cnt{width:26px;text-align:right;font-size:9px;color:#d0d8e8;flex-shrink:0}
 .lrow{display:flex;align-items:center;padding:0 14px;height:38px;border-bottom:1px solid var(--border);transition:background .08s}
 .lrow:hover{background:var(--bg3)}.lrow.sel{background:rgba(45,140,255,.06);border-left:2px solid var(--blue)}
 .lchk{margin-right:9px;flex-shrink:0;accent-color:var(--blue);width:12px;height:12px;cursor:pointer}
@@ -69,8 +69,8 @@ body{display:flex;flex-direction:column}
 .ltf{width:70px;text-align:right;font-family:var(--mono);font-size:12px;flex-shrink:0;cursor:pointer}
 .ltf:hover{opacity:.7}
 .lrs{width:32px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0}
-.lcnt{width:26px;text-align:right;font-size:11px;color:#aab;flex-shrink:0}
-.pos{color:var(--green)}.neg{color:var(--red)}.neu{color:#8899aa}
+.lcnt{width:26px;text-align:right;font-size:11px;color:#c0cce0;flex-shrink:0}
+.pos{color:var(--green)}.neg{color:var(--red)}.neu{color:#a0aec0}
 .hv{flex:1;overflow-y:auto;padding:8px}
 .hgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:4px}
 .hcell{padding:10px 12px 8px;border-radius:4px;cursor:pointer}
@@ -82,9 +82,9 @@ body{display:flex;flex-direction:column}
 .dhdr{padding:8px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px;flex-shrink:0;background:var(--bg2)}
 .dback{background:transparent;border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 8px;cursor:pointer}
 .dback:hover{color:var(--text)}
-.dtitle{font-size:14px;font-weight:500}.dsub{font-size:10px;color:#aab}
+.dtitle{font-size:14px;font-weight:500}.dsub{font-size:10px;color:#c0cce0}
 .dsi{margin-left:auto;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-size:12px;padding:3px 8px;width:130px;outline:none}
-.dsi:focus{border-color:var(--blue);color:var(--text)}.dsi::placeholder{color:var(--text3)}
+.dsi:focus{border-color:var(--blue);color:var(--text)}.dsi::placeholder{color:var(--text2)}
 .tw{flex:1;overflow-y:auto}
 table{width:100%;border-collapse:collapse}
 thead{position:sticky;top:0;background:var(--bg2);z-index:4}
@@ -105,13 +105,13 @@ tr:hover td{background:var(--bg3)}
 .as-title{font-size:11px;color:#fff;margin-bottom:8px;letter-spacing:.05em;text-transform:uppercase;font-family:var(--mono);padding-bottom:4px;border-bottom:1px solid var(--border)}
 .as-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
 .as-label{flex:1;font-size:12px}
-.as-sub{font-size:11px;color:#aab;margin-top:2px}
+.as-sub{font-size:11px;color:#c0cce0;margin-top:2px}
 .as-in{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12px;padding:3px 8px;width:70px;outline:none;text-align:right}
 .as-in:focus{border-color:var(--blue)}
 .as-toggle{display:flex;gap:4px}
 .as-tog{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 8px;cursor:pointer}
 .as-tog.on{background:var(--gd);border-color:var(--green);color:var(--green)}
-.state{padding:60px 20px;text-align:center;color:#aab;font-size:12px;line-height:2.4}
+.state{padding:60px 20px;text-align:center;color:#c0cce0;font-size:12px;line-height:2.4}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
 .tooltip-wrap{position:relative;display:inline-block;cursor:help}
@@ -119,7 +119,7 @@ tr:hover td{background:var(--bg3)}
 .tooltip-wrap .tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--border2)}
 .tooltip-wrap:hover .tooltip{visibility:visible;opacity:1}
 ::-webkit-scrollbar{width:6px;height:10px}::-webkit-scrollbar-track{background:var(--bg3);border-radius:4px}
-::-webkit-scrollbar-thumb{background:var(--text3);border-radius:4px}
+::-webkit-scrollbar-thumb{background:var(--text2);border-radius:4px}
 ::-webkit-scrollbar-thumb:hover{background:var(--text2)}
 </style>
 </head>
@@ -169,32 +169,32 @@ tr:hover td{background:var(--bg3)}
 <div class="main" id="main">
   <div id="onboard" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:0;padding:40px 20px;text-align:center">
     <div style="font-family:var(--mono);font-size:22px;font-weight:500;color:var(--text);margin-bottom:8px">Pulse Scanner</div>
-    <div style="font-size:13px;color:#aab;margin-bottom:36px">Real-time theme & sector performance powered by Polygon.io</div>
+    <div style="font-size:13px;color:#c0cce0;margin-bottom:36px">Real-time theme & sector performance powered by Polygon.io</div>
 
     <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:28px 32px;max-width:420px;width:100%;text-align:left">
       <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px">Get Started</div>
-      <div style="font-size:12px;color:#ccc;margin-bottom:20px;line-height:1.7">
+      <div style="font-size:12px;color:#d0d8e8;margin-bottom:20px;line-height:1.7">
         You need a <a href="https://polygon.io/dashboard/signup" target="_blank" style="color:var(--blue)">Polygon.io Starter</a> API key (~$29/mo) to sync live market data.
         Your key is stored locally in your browser and never shared.
       </div>
 
       <div style="font-size:10px;color:var(--text2);font-family:var(--mono);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Step 1 — Enter your API key above and hit Sync</div>
-      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:10px 12px;font-size:12px;color:#ccc;margin-bottom:16px;font-family:var(--mono)">
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:10px 12px;font-size:12px;color:#d0d8e8;margin-bottom:16px;font-family:var(--mono)">
         ↑ Paste key in the field at top right, then click <span style="color:var(--green)">⟳ Sync</span>
       </div>
 
       <div style="font-size:10px;color:var(--text2);font-family:var(--mono);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Step 2 — Explore your themes</div>
-      <div style="font-size:12px;color:#ccc;line-height:1.7;margin-bottom:16px">
+      <div style="font-size:12px;color:#d0d8e8;line-height:1.7;margin-bottom:16px">
         After syncing, browse 48 themes ranked by performance. Click any theme to see individual tickers with ATR, volume, and % change across all timeframes.
       </div>
 
       <div style="font-size:10px;color:var(--text2);font-family:var(--mono);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Step 3 — Set up TradingView (optional)</div>
-      <div style="font-size:11px;color:var(--text3);line-height:1.7">
+      <div style="font-size:11px;color:var(--text2);line-height:1.7">
         In TradingView, save your indicators as a <strong style="color:var(--text2)">Default Chart Layout</strong> so they load automatically when you click any ticker link.
       </div>
     </div>
 
-    <div style="display:flex;gap:24px;margin-top:24px;font-size:11px;color:#aab">
+    <div style="display:flex;gap:24px;margin-top:24px;font-size:11px;color:#c0cce0">
       <div>⚡ 48 themes</div>
       <div>📊 ATR / 50MA scan</div>
       <div>🔔 Custom alerts</div>
@@ -426,7 +426,7 @@ function renderSectors(){
     h.addEventListener('click',()=>{tf=t;document.querySelectorAll('.tf').forEach(b=>b.classList.toggle('on',b.textContent===(t==='today'?'Today':t)));renderSectors();});
     hdr.appendChild(h);
   });
-  const hvol2=document.createElement('div');hvol2.className='lhdr-tf';hvol2.style.cssText='width:52px;text-align:right;font-size:9px;color:#ccc;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);flex-shrink:0';hvol2.textContent='ATR%';
+  const hvol2=document.createElement('div');hvol2.className='lhdr-tf';hvol2.style.cssText='width:52px;text-align:right;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);flex-shrink:0';hvol2.textContent='ATR%';
   const hrs=document.createElement('div');hrs.className='lhdr-rs';hrs.textContent='RS';
   hrs.style.cursor='help';
   const hcnt=document.createElement('div');hcnt.className='lhdr-cnt';hcnt.textContent='#';
@@ -445,7 +445,7 @@ function renderSectors(){
     const bw=tv!=null?Math.round(Math.abs(tv)/maxAbs*100):0;
     const bc=tv==null?'var(--bg4)':tv>=0?'var(--green)':'var(--red)';
     const rsVal=rs[s.id]||50;
-    const rsColor=rsVal>=70?'var(--green)':rsVal<=30?'var(--red)':'var(--text3)';
+    const rsColor=rsVal>=70?'var(--green)':rsVal<=30?'var(--red)':'var(--text2)';
 
     const row=document.createElement('div');
     row.style.cssText='display:flex;align-items:center;padding:0 14px;height:38px;cursor:default';
@@ -462,7 +462,7 @@ function renderSectors(){
 
     // Pulse sparkline — color and amplitude both reflect selected timeframe (tf), not hardcoded today
     const pulseW=document.createElement('div');pulseW.style.cssText='width:110px;height:28px;flex-shrink:0;display:flex;align-items:center;margin-right:4px;overflow:hidden';
-    const pulseCol=tfv==null?'#3a4455':tfv>=0?'var(--green)':'var(--red)';
+    const pulseCol=tfv==null?'#5a6a80':tfv>=0?'var(--green)':'var(--red)';
     const pw=110,ph=28,mid=ph/2;
     // Health score uses tfv so amplitude reflects selected timeframe ranking
     const health=tfv==null?0.1:Math.max(0,Math.min(1,(tfv-sectorMin)/sectorRange));
@@ -494,7 +494,7 @@ function renderSectors(){
     const avgAtr2=atrPcts2.length?+(atrPcts2.reduce((a,b)=>a+b,0)/atrPcts2.length).toFixed(2):null;
     const atrEl2=document.createElement('div');
     atrEl2.style.cssText='width:52px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';
-    atrEl2.style.color=avgAtr2>=8?'var(--green)':avgAtr2>=4?'var(--text)':'var(--text3)';
+    atrEl2.style.color=avgAtr2>=8?'var(--green)':avgAtr2>=4?'var(--text)':'var(--text2)';
     atrEl2.textContent=avgAtr2!=null?avgAtr2.toFixed(1)+'%':'—';
 
     const rsEl=document.createElement('div');rsEl.className='lrs';rsEl.style.color=rsColor;rsEl.textContent=rsVal;
@@ -511,7 +511,7 @@ function renderSectors(){
         const th2=THEMES.find(t=>t.id===tid);if(!th2)return;
         const tv2=stats[tid]?.[tf]??null;
         const chip=document.createElement('span');
-        chip.style.cssText='font-size:9px;font-family:var(--mono);padding:1px 6px;border-radius:2px;border:1px solid '+(tv2==null?'var(--border2)':tv2>=0?'rgba(0,201,122,0.5)':'rgba(255,61,85,0.5)')+';color:'+(tv2==null?'var(--text3)':tv2>=0?'var(--green)':'var(--red)')+';background:'+(tv2==null?'transparent':tv2>=0?'var(--gd)':'var(--rd)')+';cursor:pointer;white-space:nowrap';
+        chip.style.cssText='font-size:9px;font-family:var(--mono);padding:1px 6px;border-radius:2px;border:1px solid '+(tv2==null?'var(--border2)':tv2>=0?'rgba(0,201,122,0.5)':'rgba(255,61,85,0.5)')+';color:'+(tv2==null?'var(--text2)':tv2>=0?'var(--green)':'var(--red)')+';background:'+(tv2==null?'transparent':tv2>=0?'var(--gd)':'var(--rd)')+';cursor:pointer;white-space:nowrap';
         chip.textContent=th2.name+(tv2!=null?(tv2>=0?' +':' ')+tv2.toFixed(1)+'%':'');
         chip.addEventListener('click',()=>openDrill(tid));
         subRow.appendChild(chip);
@@ -829,12 +829,12 @@ function renderAlertBar(){
     const item=document.createElement('div');item.className='alert-item';
     const tk=document.createElement('span');tk.className='atk';tk.textContent=a.ticker;
     tk.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+a.ticker,'_blank'));
-    const th=document.createElement('span');th.style.cssText='color:#aab;width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0';th.textContent=a.theme;
+    const th=document.createElement('span');th.style.cssText='color:#c0cce0;width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0';th.textContent=a.theme;
     const msg=document.createElement('span');msg.className='amsg';msg.textContent='⚡ '+a.msg;
     const ts=document.createElement('span');ts.style.cssText='color:#fff;font-size:10px;font-family:var(--mono);flex-shrink:0;margin-left:8px;opacity:0.7';ts.textContent=a.time||'';
     item.append(tk,th,msg,ts);bar.appendChild(item);
   });
-  if(triggeredAlerts.length>8){const m=document.createElement('div');m.style.cssText='font-size:10px;color:var(--text3);font-family:var(--mono)';m.textContent='+'+(triggeredAlerts.length-8)+' more — see Alerts tab';bar.appendChild(m);}
+  if(triggeredAlerts.length>8){const m=document.createElement('div');m.style.cssText='font-size:10px;color:var(--text2);font-family:var(--mono)';m.textContent='+'+(triggeredAlerts.length-8)+' more — see Alerts tab';bar.appendChild(m);}
 }
 
 // ── AUTO REFRESH ──────────────────────────────────────────────────────────────
@@ -932,7 +932,7 @@ function renderList(filter=''){
     h.addEventListener('click',()=>{tf=t;document.querySelectorAll('.tf').forEach(b=>b.classList.toggle('on',b.textContent===(t==='today'?'Today':t)));renderList();});
     hdr.appendChild(h);
   });
-  const hvol=document.createElement('div');hvol.className='lhdr-tf';hvol.style.cssText='width:52px;text-align:right;font-size:9px;color:#ccc;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);flex-shrink:0';hvol.textContent='Vol %';
+  const hvol=document.createElement('div');hvol.className='lhdr-tf';hvol.style.cssText='width:52px;text-align:right;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);flex-shrink:0';hvol.textContent='Vol %';
   const hrs=document.createElement('div');hrs.className='lhdr-rs';hrs.textContent='RS';
   hrs.style.cursor='help';
   const hcnt=document.createElement('div');hcnt.className='lhdr-cnt';hcnt.textContent='#';
@@ -945,7 +945,7 @@ function renderList(filter=''){
     const bw=tfv!=null?Math.round(Math.abs(tfv)/maxAbs*100):0;
     const bc=tfv==null?'var(--bg4)':tfv>=0?'var(--green)':'var(--red)';
     const rsVal=rs[th.id]||50;
-    const rsColor=rsVal>=70?'var(--green)':rsVal<=30?'var(--red)':'var(--text3)';
+    const rsColor=rsVal>=70?'var(--green)':rsVal<=30?'var(--red)':'var(--text2)';
 
     const row=document.createElement('div');row.className='lrow'+(selected.has(th.id)?' sel':'');
     const chk=document.createElement('input');chk.type='checkbox';chk.className='lchk';chk.checked=selected.has(th.id);
@@ -971,7 +971,7 @@ function renderList(filter=''){
     const avgAtrPct=atrPcts.length?+(atrPcts.reduce((a,b)=>a+b,0)/atrPcts.length).toFixed(2):null;
     const atrPctEl=document.createElement('div');
     atrPctEl.style.cssText='width:52px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';
-    atrPctEl.style.color=avgAtrPct>=2.5?'var(--green)':avgAtrPct>=1.5?'var(--text)':'var(--text3)';
+    atrPctEl.style.color=avgAtrPct>=2.5?'var(--green)':avgAtrPct>=1.5?'var(--text)':'var(--text2)';
     atrPctEl.textContent=avgAtrPct!=null?avgAtrPct.toFixed(2)+'%':'—';
 
     const rsEl=document.createElement('div');rsEl.className='lrs';rsEl.style.color=rsColor;rsEl.textContent=rsVal;
@@ -1042,7 +1042,7 @@ function renderDrill(filter=''){drillFilter=filter;
   thead.appendChild(hrow);tbl.appendChild(thead);
 
   const tbody=document.createElement('tbody');
-  if(!rows.length){const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=10;td.style.cssText='text-align:center;padding:40px;color:var(--text3)';td.textContent='No tickers';tr.appendChild(td);tbody.appendChild(tr);}
+  if(!rows.length){const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=10;td.style.cssText='text-align:center;padding:40px;color:var(--text2)';td.textContent='No tickers';tr.appendChild(td);tbody.appendChild(tr);}
   else rows.forEach(r=>{
     const tr=document.createElement('tr');
     const tdTk=document.createElement('td');const tkS=document.createElement('span');tkS.className='tk';tkS.textContent=r.ticker+(r.stale?' ⚠':'');tkS.title=r.stale?'No recent data — may be delisted or halted':'';tkS.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));tdTk.appendChild(tkS);tr.appendChild(tdTk);
@@ -1110,7 +1110,7 @@ function renderMovers(){
       const pct=document.createElement('span');pct.style.cssText='font-family:var(--mono);font-size:11px;font-weight:500;color:'+(isG?'var(--green)':'var(--red)')+';flex-shrink:0';pct.textContent=f2(r[tf]);
       const vol=r.volume&&r.avgVolume?r.volume/r.avgVolume:null;
       const volEl=document.createElement('span');volEl.style.cssText='font-family:var(--mono);font-size:10px;flex-shrink:0;width:36px;text-align:right';
-      volEl.style.color=vol>=2?'var(--green)':vol>=1.3?'var(--amber)':'#aab';volEl.textContent=vol?vol.toFixed(1)+'x':'';
+      volEl.style.color=vol>=2?'var(--green)':vol>=1.3?'var(--amber)':'#c0cce0';volEl.textContent=vol?vol.toFixed(1)+'x':'';
       row.append(tk,th2,pct,volEl);sec.appendChild(row);
     });
     return sec;
@@ -1131,7 +1131,7 @@ async function loadNotes(container){
   }
   container.innerHTML='';
   if(!data.length){
-    container.innerHTML='<div style="font-size:11px;color:var(--text3);font-family:var(--mono);padding:8px 0">No notes yet — be the first to post!</div>';
+    container.innerHTML='<div style="font-size:11px;color:var(--text2);font-family:var(--mono);padding:8px 0">No notes yet — be the first to post!</div>';
     return;
   }
   data.forEach((note,i)=>container.appendChild(renderNote(note,i,container)));
@@ -1150,10 +1150,10 @@ function renderNote(note,i,container){
   author.textContent=note.author||'Anonymous';
   topRow.appendChild(author);
   const del=document.createElement('button');
-  del.style.cssText='background:transparent;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0';
+  del.style.cssText='background:transparent;border:none;color:var(--text2);font-size:13px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0';
   del.textContent='✕';del.title='Delete note';
   del.addEventListener('mouseenter',()=>del.style.color='var(--red)');
-  del.addEventListener('mouseleave',()=>del.style.color='var(--text3)');
+  del.addEventListener('mouseleave',()=>del.style.color='var(--text2)');
   del.addEventListener('click',async()=>{
     if(!confirm('Delete this note?'))return;
     await supaFetch('DELETE','/rest/v1/pulse_notes?id=eq.'+note.id);
@@ -1181,7 +1181,7 @@ function renderNote(note,i,container){
   // Timestamp — readable, own line at bottom
   const d=new Date(note.created_at);
   const ts=document.createElement('div');
-  ts.style.cssText='font-size:10px;color:var(--text3);font-family:var(--mono);border-top:1px solid rgba(255,255,255,0.07);padding-top:5px;margin-top:2px';
+  ts.style.cssText='font-size:11px;color:#ffffff;font-family:var(--mono);border-top:1px solid rgba(255,255,255,0.15);padding-top:6px;margin-top:2px;font-weight:500';
   ts.textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
   card.appendChild(ts);
 
@@ -1265,7 +1265,7 @@ function renderAlertSettings(){
       row.append(tk2,cur,targets,delBtn);s3.appendChild(row);
     });
   } else {
-    const none=document.createElement('div');none.style.cssText='color:var(--text3);font-size:11px;padding:10px 0';
+    const none=document.createElement('div');none.style.cssText='color:var(--text2);font-size:11px;padding:10px 0';
     none.textContent='No custom ticker alerts set.';s3.appendChild(none);
   }
   asv.appendChild(s3);
@@ -1278,7 +1278,7 @@ function renderAlertSettings(){
   const notesGrid=document.createElement('div');
   notesGrid.id='notes-grid';
   notesGrid.style.cssText='display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;min-height:40px';
-  notesGrid.innerHTML='<div style="font-size:11px;color:var(--text3);font-family:var(--mono);padding:8px 0">Loading notes...</div>';
+  notesGrid.innerHTML='<div style="font-size:11px;color:var(--text2);font-family:var(--mono);padding:8px 0">Loading notes...</div>';
   s4.appendChild(notesGrid);
 
   // Add note form
@@ -1323,14 +1323,14 @@ function renderAlertSettings(){
       const row=document.createElement('div');row.className='as-row';
       const tk=document.createElement('span');tk.style.cssText='width:60px;color:var(--blue);font-family:var(--mono);font-weight:500;cursor:pointer;flex-shrink:0';tk.textContent=a.ticker;
       tk.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+a.ticker,'_blank'));
-      const th2=document.createElement('span');th2.style.cssText='width:130px;font-size:11px;color:#aab;flex-shrink:0';th2.textContent=a.theme;
+      const th2=document.createElement('span');th2.style.cssText='width:130px;font-size:11px;color:#c0cce0;flex-shrink:0';th2.textContent=a.theme;
       const msg=document.createElement('span');msg.style.color='var(--amber)';msg.textContent=a.msg;
       const ts2=document.createElement('span');ts2.style.cssText='color:#fff;font-size:10px;font-family:var(--mono);flex-shrink:0;margin-left:auto;opacity:0.7';ts2.textContent=a.time||'';
       row.append(tk,th2,msg,ts2);s2.appendChild(row);
     });
     asv.appendChild(s2);
   } else {
-    const none=document.createElement('div');none.style.cssText='color:var(--text3);font-size:11px;margin-top:12px';
+    const none=document.createElement('div');none.style.cssText='color:var(--text2);font-size:11px;margin-top:12px';
     none.textContent=Object.keys(cache).length>0?'No alerts at current thresholds.':'Sync data first.';asv.appendChild(none);
   }
   main.innerHTML='';main.appendChild(asv);
@@ -1530,7 +1530,7 @@ function buildScanResults(thresh, volOnly, minAtrPct, minDVol, direction, scanTF
   body.innerHTML='';
 
   if(!results.length){
-    body.innerHTML='<div class="state" style="padding:30px;color:#aab">No tickers within '+thresh+'% of '+maLabel+(volOnly?' with vol >1.5x':'')+'</div>';
+    body.innerHTML='<div class="state" style="padding:30px;color:#c0cce0">No tickers within '+thresh+'% of '+maLabel+(volOnly?' with vol >1.5x':'')+'</div>';
     return;
   }
 
@@ -1559,7 +1559,7 @@ function buildScanResults(thresh, volOnly, minAtrPct, minDVol, direction, scanTF
 
   // Header
   const hdr=document.createElement('div');
-  hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#ccc;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
+  hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
   const h50Static=(t,w,extra='')=>{const d=document.createElement('div');d.style.cssText='width:'+w+';text-align:right;flex-shrink:0;'+extra;d.textContent=t;return d;};
   const h50Left=(t,w)=>{const d=document.createElement('div');d.style.cssText='width:'+w+';flex-shrink:0';d.textContent=t;return d;};
   hdr.append(
@@ -1617,7 +1617,7 @@ function buildScanResults(thresh, volOnly, minAtrPct, minDVol, direction, scanTF
     const atrPctEl=document.createElement('div');
     atrPctEl.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:12px;flex-shrink:0';
     const atrPctVal = r.dailyVol??null;
-    atrPctEl.style.color = atrPctVal>=2.5?'var(--green)':atrPctVal>=1.5?'#fff':'#aab';
+    atrPctEl.style.color = atrPctVal>=2.5?'var(--green)':atrPctVal>=1.5?'#fff':'#c0cce0';
     atrPctEl.textContent = atrPctVal!=null ? atrPctVal.toFixed(2)+'%' : '—';
 
     const atrMA=document.createElement('div');
@@ -1634,7 +1634,7 @@ function buildScanResults(thresh, volOnly, minAtrPct, minDVol, direction, scanTF
 
     // Avg dollar volume cell
     const dvolEl=document.createElement('div');
-    dvolEl.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:12px;color:#aab;flex-shrink:0';
+    dvolEl.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:12px;color:#c0cce0;flex-shrink:0';
     dvolEl.textContent=r.avgDVol!=null?'$'+r.avgDVol.toFixed(0)+'M':'—';
     row.append(tk,th,price,ma,pct,atr,atrPctEl,atrMA,vol,dvolEl,today);
     body.appendChild(row);
@@ -1733,7 +1733,7 @@ function renderPositions(){
     el.addEventListener('keydown',e=>{if(e.key==='Enter')addBtn.click();});
   });
 
-  const lbl=document.createElement('span');lbl.style.cssText='font-size:10px;color:var(--text3);font-family:var(--mono);margin-right:4px';
+  const lbl=document.createElement('span');lbl.style.cssText='font-size:10px;color:var(--text2);font-family:var(--mono);margin-right:4px';
   lbl.textContent='Add:';
 
   // Long/Short toggle
@@ -1750,7 +1750,7 @@ function renderPositions(){
     dirToggle.style.color=isLong?'var(--red)':'var(--green)';
   });
 
-  const sep5=document.createElement('span');sep5.style.cssText='color:var(--text3);margin:0 6px';sep5.textContent='|';
+  const sep5=document.createElement('span');sep5.style.cssText='color:var(--text2);margin:0 6px';sep5.textContent='|';
 
   // Refresh button — reloads positions from Supabase
   const refreshBtn=document.createElement('button');
@@ -1770,7 +1770,7 @@ function renderPositions(){
   const tw=document.createElement('div');tw.style.cssText='flex:1;overflow-y:auto';
 
   if(!positions.length){
-    tw.innerHTML='<div class="state">No positions yet<br><span style="font-size:10px;color:var(--text3)">Enter a ticker above and click + Add Position</span></div>';
+    tw.innerHTML='<div class="state">No positions yet<br><span style="font-size:10px;color:var(--text2)">Enter a ticker above and click + Add Position</span></div>';
   } else {
     const tbl=document.createElement('table');
     const thead=document.createElement('thead');const hrow=document.createElement('tr');
@@ -1926,7 +1926,7 @@ function renderPositions(){
       if(pctFromEntry!=null){
         tdMoveFrom.style.color=pctFromEntry>=0?'var(--green)':'var(--red)';
         tdMoveFrom.textContent=(pctFromEntry>=0?'+':'')+pctFromEntry.toFixed(2)+'%';
-      } else {tdMoveFrom.textContent='—';tdMoveFrom.style.color='var(--text3)';}
+      } else {tdMoveFrom.textContent='—';tdMoveFrom.style.color='var(--text2)';}
       tr.appendChild(tdMoveFrom);
 
       // ATR/50MA
@@ -1969,7 +1969,7 @@ function renderPositions(){
 
         const mkField=(lbl,val,type='text')=>{
           const wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;gap:4px';
-          const l=document.createElement('label');l.style.cssText='font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em';l.textContent=lbl;
+          const l=document.createElement('label');l.style.cssText='font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em';l.textContent=lbl;
           const inp=document.createElement('input');inp.className='pos-in';inp.type=type;inp.value=val||'';inp.style.cssText='width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12px;padding:6px 8px;outline:none';
           inp.addEventListener('focus',()=>inp.style.borderColor='var(--blue)');
           inp.addEventListener('blur',()=>inp.style.borderColor='var(--border2)');
@@ -2124,7 +2124,7 @@ function renderGaps(){
 
   // Session indicator
   const session=getMarketSession();
-  const sessionCol=session==='Market Hours'?'var(--green)':session==='Pre-Market'?'var(--amber)':session==='After-Hours'?'var(--blue)':'var(--text3)';
+  const sessionCol=session==='Market Hours'?'var(--green)':session==='Pre-Market'?'var(--amber)':session==='After-Hours'?'var(--blue)':'var(--text2)';
   const sessionBadge=document.createElement('span');
   sessionBadge.style.cssText='font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:3px;border:1px solid '+sessionCol+';color:'+sessionCol+';background:'+sessionCol+'22;flex-shrink:0';
   sessionBadge.textContent='⏱ '+session;
@@ -2196,13 +2196,13 @@ function buildGaps(minGap, minDVol, volOnly, body){
   body.innerHTML='';
 
   if(!results.length){
-    body.innerHTML=`<div class="state" style="padding:30px;color:var(--text3)">No gaps ≥${minGap}% found in today\'s data<br><span style="font-size:10px">Sync during market hours for fresh gap data</span></div>`;
+    body.innerHTML=`<div class="state" style="padding:30px;color:var(--text2)">No gaps ≥${minGap}% found in today\'s data<br><span style="font-size:10px">Sync during market hours for fresh gap data</span></div>`;
     return;
   }
 
   // Header
   const hdr=document.createElement('div');
-  hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#ccc;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
+  hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
   hdr.innerHTML=
     '<div style="width:60px;flex-shrink:0">Ticker</div>'+
     '<div style="flex:1">Theme</div>'+
@@ -2223,7 +2223,7 @@ function buildGaps(minGap, minDVol, volOnly, body){
     const secTitle=document.createElement('span');
     secTitle.textContent=(isUp?'▲ Gap Up':'▼ Gap Down')+' — '+rows.length+' ticker'+(rows.length!==1?'s':'');
     const secNote=document.createElement('span');
-    const noteCol=gapSession==='Market Hours'?'var(--green)':gapSession==='Pre-Market'?'var(--amber)':gapSession==='After-Hours'?'var(--blue)':'var(--text3)';
+    const noteCol=gapSession==='Market Hours'?'var(--green)':gapSession==='Pre-Market'?'var(--amber)':gapSession==='After-Hours'?'var(--blue)':'var(--text2)';
     secNote.style.cssText='font-size:9px;color:'+noteCol+';letter-spacing:.04em;font-weight:400;text-transform:none';
     secNote.textContent=gapSession==='Pre-Market'?'⚡ Pre-market gaps - may fill at open':
                         gapSession==='Market Hours'?'✓ Intraday gaps from yesterday close':
@@ -2431,13 +2431,13 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
   body.innerHTML='';
 
   if(!results.length){
-    body.innerHTML='<div class="state" style="padding:30px;color:var(--text3)">No tickers found at current thresholds<br><span style="font-size:10px">Try lowering the Min ATR/50MA threshold</span></div>';
+    body.innerHTML='<div class="state" style="padding:30px;color:var(--text2)">No tickers found at current thresholds<br><span style="font-size:10px">Try lowering the Min ATR/50MA threshold</span></div>';
     return;
   }
 
   // Header
   const hdr=document.createElement('div');
-  hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#ccc;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
+  hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
   hdr.innerHTML=
     '<div style="width:60px;flex-shrink:0">Ticker</div>'+
     '<div style="flex:1">Theme</div>'+
@@ -2477,7 +2477,7 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
 
     const vp=document.createElement('div');
     vp.style.cssText='width:70px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';
-    vp.style.color=r.volPct>=2.5?'var(--green)':r.volPct>=1.5?'#fff':'var(--text3)';
+    vp.style.color=r.volPct>=2.5?'var(--green)':r.volPct>=1.5?'#fff':'var(--text2)';
     vp.textContent=r.volPct?r.volPct.toFixed(2)+'%':'—';
 
     const vol=document.createElement('div');
@@ -2546,7 +2546,7 @@ function renderCorrelation(tk1, tk2){
   wrap.appendChild(title);
 
   const subtitle=document.createElement('div');
-  subtitle.style.cssText='font-size:11px;color:var(--text3);margin-bottom:20px;font-family:var(--mono)';
+  subtitle.style.cssText='font-size:11px;color:var(--text2);margin-bottom:20px;font-family:var(--mono)';
   subtitle.textContent='Based on daily returns from Polygon data';
   wrap.appendChild(subtitle);
 
@@ -2570,12 +2570,12 @@ function renderCorrelation(tk1, tk2){
   ];
 
   const corrColor=(r)=>{
-    if(r===null) return'var(--text3)';
+    if(r===null) return'var(--text2)';
     const a=Math.abs(r);
     if(a>=0.8) return r>0?'var(--green)':'var(--red)';
     if(a>=0.5) return r>0?'#80e0a0':'#ff8090';
     if(a>=0.2) return'var(--amber)';
-    return'var(--text3)';
+    return'var(--text2)';
   };
 
   const corrLabel=(r)=>{
@@ -2597,7 +2597,7 @@ function renderCorrelation(tk1, tk2){
     card.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:14px 12px;text-align:center';
 
     const lbl=document.createElement('div');
-    lbl.style.cssText='font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px';
+    lbl.style.cssText='font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px';
     lbl.textContent=label;
 
     const val=document.createElement('div');
@@ -2646,7 +2646,7 @@ function renderCorrelation(tk1, tk2){
   const barsSection=document.createElement('div');
   barsSection.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:14px 16px;margin-bottom:16px';
   const barsTitle=document.createElement('div');
-  barsTitle.style.cssText='font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px';
+  barsTitle.style.cssText='font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px';
   barsTitle.textContent='Correlation Scale  (-1 = inverse  ·  0 = none  ·  +1 = perfect)';
   barsSection.appendChild(barsTitle);
   [5,10,20,50,100,200].forEach(d=>{
@@ -2664,7 +2664,7 @@ function renderCorrelation(tk1, tk2){
     const t=document.createElement('div');t.style.cssText='font-size:14px;font-weight:600;color:var(--blue);font-family:var(--mono)';t.textContent=tk.toUpperCase();
     const p=document.createElement('div');p.style.cssText='font-size:11px;color:var(--text2);margin-top:4px';p.textContent=d.price?'$'+d.price.toFixed(2):'No price data';
     const chg=document.createElement('div');chg.style.cssText='font-size:11px;margin-top:2px';
-    chg.style.color=d.today>0?'var(--green)':d.today<0?'var(--red)':'var(--text3)';
+    chg.style.color=d.today>0?'var(--green)':d.today<0?'var(--red)':'var(--text2)';
     chg.textContent=d.today!=null?(d.today>0?'+':'')+d.today.toFixed(2)+'% today':'';
     box.append(t,p,chg);
     return box;
@@ -2703,12 +2703,12 @@ function showAddTickerModal(){
   title.textContent='Add Custom Ticker';
   const closeBtn=document.createElement('button');
   closeBtn.textContent='✕';
-  closeBtn.style.cssText='background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0';
+  closeBtn.style.cssText='background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;padding:0';
   closeBtn.addEventListener('click',()=>document.body.removeChild(overlay));
   hdr.append(title,closeBtn);
 
   const sub=document.createElement('div');
-  sub.style.cssText='font-size:11px;color:var(--text3);font-family:var(--mono)';
+  sub.style.cssText='font-size:11px;color:var(--text2);font-family:var(--mono)';
   sub.textContent='Add any ticker to your personal watchlist — gets synced with Polygon data automatically';
 
   // Input row
@@ -2743,7 +2743,7 @@ function showAddTickerModal(){
 
   // Current watchlist
   const wlTitle=document.createElement('div');
-  wlTitle.style.cssText='font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;padding-top:4px;border-top:1px solid var(--border)';
+  wlTitle.style.cssText='font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;padding-top:4px;border-top:1px solid var(--border)';
   wlTitle.textContent='Current Watchlist';
 
   const wlList=document.createElement('div');
@@ -2754,7 +2754,7 @@ function showAddTickerModal(){
     wlList.innerHTML='';
     if(!watchlistTickers.length){
       const empty=document.createElement('div');
-      empty.style.cssText='font-size:11px;color:var(--text3);font-family:var(--mono);padding:8px 0';
+      empty.style.cssText='font-size:11px;color:var(--text2);font-family:var(--mono);padding:8px 0';
       empty.textContent='No custom tickers yet';
       wlList.appendChild(empty);
       return;
@@ -2768,7 +2768,7 @@ function showAddTickerModal(){
       // Check if in themes
       const inThemes=THEMES.some(t=>t.tickers.includes(tk));
       const badge=document.createElement('span');
-      badge.style.cssText='font-size:9px;color:var(--text3);font-family:var(--mono)';
+      badge.style.cssText='font-size:9px;color:var(--text2);font-family:var(--mono)';
       badge.textContent=inThemes?'in themes':'watchlist only';
       const rmBtn=document.createElement('button');
       rmBtn.textContent='✕';
@@ -2784,7 +2784,7 @@ function showAddTickerModal(){
   renderWatchlistItems();
 
   const note=document.createElement('div');
-  note.style.cssText='font-size:10px;color:var(--text3);font-family:var(--mono);line-height:1.6';
+  note.style.cssText='font-size:10px;color:var(--text2);font-family:var(--mono);line-height:1.6';
   note.textContent='⚡ Watchlist tickers are fetched during Sync and available for search and correlation lookups. Shared across all users.';
 
   modal.append(hdr,sub,row,wlTitle,wlList,note);
@@ -2953,7 +2953,7 @@ function mkH(label, col){
   if(tip){
     h.style.cursor='help';
     const inner=document.createElement('span');
-    inner.style.cssText='border-bottom:1px dashed var(--text3);padding-bottom:1px';
+    inner.style.cssText='border-bottom:1px dashed var(--text2);padding-bottom:1px';
     inner.textContent=label+(drillSort.col===col?(drillSort.dir==='desc'?' ▼':' ▲'):'');
     // Tooltip div uses position:fixed so it isn't clipped by the .main/.dv/.tw overflow chain
     const tipDiv=document.createElement('div');
@@ -3068,7 +3068,7 @@ function build20MAScan(thresh,minAtrPct,minDVol,direction,scanTF,body){
 
   const countEl=document.getElementById('scan20-count');if(countEl)countEl.textContent=deduped.length+' matches';
   body.innerHTML='';
-  if(!deduped.length){body.innerHTML='<div class="state" style="padding:30px;color:var(--text3)">No tickers within '+thresh+'% of '+maLabel+'</div>';return;}
+  if(!deduped.length){body.innerHTML='<div class="state" style="padding:30px;color:var(--text2)">No tickers within '+thresh+'% of '+maLabel+'</div>';return;}
 
   // Helper: sortable header cell for 20MA scan
   const mkSortHdr20=(label,col,width)=>{
@@ -3090,7 +3090,7 @@ function build20MAScan(thresh,minAtrPct,minDVol,direction,scanTF,body){
     return d;
   };
 
-  const hdr=document.createElement('div');hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#ccc;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
+  const hdr=document.createElement('div');hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
   const h20s=(t,w)=>{const d=document.createElement('div');d.style.cssText='width:'+w+';text-align:right;flex-shrink:0';d.textContent=t;return d;};
   hdr.append(
     (()=>{const d=document.createElement('div');d.style.cssText='width:60px;flex-shrink:0';d.textContent='Ticker';return d;})(),
@@ -3111,7 +3111,7 @@ function build20MAScan(thresh,minAtrPct,minDVol,direction,scanTF,body){
     const ma=document.createElement('div');ma.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';ma.textContent='$'+r.ma20.toFixed(2);
     const pct=document.createElement('div');pct.style.cssText='width:90px;text-align:right;font-family:var(--mono);font-size:11px;font-weight:500;flex-shrink:0;color:'+pctCol;pct.textContent=(isAbove?'+':'')+r.pctFromMA.toFixed(3)+'%';
     const atr=document.createElement('div');atr.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';atr.textContent=r.atr?'$'+r.atr.toFixed(2):'—';
-    const atrPctEl=document.createElement('div');atrPctEl.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:12px;flex-shrink:0';atrPctEl.style.color=r.atrPct>=8?'var(--green)':r.atrPct>=4?'#fff':'#aab';atrPctEl.textContent=r.atrPct?r.atrPct.toFixed(1)+'%':'—';
+    const atrPctEl=document.createElement('div');atrPctEl.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:12px;flex-shrink:0';atrPctEl.style.color=r.atrPct>=8?'var(--green)':r.atrPct>=4?'#fff':'#c0cce0';atrPctEl.textContent=r.atrPct?r.atrPct.toFixed(1)+'%':'—';
     const atrMA20El=document.createElement('div');atrMA20El.style.cssText='width:90px;text-align:right;flex-shrink:0';atrMA20El.appendChild(atrBar(r.atrMA20??null));
     const vol=document.createElement('div');vol.style.cssText='width:70px;text-align:right;flex-shrink:0';vol.appendChild(volChip(r.volume,r.avgVolume));
     const dvol=document.createElement('div');dvol.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--text2);flex-shrink:0';dvol.textContent=r.avgDVol?'$'+r.avgDVol.toFixed(0)+'M':'—';
@@ -3174,8 +3174,8 @@ function buildEarningsSetup(minGap,maThresh,minAtrPct,minDVol,gapDir,body){
   results.sort((a,b)=>b.gap.date.localeCompare(a.gap.date)||Math.abs(b.gap.pct)-Math.abs(a.gap.pct));
   const countEl=document.getElementById('earnings-count');if(countEl)countEl.textContent=results.length+' matches';
   body.innerHTML='';
-  if(!results.length){body.innerHTML='<div class="state" style="padding:30px;color:var(--text3)">No earnings setups found<br><span style="font-size:10px">Try widening the MA threshold or lowering the min gap %</span></div>';return;}
-  const hdr=document.createElement('div');hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#ccc;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
+  if(!results.length){body.innerHTML='<div class="state" style="padding:30px;color:var(--text2)">No earnings setups found<br><span style="font-size:10px">Try widening the MA threshold or lowering the min gap %</span></div>';return;}
+  const hdr=document.createElement('div');hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
   hdr.innerHTML='<div style="width:60px;flex-shrink:0">Ticker</div><div style="flex:1">Theme</div><div style="width:75px;text-align:right;flex-shrink:0">Price</div><div style="width:80px;text-align:right;flex-shrink:0">Gap Date</div><div style="width:75px;text-align:right;flex-shrink:0">Gap %</div><div style="width:75px;text-align:right;flex-shrink:0">% fr 20MA</div><div style="width:75px;text-align:right;flex-shrink:0">% fr 50MA</div><div style="width:65px;text-align:right;flex-shrink:0">ATR%</div><div style="width:90px;text-align:right;flex-shrink:0">ATR/50MA</div><div style="width:70px;text-align:right;flex-shrink:0">Vol x</div><div style="width:75px;text-align:right;flex-shrink:0">Today</div>';
   body.appendChild(hdr);
   results.forEach(r=>{
@@ -3189,8 +3189,8 @@ function buildEarningsSetup(minGap,maThresh,minAtrPct,minDVol,gapDir,body){
     const gapDate=document.createElement('div');gapDate.style.cssText='width:80px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';gapDate.textContent=r.gap.date;
     const gapPct=document.createElement('div');gapPct.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;font-weight:500;flex-shrink:0;color:'+(isGapUp?'var(--green)':'var(--red)');gapPct.textContent=(isGapUp?'+':'')+r.gap.pct.toFixed(1)+'%';
     const pct20=document.createElement('div');pct20.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';pct20.style.color=r.pctFrom20<1?'var(--green)':r.pctFrom20<2?'var(--amber)':'var(--text2)';pct20.textContent=r.pctFrom20.toFixed(2)+'%';
-    const pct50=document.createElement('div');pct50.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';pct50.style.color=r.pctFrom50!=null?(r.pctFrom50<1?'var(--green)':r.pctFrom50<2?'var(--amber)':'var(--text2)'):'var(--text3)';pct50.textContent=r.pctFrom50!=null?r.pctFrom50.toFixed(2)+'%':'—';
-    const atrPctEl=document.createElement('div');atrPctEl.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';atrPctEl.style.color=r.atrPct>=8?'var(--green)':r.atrPct>=4?'#fff':'#aab';atrPctEl.textContent=r.atrPct?r.atrPct.toFixed(1)+'%':'—';
+    const pct50=document.createElement('div');pct50.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';pct50.style.color=r.pctFrom50!=null?(r.pctFrom50<1?'var(--green)':r.pctFrom50<2?'var(--amber)':'var(--text2)'):'var(--text2)';pct50.textContent=r.pctFrom50!=null?r.pctFrom50.toFixed(2)+'%':'—';
+    const atrPctEl=document.createElement('div');atrPctEl.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';atrPctEl.style.color=r.atrPct>=8?'var(--green)':r.atrPct>=4?'#fff':'#c0cce0';atrPctEl.textContent=r.atrPct?r.atrPct.toFixed(1)+'%':'—';
     const atrMAEl=document.createElement('div');atrMAEl.style.cssText='width:90px;text-align:right;flex-shrink:0';atrMAEl.appendChild(atrBar(r.atrMA??null));
     const vol=document.createElement('div');vol.style.cssText='width:70px;text-align:right;flex-shrink:0';vol.appendChild(volChip(r.volume,r.avgVolume));
     const today=document.createElement('div');today.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';today.className=pc(r.today);today.textContent=f2(r.today);
