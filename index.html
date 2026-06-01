@@ -1118,6 +1118,75 @@ function renderMovers(){
   main.innerHTML='';main.appendChild(pv);
 }
 
+// ── SHARED NOTES BOARD ────────────────────────────────────────────────────────
+const NOTE_COLORS=['#2a2440','#1a3040','#2a3520','#3a2a20','#2a2a3a','#1e3830'];
+const NOTE_BORDERS=['rgba(139,92,246,0.4)','rgba(45,140,255,0.4)','rgba(0,201,122,0.4)','rgba(245,166,35,0.4)','rgba(100,120,200,0.4)','rgba(0,180,160,0.4)'];
+
+async function loadNotes(container){
+  const data=await supaFetch('GET','/rest/v1/pulse_notes?select=*&order=created_at.desc&limit=50');
+  if(!data||!Array.isArray(data)){
+    container.innerHTML='<div style="font-size:11px;color:var(--red);font-family:var(--mono)">Could not load notes — check Supabase table "pulse_notes" exists.</div>';
+    return;
+  }
+  container.innerHTML='';
+  if(!data.length){
+    container.innerHTML='<div style="font-size:11px;color:var(--text3);font-family:var(--mono);padding:8px 0">No notes yet — be the first to post!</div>';
+    return;
+  }
+  data.forEach((note,i)=>container.appendChild(renderNote(note,i,container)));
+}
+
+function renderNote(note,i,container){
+  const idx=i%NOTE_COLORS.length;
+  const card=document.createElement('div');
+  card.style.cssText='background:'+NOTE_COLORS[idx]+';border:1px solid '+NOTE_BORDERS[idx]+';border-radius:6px;padding:10px 12px;width:200px;flex-shrink:0;position:relative;display:flex;flex-direction:column;gap:5px;box-shadow:0 2px 8px rgba(0,0,0,0.3)';
+
+  // Header — author + ticker + time
+  const hdr=document.createElement('div');
+  hdr.style.cssText='display:flex;align-items:center;gap:6px;flex-wrap:wrap';
+  const author=document.createElement('span');
+  author.style.cssText='font-size:10px;font-family:var(--mono);color:'+NOTE_BORDERS[idx].replace('0.4','0.9')+';font-weight:500';
+  author.textContent=note.author||'Anonymous';
+  hdr.appendChild(author);
+  if(note.ticker){
+    const tk=document.createElement('span');
+    tk.style.cssText='font-size:9px;font-family:var(--mono);padding:1px 5px;border-radius:2px;background:rgba(45,140,255,0.15);border:1px solid rgba(45,140,255,0.35);color:var(--blue);cursor:pointer';
+    tk.textContent=note.ticker;
+    tk.title='Open on TradingView';
+    tk.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+note.ticker,'_blank'));
+    hdr.appendChild(tk);
+  }
+  const ts=document.createElement('span');
+  ts.style.cssText='font-size:9px;color:var(--text3);font-family:var(--mono);margin-left:auto';
+  const d=new Date(note.created_at);
+  ts.textContent=d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+  hdr.appendChild(ts);
+  card.appendChild(hdr);
+
+  // Note text
+  const txt=document.createElement('div');
+  txt.style.cssText='font-size:12px;color:var(--text);line-height:1.55;word-break:break-word;font-family:var(--sans);white-space:pre-wrap';
+  txt.textContent=note.text;
+  card.appendChild(txt);
+
+  // Delete button — only show for notes by current author
+  const savedAuthor=localStorage.getItem('pulse_author')||'';
+  if(savedAuthor&&note.author===savedAuthor){
+    const del=document.createElement('button');
+    del.style.cssText='position:absolute;top:6px;right:8px;background:transparent;border:none;color:var(--text3);font-size:11px;cursor:pointer;padding:0;line-height:1';
+    del.textContent='✕';del.title='Delete note';
+    del.addEventListener('mouseenter',()=>del.style.color='var(--red)');
+    del.addEventListener('mouseleave',()=>del.style.color='var(--text3)');
+    del.addEventListener('click',async()=>{
+      if(!confirm('Delete this note?'))return;
+      await supaFetch('DELETE','/rest/v1/pulse_notes?id=eq.'+note.id);
+      loadNotes(container);
+    });
+    card.appendChild(del);
+  }
+  return card;
+}
+
 // ── ALERT SETTINGS ────────────────────────────────────────────────────────────
 function renderAlertSettings(){
   const main=document.getElementById('main');
@@ -1199,6 +1268,53 @@ function renderAlertSettings(){
     none.textContent='No custom ticker alerts set.';s3.appendChild(none);
   }
   asv.appendChild(s3);
+
+  // ── Shared Notes Board ────────────────────────────────────────────────────
+  const s4=mkSec('📌 Shared Notes Board');
+  s4.style.marginBottom='20px';
+
+  // Notes container — loads from Supabase
+  const notesGrid=document.createElement('div');
+  notesGrid.id='notes-grid';
+  notesGrid.style.cssText='display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;min-height:40px';
+  notesGrid.innerHTML='<div style="font-size:11px;color:var(--text3);font-family:var(--mono);padding:8px 0">Loading notes...</div>';
+  s4.appendChild(notesGrid);
+
+  // Add note form
+  const addNoteRow=document.createElement('div');
+  addNoteRow.style.cssText='display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap';
+  const authorIn=document.createElement('input');
+  authorIn.className='as-in';authorIn.placeholder='Your name';authorIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 8px;width:90px;outline:none';
+  const savedAuthor=localStorage.getItem('pulse_author')||'';
+  authorIn.value=savedAuthor;
+  authorIn.addEventListener('input',()=>localStorage.setItem('pulse_author',authorIn.value.trim()));
+  const tickerNoteIn=document.createElement('input');
+  tickerNoteIn.className='as-in';tickerNoteIn.placeholder='TICKER (opt)';tickerNoteIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 8px;width:90px;outline:none;text-transform:uppercase';
+  const noteTextIn=document.createElement('textarea');
+  noteTextIn.placeholder='Write a note...';
+  noteTextIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--sans);font-size:12px;padding:6px 8px;width:260px;height:60px;outline:none;resize:vertical;line-height:1.5';
+  noteTextIn.addEventListener('focus',()=>noteTextIn.style.borderColor='var(--blue)');
+  noteTextIn.addEventListener('blur',()=>noteTextIn.style.borderColor='var(--border2)');
+  const postBtn=document.createElement('button');
+  postBtn.className='sbtn';postBtn.textContent='Post Note';
+  postBtn.style.alignSelf='flex-end';
+  postBtn.addEventListener('click',async()=>{
+    const author=authorIn.value.trim()||'Anonymous';
+    const ticker=tickerNoteIn.value.trim().toUpperCase()||null;
+    const text=noteTextIn.value.trim();
+    if(!text)return;
+    postBtn.textContent='Posting...';postBtn.style.opacity='0.5';
+    const note={author,ticker,text,created_at:new Date().toISOString()};
+    const res=await supaFetch('POST','/rest/v1/pulse_notes',[note]);
+    if(res){noteTextIn.value='';tickerNoteIn.value='';loadNotes(notesGrid);}
+    postBtn.textContent='Post Note';postBtn.style.opacity='1';
+  });
+  addNoteRow.append(authorIn,tickerNoteIn,noteTextIn,postBtn);
+  s4.appendChild(addNoteRow);
+  asv.appendChild(s4);
+
+  // Load notes async
+  loadNotes(notesGrid);
 
   if(triggeredAlerts.length){
     const s2=mkSec('Active Alerts ('+triggeredAlerts.length+')');
