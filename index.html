@@ -2506,15 +2506,28 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
 
 
 // ── CORRELATION ───────────────────────────────────────────────────────────────
+function rankArray(arr){
+  // Convert values to ranks (handles ties with average rank)
+  const sorted=[...arr].map((v,i)=>({v,i})).sort((a,b)=>a.v-b.v);
+  const ranks=new Array(arr.length);
+  let i=0;
+  while(i<sorted.length){
+    let j=i;
+    while(j<sorted.length-1&&sorted[j+1].v===sorted[i].v)j++;
+    const avgRank=(i+j)/2;
+    for(let k=i;k<=j;k++)ranks[sorted[k].i]=avgRank;
+    i=j+1;
+  }
+  return ranks;
+}
+
 function calcCorrelation(closes1, closes2, days){
-  // Need at least days+1 closes to get days returns
-  const n1=closes1.length, n2=closes2.length;
+  // Need days+1 closes to compute days returns
   const need=days+1;
-  if(n1<need||n2<need) return null;
-  // Use last (days+1) closes from each — ensures same window length
+  if(closes1.length<need||closes2.length<need) return null;
   const a=closes1.slice(-(days+1));
   const b=closes2.slice(-(days+1));
-  // Calculate daily returns
+  // Daily returns
   const ra=[],rb=[];
   for(let i=1;i<=days;i++){
     ra.push((a[i]-a[i-1])/a[i-1]);
@@ -2522,13 +2535,16 @@ function calcCorrelation(closes1, closes2, days){
   }
   const m=ra.length;
   if(m<4) return null;
-  const ma=ra.reduce((s,v)=>s+v,0)/m;
-  const mb=rb.reduce((s,v)=>s+v,0)/m;
+  // Spearman rank correlation — direction-focused, magnitude-agnostic
+  const ranksA=rankArray(ra);
+  const ranksB=rankArray(rb);
+  const mA=ranksA.reduce((s,v)=>s+v,0)/m;
+  const mB=ranksB.reduce((s,v)=>s+v,0)/m;
   let cov=0,sa=0,sb=0;
   for(let i=0;i<m;i++){
-    cov+=(ra[i]-ma)*(rb[i]-mb);
-    sa+=(ra[i]-ma)**2;
-    sb+=(rb[i]-mb)**2;
+    cov+=(ranksA[i]-mA)*(ranksB[i]-mB);
+    sa+=(ranksA[i]-mA)**2;
+    sb+=(ranksB[i]-mB)**2;
   }
   if(sa===0||sb===0) return null;
   return +(cov/Math.sqrt(sa*sb)).toFixed(3);
@@ -2549,7 +2565,7 @@ function renderCorrelation(tk1, tk2){
 
   const subtitle=document.createElement('div');
   subtitle.style.cssText='font-size:11px;color:var(--text2);margin-bottom:20px;font-family:var(--mono)';
-  subtitle.textContent='Based on daily returns from Polygon data';
+  subtitle.textContent='Spearman rank correlation — direction-focused, magnitude-agnostic';
   wrap.appendChild(subtitle);
 
   if(!d1||!d2||!d1.closes||!d2.closes){
