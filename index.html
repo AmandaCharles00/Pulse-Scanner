@@ -2506,48 +2506,22 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
 
 
 // ── CORRELATION ───────────────────────────────────────────────────────────────
-function rankArray(arr){
-  // Convert values to ranks (handles ties with average rank)
-  const sorted=[...arr].map((v,i)=>({v,i})).sort((a,b)=>a.v-b.v);
-  const ranks=new Array(arr.length);
-  let i=0;
-  while(i<sorted.length){
-    let j=i;
-    while(j<sorted.length-1&&sorted[j+1].v===sorted[i].v)j++;
-    const avgRank=(i+j)/2;
-    for(let k=i;k<=j;k++)ranks[sorted[k].i]=avgRank;
-    i=j+1;
-  }
-  return ranks;
-}
-
 function calcCorrelation(closes1, closes2, days){
-  // Need days+1 closes to compute days returns
   const need=days+1;
   if(closes1.length<need||closes2.length<need) return null;
   const a=closes1.slice(-(days+1));
   const b=closes2.slice(-(days+1));
-  // Daily returns
-  const ra=[],rb=[];
+  let same=0,total=0;
   for(let i=1;i<=days;i++){
-    ra.push((a[i]-a[i-1])/a[i-1]);
-    rb.push((b[i]-b[i-1])/b[i-1]);
+    const da=a[i]-a[i-1];
+    const db=b[i]-b[i-1];
+    if(da===0&&db===0) continue; // skip flat days
+    total++;
+    if((da>0&&db>0)||(da<0&&db<0)) same++;
   }
-  const m=ra.length;
-  if(m<4) return null;
-  // Spearman rank correlation — direction-focused, magnitude-agnostic
-  const ranksA=rankArray(ra);
-  const ranksB=rankArray(rb);
-  const mA=ranksA.reduce((s,v)=>s+v,0)/m;
-  const mB=ranksB.reduce((s,v)=>s+v,0)/m;
-  let cov=0,sa=0,sb=0;
-  for(let i=0;i<m;i++){
-    cov+=(ranksA[i]-mA)*(ranksB[i]-mB);
-    sa+=(ranksA[i]-mA)**2;
-    sb+=(ranksB[i]-mB)**2;
-  }
-  if(sa===0||sb===0) return null;
-  return +(cov/Math.sqrt(sa*sb)).toFixed(3);
+  if(total<4) return null;
+  // Concordance: 1.0 = always same direction, 0 = random, -1.0 = always opposite
+  return +(same/total*2-1).toFixed(3);
 }
 
 function calcDirectionalAgreement(closes1, closes2, days){
@@ -2579,7 +2553,7 @@ function renderCorrelation(tk1, tk2){
 
   const subtitle=document.createElement('div');
   subtitle.style.cssText='font-size:11px;color:var(--text2);margin-bottom:20px;font-family:var(--mono)';
-  subtitle.textContent='Spearman rank correlation — direction-focused, magnitude-agnostic';
+  subtitle.textContent='Directional concordance — % of days moving same direction, scaled -1 to +1';
   wrap.appendChild(subtitle);
 
   if(!d1||!d2||!d1.closes||!d2.closes){
