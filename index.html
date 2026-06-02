@@ -2511,17 +2511,46 @@ function calcCorrelation(closes1, closes2, days){
   if(closes1.length<need||closes2.length<need) return null;
   const a=closes1.slice(-(days+1));
   const b=closes2.slice(-(days+1));
-  let same=0,total=0;
+
+  // Compute daily returns
+  const ra=[],rb=[];
   for(let i=1;i<=days;i++){
-    const da=a[i]-a[i-1];
-    const db=b[i]-b[i-1];
-    if(da===0&&db===0) continue; // skip flat days
-    total++;
-    if((da>0&&db>0)||(da<0&&db<0)) same++;
+    ra.push((a[i]-a[i-1])/a[i-1]);
+    rb.push((b[i]-b[i-1])/b[i-1]);
   }
-  if(total<4) return null;
-  // Concordance: 1.0 = always same direction, 0 = random, -1.0 = always opposite
-  return +(same/total*2-1).toFixed(3);
+  const n=ra.length;
+  if(n<4) return null;
+
+  // Assign ranks — sort by value, assign 1-based ranks, average ties
+  function rank(arr){
+    const indexed=arr.map((v,i)=>({v,i})).sort((x,y)=>x.v-y.v);
+    const r=new Array(n);
+    let i=0;
+    while(i<n){
+      let j=i;
+      while(j<n-1&&indexed[j+1].v===indexed[i].v) j++;
+      const avg=(i+j)/2+1; // 1-based average rank for ties
+      for(let k=i;k<=j;k++) r[indexed[k].i]=avg;
+      i=j+1;
+    }
+    return r;
+  }
+
+  const rA=rank(ra);
+  const rB=rank(rb);
+
+  // Pearson correlation on the ranks = Spearman
+  const mA=rA.reduce((s,v)=>s+v,0)/n;
+  const mB=rB.reduce((s,v)=>s+v,0)/n;
+  let num=0,dA=0,dB=0;
+  for(let i=0;i<n;i++){
+    const da=rA[i]-mA, db=rB[i]-mB;
+    num+=da*db;
+    dA+=da*da;
+    dB+=db*db;
+  }
+  if(dA===0||dB===0) return null;
+  return +(num/Math.sqrt(dA*dB)).toFixed(3);
 }
 
 function calcDirectionalAgreement(closes1, closes2, days){
@@ -2553,7 +2582,7 @@ function renderCorrelation(tk1, tk2){
 
   const subtitle=document.createElement('div');
   subtitle.style.cssText='font-size:11px;color:var(--text2);margin-bottom:20px;font-family:var(--mono)';
-  subtitle.textContent='Directional concordance — % of days moving same direction, scaled -1 to +1';
+  subtitle.textContent='Spearman rank correlation of daily returns — direction-weighted, magnitude-agnostic';
   wrap.appendChild(subtitle);
 
   if(!d1||!d2||!d1.closes||!d2.closes){
