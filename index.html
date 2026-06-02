@@ -2564,7 +2564,7 @@ function calcDirectionalAgreement(closes1, closes2, days){
   return Math.round(same/days*100);
 }
 
-
+function renderCorrelation(tk1, tk2){
   const main=document.getElementById('main');
   const d1=cache[tk1.toUpperCase()];
   const d2=cache[tk2.toUpperCase()];
