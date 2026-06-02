@@ -2550,7 +2550,21 @@ function calcCorrelation(closes1, closes2, days){
   return +(cov/Math.sqrt(sa*sb)).toFixed(3);
 }
 
-function renderCorrelation(tk1, tk2){
+function calcDirectionalAgreement(closes1, closes2, days){
+  const need=days+1;
+  if(closes1.length<need||closes2.length<need) return null;
+  const a=closes1.slice(-(days+1));
+  const b=closes2.slice(-(days+1));
+  let same=0;
+  for(let i=1;i<=days;i++){
+    const da=a[i]-a[i-1];
+    const db=b[i]-b[i-1];
+    if((da>0&&db>0)||(da<0&&db<0)) same++;
+  }
+  return Math.round(same/days*100);
+}
+
+
   const main=document.getElementById('main');
   const d1=cache[tk1.toUpperCase()];
   const d2=cache[tk2.toUpperCase()];
@@ -2611,6 +2625,7 @@ function renderCorrelation(tk1, tk2){
 
   periods.forEach(({label,days})=>{
     const r=calcCorrelation(d1.closes,d2.closes,days);
+    const agree=calcDirectionalAgreement(d1.closes,d2.closes,days);
     const card=document.createElement('div');
     card.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:14px 12px;text-align:center';
 
@@ -2626,7 +2641,15 @@ function renderCorrelation(tk1, tk2){
     desc.style.cssText='font-size:9px;margin-top:6px;font-family:var(--mono);color:'+corrColor(r);
     desc.textContent=corrLabel(r);
 
-    card.append(lbl,val,desc);
+    if(agree!==null){
+      const agreeEl=document.createElement('div');
+      const agreeCol=agree>=65?'var(--green)':agree>=50?'var(--amber)':'var(--red)';
+      agreeEl.style.cssText='font-size:10px;margin-top:6px;font-family:var(--mono);color:'+agreeCol+';border-top:1px solid rgba(255,255,255,0.08);padding-top:6px';
+      agreeEl.textContent=agree+'% same direction';
+      card.append(lbl,val,desc,agreeEl);
+    } else {
+      card.append(lbl,val,desc);
+    }
     grid.appendChild(card);
   });
   wrap.appendChild(grid);
