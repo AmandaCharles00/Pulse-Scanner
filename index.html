@@ -660,8 +660,7 @@ async function doSync(){
         if(!cache[ticker])cache[ticker]={today:null,price:null,volume:null,avgVolume:null};
         // Only use aggs price as fallback — snapshot price is more current (live delayed)
         if(!cache[ticker].price) cache[ticker].price=+last.toFixed(2);
-        cache[ticker].closes=bars.slice(-200).map(b=>b.c).filter(v=>v!=null);
-        cache[ticker].closes=bars.slice(-200).map(b=>b.c).filter(v=>v!=null);
+        cache[ticker].closes=bars.slice(-252).map(b=>b.c).filter(v=>v!=null);
         cache[ticker]['1W']=pct(anchor(7),last);cache[ticker]['1M']=pct(anchor(30),last);
         cache[ticker]['3M']=pct(anchor(90),last);cache[ticker]['6M']=pct(anchor(180),last);cache[ticker].YTD=pct(anchor('ytd'),last);
         if(prev&&(cache[ticker].today==null||cache[ticker].today===0))cache[ticker].today=+((last-prev)/prev*100).toFixed(2);
@@ -2508,18 +2507,21 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
 
 // ── CORRELATION ───────────────────────────────────────────────────────────────
 function calcCorrelation(closes1, closes2, days){
-  // Align to same length using last N days
-  const n=Math.min(days, closes1.length, closes2.length);
-  if(n<5) return null;
-  const a=closes1.slice(-n);
-  const b=closes2.slice(-n);
+  // Need at least days+1 closes to get days returns
+  const n1=closes1.length, n2=closes2.length;
+  const need=days+1;
+  if(n1<need||n2<need) return null;
+  // Use last (days+1) closes from each — ensures same window length
+  const a=closes1.slice(-(days+1));
+  const b=closes2.slice(-(days+1));
   // Calculate daily returns
   const ra=[],rb=[];
-  for(let i=1;i<n;i++){
+  for(let i=1;i<=days;i++){
     ra.push((a[i]-a[i-1])/a[i-1]);
     rb.push((b[i]-b[i-1])/b[i-1]);
   }
   const m=ra.length;
+  if(m<4) return null;
   const ma=ra.reduce((s,v)=>s+v,0)/m;
   const mb=rb.reduce((s,v)=>s+v,0)/m;
   let cov=0,sa=0,sb=0;
