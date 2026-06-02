@@ -661,6 +661,7 @@ async function doSync(){
         // Only use aggs price as fallback — snapshot price is more current (live delayed)
         if(!cache[ticker].price) cache[ticker].price=+last.toFixed(2);
         cache[ticker].closes=bars.map(b=>b.c).filter(v=>v!=null);
+        cache[ticker].closeDates=bars.filter(b=>b.c!=null).map(b=>b.t);
         cache[ticker]['1W']=pct(anchor(7),last);cache[ticker]['1M']=pct(anchor(30),last);
         cache[ticker]['3M']=pct(anchor(90),last);cache[ticker]['6M']=pct(anchor(180),last);cache[ticker].YTD=pct(anchor('ytd'),last);
         if(prev&&(cache[ticker].today==null||cache[ticker].today===0))cache[ticker].today=+((last-prev)/prev*100).toFixed(2);
@@ -2509,27 +2510,30 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
 function calcCorrelation(closes1, closes2, days){
   const need=days+1;
   if(closes1.length<need||closes2.length<need) return null;
-  const a=closes1.slice(-(days+1));
-  const b=closes2.slice(-(days+1));
 
-  // Compute daily returns
+  // Use last (days+1) from the SHORTER array to ensure same window
+  const len=Math.min(closes1.length,closes2.length,days+1);
+  const a=closes1.slice(-len);
+  const b=closes2.slice(-len);
+  const n=len-1;
+  if(n<4) return null;
+
+  // Daily returns
   const ra=[],rb=[];
-  for(let i=1;i<=days;i++){
+  for(let i=1;i<len;i++){
     ra.push((a[i]-a[i-1])/a[i-1]);
     rb.push((b[i]-b[i-1])/b[i-1]);
   }
-  const n=ra.length;
-  if(n<4) return null;
 
-  // Assign ranks — sort by value, assign 1-based ranks, average ties
+  // Rank function — 1-based, average ties
   function rank(arr){
     const indexed=arr.map((v,i)=>({v,i})).sort((x,y)=>x.v-y.v);
     const r=new Array(n);
     let i=0;
     while(i<n){
       let j=i;
-      while(j<n-1&&indexed[j+1].v===indexed[i].v) j++;
-      const avg=(i+j)/2+1; // 1-based average rank for ties
+      while(j<n-1&&Math.abs(indexed[j+1].v-indexed[i].v)<1e-10) j++;
+      const avg=(i+j)/2+1;
       for(let k=i;k<=j;k++) r[indexed[k].i]=avg;
       i=j+1;
     }
@@ -2539,32 +2543,31 @@ function calcCorrelation(closes1, closes2, days){
   const rA=rank(ra);
   const rB=rank(rb);
 
-  // Pearson correlation on the ranks = Spearman
+  // Pearson on ranks = Spearman
   const mA=rA.reduce((s,v)=>s+v,0)/n;
   const mB=rB.reduce((s,v)=>s+v,0)/n;
   let num=0,dA=0,dB=0;
   for(let i=0;i<n;i++){
     const da=rA[i]-mA, db=rB[i]-mB;
-    num+=da*db;
-    dA+=da*da;
-    dB+=db*db;
+    num+=da*db; dA+=da*da; dB+=db*db;
   }
   if(dA===0||dB===0) return null;
   return +(num/Math.sqrt(dA*dB)).toFixed(3);
 }
 
 function calcDirectionalAgreement(closes1, closes2, days){
-  const need=days+1;
-  if(closes1.length<need||closes2.length<need) return null;
-  const a=closes1.slice(-(days+1));
-  const b=closes2.slice(-(days+1));
-  let same=0;
-  for(let i=1;i<=days;i++){
-    const da=a[i]-a[i-1];
-    const db=b[i]-b[i-1];
+  const len=Math.min(closes1.length,closes2.length,days+1);
+  if(len<days+1) return null;
+  const a=closes1.slice(-len);
+  const b=closes2.slice(-len);
+  let same=0,total=0;
+  for(let i=1;i<len;i++){
+    const da=a[i]-a[i-1], db=b[i]-b[i-1];
+    if(Math.abs(da)<1e-10&&Math.abs(db)<1e-10) continue;
+    total++;
     if((da>0&&db>0)||(da<0&&db<0)) same++;
   }
-  return Math.round(same/days*100);
+  return total>0?Math.round(same/total*100):null;
 }
 
 function renderCorrelation(tk1, tk2){
@@ -2585,7 +2588,17 @@ function renderCorrelation(tk1, tk2){
   subtitle.textContent='Spearman rank correlation of daily returns — direction-weighted, magnitude-agnostic';
   wrap.appendChild(subtitle);
 
-  if(!d1||!d2||!d1.closes||!d2.closes){
+  // Date-align the closes arrays — only use trading days present in BOTH tickers
+  let aligned1=d1.closes, aligned2=d2.closes;
+  if(d1.closeDates&&d2.closeDates){
+    const dates2=new Set(d2.closeDates);
+    const pairs=d1.closeDates.map((t,i)=>({t,c:d1.closes[i]})).filter(p=>dates2.has(p.t));
+    const map2=new Map(d2.closeDates.map((t,i)=>[t,d2.closes[i]]));
+    aligned1=pairs.map(p=>p.c);
+    aligned2=pairs.map(p=>map2.get(p.t));
+  }
+
+  if(!aligned1.length||!aligned2.length){
     const err=document.createElement('div');
     err.style.cssText='color:var(--amber);font-size:12px;font-family:var(--mono);padding:16px;background:var(--bg3);border-radius:4px;border:1px solid var(--border2)';
     err.textContent='⚠ Missing data for '+((!d1||!d1.closes)?tk1.toUpperCase():'')+((!d1||!d1.closes)&&(!d2||!d2.closes)?' and ':'')+
@@ -2627,8 +2640,8 @@ function renderCorrelation(tk1, tk2){
   grid.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px';
 
   periods.forEach(({label,days})=>{
-    const r=calcCorrelation(d1.closes,d2.closes,days);
-    const agree=calcDirectionalAgreement(d1.closes,d2.closes,days);
+    const r=calcCorrelation(aligned1,aligned2,days);
+    const agree=calcDirectionalAgreement(aligned1,aligned2,days);
     const card=document.createElement('div');
     card.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:14px 12px;text-align:center';
 
@@ -2659,7 +2672,7 @@ function renderCorrelation(tk1, tk2){
 
   // Visual bar for 20d and 200d
   const mkBar=(label,days)=>{
-    const r=calcCorrelation(d1.closes,d2.closes,days);
+    const r=calcCorrelation(aligned1,aligned2,days);
     if(r===null) return null;
     const row=document.createElement('div');
     row.style.cssText='display:flex;align-items:center;gap:12px;margin-bottom:10px';
