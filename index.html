@@ -2507,20 +2507,47 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
 
 
 // ── CORRELATION ───────────────────────────────────────────────────────────────
+// Pearson correlation coefficient on daily returns — linear regression approach
+// r = covariance(x,y) / (stddev(x) * stddev(y))
+// R² = r² tells you % of variance explained
 function calcCorrelation(closes1, closes2, days){
   if(closes1.length<days+1||closes2.length<days+1) return null;
-  // Always use the last days+1 entries from the already-aligned arrays
   const a=closes1.slice(closes1.length-(days+1));
   const b=closes2.slice(closes2.length-(days+1));
-  let same=0,total=0;
+
+  // Compute daily returns
+  const ra=[],rb=[];
   for(let i=1;i<=days;i++){
-    const da=a[i]-a[i-1], db=b[i]-b[i-1];
-    if(Math.abs(da)<1e-10&&Math.abs(db)<1e-10) continue;
-    total++;
-    if((da>0&&db>0)||(da<0&&db<0)) same++;
+    if(a[i-1]===0||b[i-1]===0) continue;
+    ra.push((a[i]-a[i-1])/a[i-1]);
+    rb.push((b[i]-b[i-1])/b[i-1]);
   }
-  if(total<4) return null;
-  return +(same/total*2-1).toFixed(3);
+  const n=ra.length;
+  if(n<4) return null;
+
+  // Means
+  const ma=ra.reduce((s,v)=>s+v,0)/n;
+  const mb=rb.reduce((s,v)=>s+v,0)/n;
+
+  // Covariance and standard deviations
+  let cov=0,va=0,vb=0;
+  for(let i=0;i<n;i++){
+    const da=ra[i]-ma, db=rb[i]-mb;
+    cov+=da*db;
+    va+=da*da;
+    vb+=db*db;
+  }
+  if(va===0||vb===0) return null;
+
+  // Pearson r
+  const r=cov/Math.sqrt(va*vb);
+  return +r.toFixed(3);
+}
+
+function calcR2(closes1, closes2, days){
+  const r=calcCorrelation(closes1,closes2,days);
+  if(r===null) return null;
+  return +(r*r).toFixed(3);
 }
 
 function calcDirectionalAgreement(closes1, closes2, days){
@@ -2552,7 +2579,7 @@ function renderCorrelation(tk1, tk2){
 
   const subtitle=document.createElement('div');
   subtitle.style.cssText='font-size:11px;color:var(--text2);margin-bottom:20px;font-family:var(--mono)';
-  subtitle.textContent='Directional concordance — same-direction days scaled -1 to +1  ·  70%+ same direction = 0.4+  ·  80%+ = 0.6+';
+  subtitle.textContent='Pearson r on daily returns (linear regression) · R² = % variance explained · r>0.7 = Strong · r>0.4 = Moderate';
   wrap.appendChild(subtitle);
 
   // Date-align the closes arrays — only use trading days present in BOTH tickers
@@ -2588,18 +2615,18 @@ function renderCorrelation(tk1, tk2){
   const corrColor=(r)=>{
     if(r===null) return'var(--text2)';
     const a=Math.abs(r);
-    if(a>=0.6) return r>0?'var(--green)':'var(--red)';
-    if(a>=0.3) return r>0?'#80e0a0':'#ff8090';
-    if(a>=0.1) return'var(--amber)';
+    if(a>=0.7) return r>0?'var(--green)':'var(--red)';
+    if(a>=0.4) return r>0?'#80e0a0':'#ff8090';
+    if(a>=0.2) return'var(--amber)';
     return'var(--text2)';
   };
 
   const corrLabel=(r)=>{
     if(r===null) return'—';
     const a=Math.abs(r);
-    if(a>=0.6) return r>0?'Strong Positive':'Strong Negative';
-    if(a>=0.3) return r>0?'Moderate Positive':'Moderate Negative';
-    if(a>=0.1) return r>0?'Weak Positive':'Weak Negative';
+    if(a>=0.7) return r>0?'Strong Positive':'Strong Negative';
+    if(a>=0.4) return r>0?'Moderate Positive':'Moderate Negative';
+    if(a>=0.2) return r>0?'Weak Positive':'Weak Negative';
     return'Uncorrelated';
   };
 
@@ -2609,6 +2636,7 @@ function renderCorrelation(tk1, tk2){
 
   periods.forEach(({label,days})=>{
     const r=calcCorrelation(aligned1,aligned2,days);
+    const r2=calcR2(aligned1,aligned2,days);
     const agree=calcDirectionalAgreement(aligned1,aligned2,days);
     const card=document.createElement('div');
     card.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:14px 12px;text-align:center';
@@ -2622,17 +2650,22 @@ function renderCorrelation(tk1, tk2){
     val.textContent=r!==null?r.toFixed(2):'—';
 
     const desc=document.createElement('div');
-    desc.style.cssText='font-size:9px;margin-top:6px;font-family:var(--mono);color:'+corrColor(r);
+    desc.style.cssText='font-size:9px;margin-top:4px;font-family:var(--mono);color:'+corrColor(r);
     desc.textContent=corrLabel(r);
+
+    // R² row
+    const r2El=document.createElement('div');
+    r2El.style.cssText='font-size:10px;color:var(--text2);font-family:var(--mono);margin-top:6px;border-top:1px solid rgba(255,255,255,0.08);padding-top:5px';
+    r2El.textContent=r2!==null?'R² = '+r2.toFixed(2)+' ('+Math.round(r2*100)+'% variance explained)':'R² = —';
 
     if(agree!==null){
       const agreeEl=document.createElement('div');
       const agreeCol=agree>=65?'var(--green)':agree>=50?'var(--amber)':'var(--red)';
-      agreeEl.style.cssText='font-size:10px;margin-top:6px;font-family:var(--mono);color:'+agreeCol+';border-top:1px solid rgba(255,255,255,0.08);padding-top:6px';
+      agreeEl.style.cssText='font-size:10px;margin-top:4px;font-family:var(--mono);color:'+agreeCol;
       agreeEl.textContent=agree+'% same direction';
-      card.append(lbl,val,desc,agreeEl);
+      card.append(lbl,val,desc,r2El,agreeEl);
     } else {
-      card.append(lbl,val,desc);
+      card.append(lbl,val,desc,r2El);
     }
     grid.appendChild(card);
   });
