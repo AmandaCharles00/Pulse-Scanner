@@ -335,10 +335,10 @@ const SECTOR_THEMES = {
   'xly': ['cons_cyc','ev','restaurants','luxury','res_const'],
   'xlp': ['cons_disc','cons_staples'],
   'xle': ['oil_ep','oil_drill'],
-  'xli': ['defense','aerospace','logistics','build_mat','robotics'],
+  'xli': ['defense','aerospace','logistics','build_mat','robotics','util_indep'],
   'xlb': ['chemicals','ind_metals','mining','agriculture'],
   'xlre': ['reit_office','re_dev'],
-  'xlu': ['util_indep','nuclear','clean_e'],
+  'xlu': ['nuclear','clean_e'],
   'xlc': ['adtech','space'],
   'igv': ['saas','cloud','cyber'],
 };
@@ -2508,12 +2508,12 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
 
 // ── CORRELATION ───────────────────────────────────────────────────────────────
 function calcCorrelation(closes1, closes2, days){
-  const len=Math.min(closes1.length,closes2.length,days+1);
-  if(len<days+1) return null;
-  const a=closes1.slice(-len);
-  const b=closes2.slice(-len);
+  if(closes1.length<days+1||closes2.length<days+1) return null;
+  // Always use the last days+1 entries from the already-aligned arrays
+  const a=closes1.slice(closes1.length-(days+1));
+  const b=closes2.slice(closes2.length-(days+1));
   let same=0,total=0;
-  for(let i=1;i<len;i++){
+  for(let i=1;i<=days;i++){
     const da=a[i]-a[i-1], db=b[i]-b[i-1];
     if(Math.abs(da)<1e-10&&Math.abs(db)<1e-10) continue;
     total++;
@@ -2524,12 +2524,11 @@ function calcCorrelation(closes1, closes2, days){
 }
 
 function calcDirectionalAgreement(closes1, closes2, days){
-  const len=Math.min(closes1.length,closes2.length,days+1);
-  if(len<days+1) return null;
-  const a=closes1.slice(-len);
-  const b=closes2.slice(-len);
+  if(closes1.length<days+1||closes2.length<days+1) return null;
+  const a=closes1.slice(closes1.length-(days+1));
+  const b=closes2.slice(closes2.length-(days+1));
   let same=0,total=0;
-  for(let i=1;i<len;i++){
+  for(let i=1;i<=days;i++){
     const da=a[i]-a[i-1], db=b[i]-b[i-1];
     if(Math.abs(da)<1e-10&&Math.abs(db)<1e-10) continue;
     total++;
@@ -2564,6 +2563,7 @@ function renderCorrelation(tk1, tk2){
     const map2=new Map(d2.closeDates.map((t,i)=>[t,d2.closes[i]]));
     aligned1=pairs.map(p=>p.c);
     aligned2=pairs.map(p=>map2.get(p.t));
+    console.log(`Correlation alignment: ${tk1} has ${d1.closes.length} bars, ${tk2} has ${d2.closes.length} bars, aligned to ${aligned1.length} shared dates`);
   }
 
   if(!aligned1.length||!aligned2.length){
