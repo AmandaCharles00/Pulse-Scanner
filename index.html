@@ -850,7 +850,19 @@ function scheduleAutoRefresh(){
 
 // ── PERSISTENCE ───────────────────────────────────────────────────────────────
 function saveCache(){
-  try{localStorage.setItem('tt_cache',JSON.stringify(cache));localStorage.setItem('tt_stats',JSON.stringify(stats));localStorage.setItem('tt_time',new Date().toISOString());localStorage.setItem('tt_alerts',JSON.stringify(alertSettings));localStorage.setItem('tt_custom_alerts',JSON.stringify(customTickerAlerts));}catch(e){}
+  try{
+    // Exclude closes/closeDates arrays from localStorage — too large, recomputed on sync
+    const slim={};
+    Object.keys(cache).forEach(tk=>{
+      const {closes,closeDates,...rest}=cache[tk];
+      slim[tk]=rest;
+    });
+    localStorage.setItem('tt_cache',JSON.stringify(slim));
+    localStorage.setItem('tt_stats',JSON.stringify(stats));
+    localStorage.setItem('tt_time',new Date().toISOString());
+    localStorage.setItem('tt_alerts',JSON.stringify(alertSettings));
+    localStorage.setItem('tt_custom_alerts',JSON.stringify(customTickerAlerts));
+  }catch(e){console.warn('saveCache error:',e);}
 }
 function loadCache(){
   try{
