@@ -2508,51 +2508,19 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
 
 // ── CORRELATION ───────────────────────────────────────────────────────────────
 function calcCorrelation(closes1, closes2, days){
-  const need=days+1;
-  if(closes1.length<need||closes2.length<need) return null;
-
-  // Use last (days+1) from the SHORTER array to ensure same window
   const len=Math.min(closes1.length,closes2.length,days+1);
+  if(len<days+1) return null;
   const a=closes1.slice(-len);
   const b=closes2.slice(-len);
-  const n=len-1;
-  if(n<4) return null;
-
-  // Daily returns
-  const ra=[],rb=[];
+  let same=0,total=0;
   for(let i=1;i<len;i++){
-    ra.push((a[i]-a[i-1])/a[i-1]);
-    rb.push((b[i]-b[i-1])/b[i-1]);
+    const da=a[i]-a[i-1], db=b[i]-b[i-1];
+    if(Math.abs(da)<1e-10&&Math.abs(db)<1e-10) continue;
+    total++;
+    if((da>0&&db>0)||(da<0&&db<0)) same++;
   }
-
-  // Rank function — 1-based, average ties
-  function rank(arr){
-    const indexed=arr.map((v,i)=>({v,i})).sort((x,y)=>x.v-y.v);
-    const r=new Array(n);
-    let i=0;
-    while(i<n){
-      let j=i;
-      while(j<n-1&&Math.abs(indexed[j+1].v-indexed[i].v)<1e-10) j++;
-      const avg=(i+j)/2+1;
-      for(let k=i;k<=j;k++) r[indexed[k].i]=avg;
-      i=j+1;
-    }
-    return r;
-  }
-
-  const rA=rank(ra);
-  const rB=rank(rb);
-
-  // Pearson on ranks = Spearman
-  const mA=rA.reduce((s,v)=>s+v,0)/n;
-  const mB=rB.reduce((s,v)=>s+v,0)/n;
-  let num=0,dA=0,dB=0;
-  for(let i=0;i<n;i++){
-    const da=rA[i]-mA, db=rB[i]-mB;
-    num+=da*db; dA+=da*da; dB+=db*db;
-  }
-  if(dA===0||dB===0) return null;
-  return +(num/Math.sqrt(dA*dB)).toFixed(3);
+  if(total<4) return null;
+  return +(same/total*2-1).toFixed(3);
 }
 
 function calcDirectionalAgreement(closes1, closes2, days){
@@ -2585,7 +2553,7 @@ function renderCorrelation(tk1, tk2){
 
   const subtitle=document.createElement('div');
   subtitle.style.cssText='font-size:11px;color:var(--text2);margin-bottom:20px;font-family:var(--mono)';
-  subtitle.textContent='Spearman rank correlation of daily returns — direction-weighted, magnitude-agnostic';
+  subtitle.textContent='Directional concordance — same-direction days scaled -1 to +1  ·  70%+ same direction = 0.4+  ·  80%+ = 0.6+';
   wrap.appendChild(subtitle);
 
   // Date-align the closes arrays — only use trading days present in BOTH tickers
@@ -2620,18 +2588,18 @@ function renderCorrelation(tk1, tk2){
   const corrColor=(r)=>{
     if(r===null) return'var(--text2)';
     const a=Math.abs(r);
-    if(a>=0.8) return r>0?'var(--green)':'var(--red)';
-    if(a>=0.5) return r>0?'#80e0a0':'#ff8090';
-    if(a>=0.2) return'var(--amber)';
+    if(a>=0.6) return r>0?'var(--green)':'var(--red)';
+    if(a>=0.3) return r>0?'#80e0a0':'#ff8090';
+    if(a>=0.1) return'var(--amber)';
     return'var(--text2)';
   };
 
   const corrLabel=(r)=>{
     if(r===null) return'—';
     const a=Math.abs(r);
-    if(a>=0.8) return r>0?'Strong Positive':'Strong Negative';
-    if(a>=0.5) return r>0?'Moderate Positive':'Moderate Negative';
-    if(a>=0.2) return r>0?'Weak Positive':'Weak Negative';
+    if(a>=0.6) return r>0?'Strong Positive':'Strong Negative';
+    if(a>=0.3) return r>0?'Moderate Positive':'Moderate Negative';
+    if(a>=0.1) return r>0?'Weak Positive':'Weak Negative';
     return'Uncorrelated';
   };
 
