@@ -117,7 +117,7 @@ tr:hover td{background:var(--bg3)}
 .tooltip-wrap{position:relative;display:inline-block;cursor:help}
 .tooltip-wrap .tooltip{visibility:hidden;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:8px 10px;font-size:11px;font-family:var(--sans);line-height:1.5;width:220px;position:absolute;z-index:100;bottom:125%;left:50%;transform:translateX(-50%);opacity:0;transition:opacity .15s;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.4)}
 .tooltip-wrap .tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--border2)}
-.tooltip-wrap:hover .tooltip{visibility:visible;opacity:1}
+.tooltip-wrap .tooltip.show{visibility:visible;opacity:1}
 ::-webkit-scrollbar{width:6px;height:10px}::-webkit-scrollbar-track{background:var(--bg3);border-radius:4px}
 ::-webkit-scrollbar-thumb{background:var(--text2);border-radius:4px}
 ::-webkit-scrollbar-thumb:hover{background:var(--text2)}
@@ -3038,6 +3038,8 @@ const COLUMN_TIPS = {
 function withTooltip(el, tipText){
   if(!tipText) return el;
   const wrap=document.createElement('span');wrap.className='tooltip-wrap';
+  wrap.addEventListener('click',e=>{e.stopPropagation();const t=wrap.querySelector('.tooltip');t.classList.toggle('show');});
+  document.addEventListener('click',()=>{const t=wrap.querySelector('.tooltip');if(t)t.classList.remove('show');});
   const tip=document.createElement('span');tip.className='tooltip';tip.textContent=tipText;
   wrap.appendChild(el.cloneNode(true));
   wrap.appendChild(tip);
@@ -3058,7 +3060,13 @@ function mkH(label, col){
     tipDiv.textContent=tip;
     h.appendChild(inner);
     setTimeout(()=>{if(!tipDiv.parentElement)document.body.appendChild(tipDiv);},0);
-    h.addEventListener('mouseenter',()=>{
+    // Click to show/hide tooltip — no hover sticking
+    h.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      if(tipDiv.style.display==='block'){tipDiv.style.display='none';return;}
+      // Hide any other open tooltips
+      document.querySelectorAll('.__pulse_tip').forEach(t=>t.style.display='none');
+      tipDiv.classList.add('__pulse_tip');
       const r=h.getBoundingClientRect();
       tipDiv.style.display='block';
       const pr=tipDiv.getBoundingClientRect();
@@ -3070,7 +3078,8 @@ function mkH(label, col){
       tipDiv.style.top=top+'px';
       tipDiv.style.left=left+'px';
     });
-    h.addEventListener('mouseleave',()=>tipDiv.style.display='none');
+    // Dismiss on any outside click
+    document.addEventListener('click',()=>tipDiv.style.display='none');
   } else {
     h.textContent=label+(drillSort.col===col?(drillSort.dir==='desc'?' ▼':' ▲'):'');
   }
