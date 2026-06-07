@@ -3050,24 +3050,25 @@ function mkH(label, col){
   const h=document.createElement('th');
   const tip=COLUMN_TIPS[label];
   if(tip){
-    h.style.cursor='help';
+    h.style.cursor='pointer';
     const inner=document.createElement('span');
-    inner.style.cssText='border-bottom:1px dashed var(--text2);padding-bottom:1px';
     inner.textContent=label+(drillSort.col===col?(drillSort.dir==='desc'?' ▼':' ▲'):'');
-    // Tooltip div uses position:fixed so it isn't clipped by the .main/.dv/.tw overflow chain
+    // Small info icon that triggers tooltip — separate from sort click
+    const icon=document.createElement('span');
+    icon.textContent=' ⓘ';
+    icon.style.cssText='font-size:9px;opacity:0.5;cursor:help;vertical-align:middle';
     const tipDiv=document.createElement('div');
     tipDiv.style.cssText='display:none;position:fixed;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:8px 10px;font-size:11px;font-family:var(--sans);line-height:1.5;width:220px;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.5);font-weight:400;text-align:left;white-space:normal;pointer-events:none';
     tipDiv.textContent=tip;
-    h.appendChild(inner);
+    h.append(inner,icon);
     setTimeout(()=>{if(!tipDiv.parentElement)document.body.appendChild(tipDiv);},0);
-    // Click to show/hide tooltip — no hover sticking
-    h.addEventListener('click',(e)=>{
+    // Tooltip on icon click only
+    icon.addEventListener('click',(e)=>{
       e.stopPropagation();
       if(tipDiv.style.display==='block'){tipDiv.style.display='none';return;}
-      // Hide any other open tooltips
       document.querySelectorAll('.__pulse_tip').forEach(t=>t.style.display='none');
       tipDiv.classList.add('__pulse_tip');
-      const r=h.getBoundingClientRect();
+      const r=icon.getBoundingClientRect();
       tipDiv.style.display='block';
       const pr=tipDiv.getBoundingClientRect();
       let top=r.top-pr.height-6;
@@ -3078,7 +3079,6 @@ function mkH(label, col){
       tipDiv.style.top=top+'px';
       tipDiv.style.left=left+'px';
     });
-    // Dismiss on any outside click
     document.addEventListener('click',()=>tipDiv.style.display='none');
   } else {
     h.textContent=label+(drillSort.col===col?(drillSort.dir==='desc'?' ▼':' ▲'):'');
