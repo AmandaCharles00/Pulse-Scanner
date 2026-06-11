@@ -2422,14 +2422,11 @@ function renderExtension(){
 
   ctrl.append(lbl1,atrIn,sep1,lbl2,volPctIn,lbl2b,sep2,lbl3,dvolIn,lbl3b,sep3,dirLbl,extDirToggle,countEl);
 
-  const body=document.createElement('div');
-  body.style.cssText='flex:1;overflow-y:auto';
-
-  // History panel — collapsible, loads from Supabase
+  // History panel — sits between controls and live results, collapsible
   const histWrap=document.createElement('div');
-  histWrap.style.cssText='flex-shrink:0;border-top:2px solid var(--border2)';
+  histWrap.style.cssText='flex-shrink:0;border-bottom:1px solid var(--border2)';
   const histHdr=document.createElement('div');
-  histHdr.style.cssText='display:flex;align-items:center;gap:8px;padding:7px 14px;background:var(--bg2);cursor:pointer;user-select:none';
+  histHdr.style.cssText='display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--bg2);cursor:pointer;user-select:none';
   const histLbl=document.createElement('span');
   histLbl.style.cssText='font-size:11px;color:var(--text2);font-family:var(--mono);letter-spacing:.05em';
   histLbl.textContent='📋 EXTENSION HISTORY';
@@ -2448,7 +2445,10 @@ function renderExtension(){
   });
   histWrap.append(histHdr,histBody);
 
-  wrap.append(ctrl,body,histWrap);
+  const body=document.createElement('div');
+  body.style.cssText='flex:1;overflow-y:auto';
+
+  wrap.append(ctrl,histWrap,body);
   main.innerHTML='';main.appendChild(wrap);
 
   if(noData){
@@ -2462,18 +2462,29 @@ async function loadExtensionHistory(container){
   container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text2);font-family:var(--mono)">Loading history...</div>';
   const now=new Date();
   const y=now.getFullYear(),m=now.getMonth();
-  // Build month buckets
-  const buckets=[
-    {label:'This Month (MTD)', from:new Date(y,m,1).toISOString(), to:now.toISOString()},
-    {label:'Last Month', from:new Date(y,m-1,1).toISOString(), to:new Date(y,m,1).toISOString()},
-    {label:'2 Months Ago', from:new Date(y,m-2,1).toISOString(), to:new Date(y,m-1,1).toISOString()},
-    {label:'3 Months Ago', from:new Date(y,m-3,1).toISOString(), to:new Date(y,m-2,1).toISOString()},
-  ];
+  // Build month buckets going back 12 months
+  const buckets=[];
+  const monthNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  // MTD first
+  buckets.push({label:'This Month (MTD)', from:new Date(y,m,1).toISOString(), to:now.toISOString()});
+  // Then previous 11 months
+  for(let i=1;i<=11;i++){
+    const bm=m-i;
+    const by=y+Math.floor(bm/12);
+    const realM=((bm%12)+12)%12;
+    const realY=bm<0?y-Math.ceil(Math.abs(bm)/12):y;
+    const fromDate=new Date(realY,realM,1);
+    const toDate=new Date(realY,realM+1,1);
+    buckets.push({
+      label:monthNames[realM]+' '+fromDate.getFullYear(),
+      from:fromDate.toISOString(),
+      to:toDate.toISOString()
+    });
+  }
 
   try{
-    // Fetch last 4 months of history
-    const from4mo=new Date(y,m-3,1).toISOString();
-    const data=await supaFetch('GET','/rest/v1/extension_history?select=*&captured_at=gte.'+from4mo+'&order=captured_at.desc&limit=2000');
+    // Fetch all history (no date limit)
+    const data=await supaFetch('GET','/rest/v1/extension_history?select=*&order=captured_at.desc&limit=5000');
     if(!data||!Array.isArray(data)){
       container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--amber);font-family:var(--mono)">⚠ Could not load history. Make sure the extension_history table exists in Supabase.</div>';
       return;
