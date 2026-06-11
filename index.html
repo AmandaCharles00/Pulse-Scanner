@@ -1238,7 +1238,7 @@ async function backfillExtensionHistory(){
   if(window._extBackfilled) return;
   window._extBackfilled=true;
 
-  // Only backfill if there's no data older than 7 days (i.e. only today's sync exists)
+  // Check oldest record — if all records are from last 7 days, backfill needed
   const cutoff=new Date(Date.now()-7*864e5).toISOString();
   const existing=await supaFetch('GET','/rest/v1/extension_history?select=captured_at&captured_at=lt.'+cutoff+'&limit=1');
   if(existing&&Array.isArray(existing)&&existing.length>0){
@@ -1251,6 +1251,20 @@ async function backfillExtensionHistory(){
   const records=[];
   const themeMap={};
   getThemesWithWatchlist().forEach(th=>th.tickers.forEach(tk=>{if(!themeMap[tk])themeMap[tk]=th.name;}));
+
+  let minDate=Infinity, maxDate=0, barsFound=0;
+  Object.keys(cache).forEach(ticker=>{
+    const d=cache[ticker];
+    if(!d||!d.bars||d.bars.length<65) return;
+    if(isOTC(ticker)) return;
+    const theme=themeMap[ticker];
+    if(!theme) return;
+    const bars=d.bars;
+    barsFound++;
+    if(bars[0].t<minDate) minDate=bars[0].t;
+    if(bars[bars.length-1].t>maxDate) maxDate=bars[bars.length-1].t;
+  });
+  console.log('Bars found for tickers:', barsFound, '| Date range:', new Date(minDate).toISOString().slice(0,10), 'to', new Date(maxDate).toISOString().slice(0,10));
 
   Object.keys(cache).forEach(ticker=>{
     const d=cache[ticker];
