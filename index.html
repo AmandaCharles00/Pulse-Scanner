@@ -1234,7 +1234,9 @@ async function saveExtensionHistory(){
   });
   if(!results.length) return;
   try{
-    await supaFetch('POST','/rest/v1/extension_history',results);
+    await supaFetch('POST','/rest/v1/extension_history',results,{
+      'Prefer':'resolution=merge-duplicates,return=minimal'
+    });
     console.log('Extension history saved:',results.length,'entries');
   }catch(e){console.warn('Extension history save failed:',e);}
 }
@@ -1342,9 +1344,11 @@ async function backfillExtensionHistory(force=false){
     seen.add(key); return true;
   });
 
-  console.log('Inserting',deduped.length,'historical records...');
+  console.log('Upserting',deduped.length,'historical records...');
   for(let i=0;i<deduped.length;i+=500)
-    await supaFetch('POST','/rest/v1/extension_history',deduped.slice(i,i+500));
+    await supaFetch('POST','/rest/v1/extension_history',deduped.slice(i,i+500),{
+      'Prefer':'resolution=merge-duplicates,return=minimal'
+    });
   console.log('Backfill complete!');
 }
 
