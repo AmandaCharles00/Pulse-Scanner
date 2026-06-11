@@ -2596,7 +2596,10 @@ async function loadExtensionHistory(container){
 
     buckets.forEach((bk,i)=>{
       // Count unique tickers in this bucket
-      const bkData=data.filter(r=>r.captured_at>=bk.from&&r.captured_at<bk.to);
+      const bkData=data.filter(r=>{
+        const t=new Date(r.captured_at).getTime();
+        return t>=new Date(bk.from).getTime()&&t<new Date(bk.to).getTime();
+      });
       const uniqueTickers=new Map();
       bkData.forEach(r=>{
         if(!uniqueTickers.has(r.ticker)||Math.abs(r.atr_ma)>Math.abs(uniqueTickers.get(r.ticker).atr_ma))
