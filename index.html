@@ -2557,6 +2557,16 @@ function renderExtension(){
   backfillBtn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-family:var(--mono);font-size:9px;padding:2px 7px;cursor:pointer;margin-left:8px';
   backfillBtn.textContent='⟳ Backfill';
   backfillBtn.title='Re-run historical backfill from bar data';
+  const histBody=document.createElement('div');
+  const histWasOpen=!!window._extHistOpen;
+  histBody.style.cssText='display:'+(histWasOpen?'block':'none')+';max-height:340px;overflow-y:auto;background:var(--bg3)';
+  let histOpen=histWasOpen;
+  if(histWasOpen){
+    histToggleBtn.textContent='▲ Hide';
+    if(window._extHistCache) renderExtHistFromCache(histBody,window._extHistCache,window._extHistActiveTab||0);
+    else loadExtensionHistory(histBody);
+  }
+
   backfillBtn.addEventListener('click',async(e)=>{
     e.stopPropagation();
     if(!Object.keys(cache).length){alert('Sync first to load bar data');return;}
@@ -2564,18 +2574,23 @@ function renderExtension(){
     window._extBackfilled=false;
     await backfillExtensionHistory(true);
     backfillBtn.textContent='⟳ Backfill';backfillBtn.style.opacity='1';
-    window._extHistCache=null; // force re-fetch from Supabase
+    window._extHistCache=null;
+    // Re-load history without touching histOpen or display
     if(histOpen) await loadExtensionHistory(histBody);
   });
+
   histHdr.append(histLbl,backfillBtn,histToggleBtn);
-  const histBody=document.createElement('div');
-  histBody.style.cssText='display:none;max-height:340px;overflow-y:auto;background:var(--bg3)';
-  let histOpen=false;
-  histHdr.addEventListener('click',async()=>{
+
+  histHdr.addEventListener('click',async(e)=>{
+    if(e.target===backfillBtn||backfillBtn.contains(e.target)) return;
     histOpen=!histOpen;
+    window._extHistOpen=histOpen;
     histToggleBtn.textContent=histOpen?'▲ Hide':'▼ Show';
     histBody.style.display=histOpen?'block':'none';
-    if(histOpen&&!histBody.dataset.loaded){histBody.dataset.loaded='1';await loadExtensionHistory(histBody);}
+    if(histOpen){
+      if(!window._extHistCache) await loadExtensionHistory(histBody);
+      else renderExtHistFromCache(histBody, window._extHistCache, window._extHistActiveTab||0);
+    }
   });
   histWrap.append(histHdr,histBody);
 
