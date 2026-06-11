@@ -2607,30 +2607,19 @@ async function loadExtensionHistory(container){
       return;
     }
 
+    // Fetch each bucket separately to avoid row limit issues
     container.innerHTML='';
 
-    // Active bucket tab
-    let activeBucket=0;
     const tabBar=document.createElement('div');
-    tabBar.style.cssText='display:flex;border-bottom:1px solid var(--border2);background:var(--bg2)';
+    tabBar.style.cssText='display:flex;flex-wrap:wrap;border-bottom:1px solid var(--border2);background:var(--bg2)';
     const panels=[];
+    let tabsBuilt=0;
 
+    // Build all tabs first with loading state, then load data
     buckets.forEach((bk,i)=>{
-      // Count unique tickers in this bucket
-      const bkData=data.filter(r=>{
-        const t=new Date(r.captured_at).getTime();
-        return t>=new Date(bk.from).getTime()&&t<new Date(bk.to).getTime();
-      });
-      const uniqueTickers=new Map();
-      bkData.forEach(r=>{
-        if(!uniqueTickers.has(r.ticker)||Math.abs(r.atr_ma)>Math.abs(uniqueTickers.get(r.ticker).atr_ma))
-          uniqueTickers.set(r.ticker,r);
-      });
-      const sorted=[...uniqueTickers.values()].sort((a,b)=>Math.abs(b.atr_ma)-Math.abs(a.atr_ma));
-
       const tab=document.createElement('button');
       tab.style.cssText='background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text2);font-family:var(--mono);font-size:10px;padding:6px 12px;cursor:pointer;white-space:nowrap';
-      tab.textContent=bk.label+' ('+sorted.length+')';
+      tab.textContent=bk.label+' (...)';
       tab.addEventListener('click',()=>{
         tabBar.querySelectorAll('button').forEach(b=>{b.style.borderBottomColor='transparent';b.style.color='var(--text2)';});
         tab.style.borderBottomColor='var(--blue)';tab.style.color='var(--blue)';
@@ -2639,16 +2628,45 @@ async function loadExtensionHistory(container){
       if(i===0){tab.style.borderBottomColor='var(--blue)';tab.style.color='var(--blue)';}
       tabBar.appendChild(tab);
 
-      // Panel
       const panel=document.createElement('div');
       panel.style.cssText='display:'+(i===0?'block':'none');
-      if(!sorted.length){
-        panel.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text2);font-family:var(--mono)">No extension events recorded this period.</div>';
-      } else {
+      panel.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text2);font-family:var(--mono)">Loading...</div>';
+      panels.push(panel);
+    });
+
+    container.appendChild(tabBar);
+    panels.forEach(p=>container.appendChild(p));
+
+    // Load each bucket's data
+    for(let i=0;i<buckets.length;i++){
+      const bk=buckets[i];
+      const tab=tabBar.children[i];
+      const panel=panels[i];
+
+      try{
+        const bkData=await supaFetch('GET',
+          '/rest/v1/extension_history?select=*&captured_at=gte.'+encodeURIComponent(bk.from)+'&captured_at=lt.'+encodeURIComponent(bk.to)+'&order=captured_at.desc',
+          null,{'Range-Unit':'items','Range':'0-4999'}
+        );
+
+        // Deduplicate — keep peak ATR/MA per ticker
+        const uniqueTickers=new Map();
+        (bkData||[]).forEach(r=>{
+          if(!uniqueTickers.has(r.ticker)||Math.abs(r.atr_ma)>Math.abs(uniqueTickers.get(r.ticker).atr_ma))
+            uniqueTickers.set(r.ticker,r);
+        });
+        const sorted=[...uniqueTickers.values()].sort((a,b)=>b.atr_ma-a.atr_ma);
+
+        tab.textContent=bk.label+' ('+sorted.length+')';
+
+        if(!sorted.length){
+          panel.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text2);font-family:var(--mono)">No extension events recorded this period.</div>';
+          continue;
+        }
+
         let histSort={col:'atr_ma',dir:'desc'};
 
         const renderHistRows=(data,container)=>{
-          // Remove old rows (keep header)
           while(container.children.length>1) container.removeChild(container.lastChild);
           data.forEach(r=>{
             const row=document.createElement('div');
@@ -2675,29 +2693,28 @@ async function loadExtensionHistory(container){
           const s=[...data].sort((a,b)=>{
             let av=parseFloat(a[histSort.col]??0);
             let bv=parseFloat(b[histSort.col]??0);
-            // Always sort ATR/MA by absolute magnitude
-            if(histSort.col==='atr_ma'){av=Math.abs(av);bv=Math.abs(bv);}
-            if(histSort.dir==='desc') return bv-av;
-            return av-bv;
+            if(histSort.col==='atr_ma'){
+              // Sort by signed value: most positive first, most negative last
+              return histSort.dir==='desc'?bv-av:av-bv;
+            }
+            return histSort.dir==='desc'?bv-av:av-bv;
           });
-          // Update header arrows
           ph.querySelectorAll('[data-col]').forEach(h=>{
-            const col=h.dataset.col;
             const arrow=h.querySelector('.sort-arrow');
-            if(arrow) arrow.textContent=histSort.col===col?(histSort.dir==='desc'?' ▼':' ▲'):'';
-            h.style.color=histSort.col===col?'var(--blue)':'var(--text2)';
+            if(arrow) arrow.textContent=histSort.col===h.dataset.col?(histSort.dir==='desc'?' ▼':' ▲'):'';
+            h.style.color=histSort.col===h.dataset.col?'var(--blue)':'var(--text2)';
           });
           renderHistRows(s,ph.parentElement);
         };
 
-        // Sortable header
+        panel.innerHTML='';
         const ph=document.createElement('div');
         ph.style.cssText='display:flex;align-items:center;padding:0 14px;height:24px;font-size:9px;color:var(--text2);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:3';
 
-        const mkHCol=(label,col,width,align='right')=>{
+        const mkHCol=(label,col,width)=>{
           const h=document.createElement('div');
           h.dataset.col=col;
-          h.style.cssText='width:'+width+';text-align:'+align+';flex-shrink:0;cursor:pointer;user-select:none;color:'+(histSort.col===col?'var(--blue)':'var(--text2)');
+          h.style.cssText='width:'+width+';text-align:right;flex-shrink:0;cursor:pointer;user-select:none;color:'+(histSort.col===col?'var(--blue)':'var(--text2)');
           const arrow=document.createElement('span');arrow.className='sort-arrow';
           arrow.textContent=histSort.col===col?(histSort.dir==='desc'?' ▼':' ▲'):'';
           h.textContent=label;h.appendChild(arrow);
@@ -2709,22 +2726,18 @@ async function loadExtensionHistory(container){
           return h;
         };
 
-        const tkH=document.createElement('div');tkH.style.cssText='width:60px;flex-shrink:0;color:var(--text2)';tkH.textContent='Ticker';
-        const thH=document.createElement('div');thH.style.cssText='flex:1;color:var(--text2)';thH.textContent='Theme';
-        ph.append(tkH,thH,
-          mkHCol('Peak ATR/50MA','atr_ma','90px'),
-          mkHCol('Price','price','70px'),
-          mkHCol('Vol %','vol_pct','70px'),
-          mkHCol('Last Seen','captured_at','100px')
-        );
+        const tkH=document.createElement('div');tkH.style.cssText='width:60px;flex-shrink:0';tkH.textContent='Ticker';
+        const thH=document.createElement('div');thH.style.cssText='flex:1';thH.textContent='Theme';
+        ph.append(tkH,thH,mkHCol('Peak ATR/50MA','atr_ma','90px'),mkHCol('Price','price','70px'),mkHCol('Vol %','vol_pct','70px'),mkHCol('Last Seen','captured_at','100px'));
         panel.appendChild(ph);
         renderHistRows(sorted,ph.parentElement);
-      }
-      panels.push(panel);
-    });
 
-    container.appendChild(tabBar);
-    panels.forEach(p=>container.appendChild(p));
+      }catch(e){
+        panel.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--red);font-family:var(--mono)">Error: '+e.message+'</div>';
+        tab.textContent=bk.label+' (!)';
+      }
+    }
+
   }catch(e){
     container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--red);font-family:var(--mono)">Error loading history: '+e.message+'</div>';
   }
