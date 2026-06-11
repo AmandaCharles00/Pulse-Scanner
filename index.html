@@ -2449,23 +2449,7 @@ function renderExtension(){
   const main=document.getElementById('main');
   const noData=Object.keys(cache).length===0;
 
-  // Reuse existing DOM so history panel survives tab switches
-  const existing=document.getElementById('ext-wrap');
-  if(existing){
-    main.innerHTML='';
-    main.appendChild(existing);
-    if(!noData) buildExtension(
-      parseFloat(existing.dataset.atr||3),
-      parseFloat(existing.dataset.volpct||0),
-      parseFloat(existing.dataset.dvol||80),
-      existing.dataset.dir||'above',
-      document.getElementById('ext-body')
-    );
-    return;
-  }
-
   const wrap=document.createElement('div');
-  wrap.id='ext-wrap';
   wrap.style.cssText='display:flex;flex-direction:column;height:100%;overflow:hidden';
 
   // Controls
