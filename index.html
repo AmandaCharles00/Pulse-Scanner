@@ -747,6 +747,7 @@ async function doSync(){
   await Promise.all(workers);
 
   buildStats();buildSectorStats();checkAlerts();checkAndPlayAlert();saveCache();saveExtensionHistory();backfillExtensionHistory();
+  window._extHistCache=null;
   syncing=false;btn.textContent='⟳ Sync';btn.classList.remove('busy');
   renderMain();scheduleAutoRefresh();
 }
@@ -2579,7 +2580,7 @@ function renderExtension(){
     window._extBackfilled=false;
     await backfillExtensionHistory(true);
     backfillBtn.textContent='⟳ Backfill';backfillBtn.style.opacity='1';
-    histBody.dataset.loaded='';
+    window._extHistCache=null; // force re-fetch from Supabase
     if(histOpen) await loadExtensionHistory(histBody);
   });
   histHdr.append(histLbl,backfillBtn,histToggleBtn);
@@ -2609,10 +2610,14 @@ function renderExtension(){
 }
 
 async function loadExtensionHistory(container){
+  // If we have cached data, just render from it (no re-fetch)
+  if(window._extHistCache && window._extHistCache.length){
+    renderExtHistFromCache(container, window._extHistCache, window._extHistActiveTab||0);
+    return;
+  }
   container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text2);font-family:var(--mono)">Loading history...</div>';
   const now=new Date();
   const y=now.getFullYear(),m=now.getMonth();
-  // Build month buckets going back 12 months
   const buckets=[];
   const monthNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   buckets.push({label:'This Month (MTD)', from:new Date(y,m,1).toISOString(), to:now.toISOString()});
@@ -2623,151 +2628,142 @@ async function loadExtensionHistory(container){
   }
 
   try{
-    // Fetch each bucket separately to avoid row limit issues
     container.innerHTML='';
-
-    const tabBar=document.createElement('div');
-    tabBar.style.cssText='display:flex;flex-wrap:wrap;border-bottom:1px solid var(--border2);background:var(--bg2)';
-    const panels=[];
-    let tabsBuilt=0;
-
-    // Build all tabs first with loading state, then load data
-    buckets.forEach((bk,i)=>{
-      const tab=document.createElement('button');
-      tab.style.cssText='background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text2);font-family:var(--mono);font-size:10px;padding:6px 12px;cursor:pointer;white-space:nowrap';
-      tab.textContent=bk.label+' (...)';
-      tab.addEventListener('click',()=>{
-        tabBar.querySelectorAll('button').forEach(b=>{b.style.borderBottomColor='transparent';b.style.color='var(--text2)';});
-        tab.style.borderBottomColor='var(--blue)';tab.style.color='var(--blue)';
-        panels.forEach((p,pi)=>p.style.display=pi===i?'block':'none');
-      });
-      if(i===0){tab.style.borderBottomColor='var(--blue)';tab.style.color='var(--blue)';}
-      tabBar.appendChild(tab);
-
-      const panel=document.createElement('div');
-      panel.style.cssText='display:'+(i===0?'block':'none');
-      panel.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text2);font-family:var(--mono)">Loading...</div>';
-      panels.push(panel);
-    });
-
-    container.appendChild(tabBar);
-    panels.forEach(p=>container.appendChild(p));
-
-    // Load each bucket's data
+    // Fetch all buckets
+    const allBucketData=[];
     for(let i=0;i<buckets.length;i++){
       const bk=buckets[i];
-      const tab=tabBar.children[i];
-      const panel=panels[i];
-
       try{
         const bkData=await supaFetch('GET',
           '/rest/v1/extension_history?select=*&captured_at=gte.'+encodeURIComponent(bk.from)+'&captured_at=lt.'+encodeURIComponent(bk.to)+'&order=captured_at.desc',
           null,{'Range-Unit':'items','Range':'0-4999'}
         );
-
-        // Deduplicate — keep peak ATR/MA per ticker
         const uniqueTickers=new Map();
         (bkData||[]).forEach(r=>{
           if(!uniqueTickers.has(r.ticker)||Math.abs(r.atr_ma)>Math.abs(uniqueTickers.get(r.ticker).atr_ma))
             uniqueTickers.set(r.ticker,r);
         });
-        const sorted=[...uniqueTickers.values()].sort((a,b)=>b.atr_ma-a.atr_ma);
-
-        tab.textContent=bk.label+' ('+sorted.length+')';
-
-        if(!sorted.length){
-          panel.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text2);font-family:var(--mono)">No extension events recorded this period.</div>';
-          continue;
-        }
-
-        let histSort={col:'atr_ma',dir:'desc'};
-
-        const renderHistRows=(data,container)=>{
-          container.innerHTML='';
-          data.forEach(r=>{
-            const row=document.createElement('div');
-            row.style.cssText='display:flex;align-items:center;padding:0 14px;height:32px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .08s';
-            row.addEventListener('mouseenter',()=>row.style.background='var(--bg4)');
-            row.addEventListener('mouseleave',()=>row.style.background='');
-            row.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
-            const isAbove=r.atr_ma>0;
-            const atrCol=isAbove?'var(--green)':'var(--red)';
-            const d=new Date(r.captured_at);
-            const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-            const volX=r.vol_x!=null?parseFloat(r.vol_x):null;
-            const volXCol=volX>=2?'var(--green)':volX>=1.5?'var(--amber)':'var(--text2)';
-            const avgDvol=r.avg_dvol!=null?parseFloat(r.avg_dvol):null;
-            row.innerHTML=
-              '<div style="width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:11px;flex-shrink:0">'+r.ticker+'</div>'+
-              '<div style="flex:1;font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+r.theme+'</div>'+
-              '<div style="width:110px;text-align:right;font-family:var(--mono);font-size:12px;color:'+atrCol+';font-weight:500;flex-shrink:0">'+(isAbove?'+':'')+parseFloat(r.atr_ma).toFixed(2)+'x</div>'+
-              '<div style="width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:#fff;flex-shrink:0">'+(r.price?'$'+parseFloat(r.price).toFixed(2):'—')+'</div>'+
-              '<div style="width:70px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0">'+(r.vol_pct?parseFloat(r.vol_pct).toFixed(2)+'%':'—')+'</div>'+
-              '<div style="width:65px;text-align:right;font-family:var(--mono);font-size:11px;color:'+volXCol+';flex-shrink:0">'+(volX!=null?volX.toFixed(2)+'x':'—')+'</div>'+
-              '<div style="width:90px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0">'+(avgDvol!=null?'$'+avgDvol.toFixed(0)+'M':'—')+'</div>'+
-              '<div style="width:100px;text-align:right;font-family:var(--mono);font-size:10px;color:var(--text2);flex-shrink:0">'+dateStr+'</div>';
-            container.appendChild(row);
-          });
-        };
-
-        const sortAndRender=(data,ph)=>{
-          const s=[...data].sort((a,b)=>{
-            let av=parseFloat(a[histSort.col]??0);
-            let bv=parseFloat(b[histSort.col]??0);
-            if(histSort.col==='atr_ma'){
-              // Sort by signed value: most positive first, most negative last
-              return histSort.dir==='desc'?bv-av:av-bv;
-            }
-            return histSort.dir==='desc'?bv-av:av-bv;
-          });
-          ph.querySelectorAll('[data-col]').forEach(h=>{
-            const arrow=h.querySelector('.sort-arrow');
-            if(arrow) arrow.textContent=histSort.col===h.dataset.col?(histSort.dir==='desc'?' ▼':' ▲'):'';
-            h.style.color=histSort.col===h.dataset.col?'var(--blue)':'var(--text2)';
-          });
-          renderHistRows(s,rowsContainer);
-        };
-
-        panel.innerHTML='';
-        const ph=document.createElement('div');
-        ph.style.cssText='display:flex;align-items:center;padding:0 14px;height:24px;font-size:9px;color:var(--text2);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:3';
-
-        const mkHCol=(label,col,width)=>{
-          const h=document.createElement('div');
-          h.dataset.col=col;
-          h.style.cssText='width:'+width+';text-align:right;flex-shrink:0;cursor:pointer;user-select:none;color:'+(histSort.col===col?'var(--blue)':'var(--text2)');
-          const arrow=document.createElement('span');arrow.className='sort-arrow';
-          arrow.textContent=histSort.col===col?(histSort.dir==='desc'?' ▼':' ▲'):'';
-          h.textContent=label;h.appendChild(arrow);
-          h.addEventListener('click',()=>{
-            histSort.dir=histSort.col===col&&histSort.dir==='desc'?'asc':'desc';
-            histSort.col=col;
-            sortAndRender(sorted,ph);
-          });
-          return h;
-        };
-
-        const tkH=document.createElement('div');tkH.style.cssText='width:60px;flex-shrink:0';tkH.textContent='Ticker';
-        const thH=document.createElement('div');thH.style.cssText='flex:1';thH.textContent='Theme';
-        ph.append(tkH,thH,mkHCol('Peak ATR/50MA','atr_ma','110px'),mkHCol('Price','price','75px'),mkHCol('Vol %','vol_pct','70px'),mkHCol('Vol ×','vol_x','65px'),mkHCol('AvgVol $M','avg_dvol','90px'),mkHCol('Last Seen','captured_at','100px'));
-        panel.appendChild(ph);
-        const note=document.createElement('div');
-        note.style.cssText='padding:4px 14px;font-size:9px;color:var(--text3);font-family:var(--mono);background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0';
-        note.textContent='\u26a1 Vol \u00d7 populated by live Sync only \u2014 backfilled rows show \u2014 for that column';
-        panel.appendChild(note);
-        const rowsContainer=document.createElement('div');
-        panel.appendChild(rowsContainer);
-        renderHistRows(sorted,rowsContainer);
-
+        allBucketData.push({bk, sorted:[...uniqueTickers.values()].sort((a,b)=>b.atr_ma-a.atr_ma)});
       }catch(e){
-        panel.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--red);font-family:var(--mono)">Error: '+e.message+'</div>';
-        tab.textContent=bk.label+' (!)';
+        allBucketData.push({bk, sorted:[]});
       }
     }
-
+    // Cache for reuse
+    window._extHistCache=allBucketData;
+    window._extHistActiveTab=0;
+    renderExtHistFromCache(container, allBucketData, 0);
   }catch(e){
     container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--red);font-family:var(--mono)">Error loading history: '+e.message+'</div>';
   }
+}
+
+function renderExtHistFromCache(container, allBucketData, activeTabIdx){
+  container.innerHTML='';
+  const tabBar=document.createElement('div');
+  tabBar.style.cssText='display:flex;flex-wrap:wrap;border-bottom:1px solid var(--border2);background:var(--bg2)';
+  const panels=[];
+
+  allBucketData.forEach(({bk,sorted},i)=>{
+    const tab=document.createElement('button');
+    tab.style.cssText='background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text2);font-family:var(--mono);font-size:10px;padding:6px 12px;cursor:pointer;white-space:nowrap';
+    tab.textContent=bk.label+' ('+(sorted.length)+')';
+    tab.addEventListener('click',()=>{
+      window._extHistActiveTab=i;
+      tabBar.querySelectorAll('button').forEach(b=>{b.style.borderBottomColor='transparent';b.style.color='var(--text2)';});
+      tab.style.borderBottomColor='var(--blue)';tab.style.color='var(--blue)';
+      panels.forEach((p,pi)=>p.style.display=pi===i?'block':'none');
+    });
+    if(i===activeTabIdx){tab.style.borderBottomColor='var(--blue)';tab.style.color='var(--blue)';}
+    tabBar.appendChild(tab);
+
+    const panel=document.createElement('div');
+    panel.style.cssText='display:'+(i===activeTabIdx?'block':'none');
+    panels.push(panel);
+
+    if(!sorted.length){
+      panel.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text2);font-family:var(--mono)">No extension events recorded this period.</div>';
+      return;
+    }
+
+    let histSort={col:'atr_ma',dir:'desc'};
+
+    const renderHistRows=(data,rc)=>{
+      rc.innerHTML='';
+      data.forEach(r=>{
+        const row=document.createElement('div');
+        row.style.cssText='display:flex;align-items:center;padding:0 14px;height:32px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .08s';
+        row.addEventListener('mouseenter',()=>row.style.background='var(--bg4)');
+        row.addEventListener('mouseleave',()=>row.style.background='');
+        row.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
+        const isAbove=r.atr_ma>0;
+        const atrCol=isAbove?'var(--green)':'var(--red)';
+        const d=new Date(r.captured_at);
+        const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+        const volX=r.vol_x!=null?parseFloat(r.vol_x):null;
+        const volXCol=volX>=2?'var(--green)':volX>=1.5?'var(--amber)':'var(--text2)';
+        const avgDvol=r.avg_dvol!=null?parseFloat(r.avg_dvol):null;
+        row.innerHTML=
+          '<div style="width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:11px;flex-shrink:0">'+r.ticker+'</div>'+
+          '<div style="flex:1;font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+r.theme+'</div>'+
+          '<div style="width:110px;text-align:right;font-family:var(--mono);font-size:12px;color:'+atrCol+';font-weight:500;flex-shrink:0">'+(isAbove?'+':'')+parseFloat(r.atr_ma).toFixed(2)+'x</div>'+
+          '<div style="width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:#fff;flex-shrink:0">'+(r.price?'$'+parseFloat(r.price).toFixed(2):'—')+'</div>'+
+          '<div style="width:70px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0">'+(r.vol_pct?parseFloat(r.vol_pct).toFixed(2)+'%':'—')+'</div>'+
+          '<div style="width:65px;text-align:right;font-family:var(--mono);font-size:11px;color:'+volXCol+';flex-shrink:0">'+(volX!=null?volX.toFixed(2)+'x':'—')+'</div>'+
+          '<div style="width:90px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0">'+(avgDvol!=null?'$'+avgDvol.toFixed(0)+'M':'—')+'</div>'+
+          '<div style="width:100px;text-align:right;font-family:var(--mono);font-size:10px;color:var(--text2);flex-shrink:0">'+dateStr+'</div>';
+        rc.appendChild(row);
+      });
+    };
+
+    const sortAndRender=(data,ph,rc)=>{
+      const s=[...data].sort((a,b)=>{
+        const av=parseFloat(a[histSort.col]??0);
+        const bv=parseFloat(b[histSort.col]??0);
+        return histSort.dir==='desc'?bv-av:av-bv;
+      });
+      ph.querySelectorAll('[data-col]').forEach(h=>{
+        const arrow=h.querySelector('.sort-arrow');
+        if(arrow) arrow.textContent=histSort.col===h.dataset.col?(histSort.dir==='desc'?' \u25bc':' \u25b2'):'';
+        h.style.color=histSort.col===h.dataset.col?'var(--blue)':'var(--text2)';
+      });
+      renderHistRows(s,rc);
+    };
+
+    const ph=document.createElement('div');
+    ph.style.cssText='display:flex;align-items:center;padding:0 14px;height:24px;font-size:9px;color:var(--text2);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:3';
+
+    const mkHCol=(label,col,width)=>{
+      const h=document.createElement('div');
+      h.dataset.col=col;
+      h.style.cssText='width:'+width+';text-align:right;flex-shrink:0;cursor:pointer;user-select:none;color:'+(histSort.col===col?'var(--blue)':'var(--text2)');
+      const arrow=document.createElement('span');arrow.className='sort-arrow';
+      arrow.textContent=histSort.col===col?(histSort.dir==='desc'?' \u25bc':' \u25b2'):'';
+      h.textContent=label;h.appendChild(arrow);
+      h.addEventListener('click',()=>{
+        histSort.dir=histSort.col===col&&histSort.dir==='desc'?'asc':'desc';
+        histSort.col=col;
+        sortAndRender(sorted,ph,rowsContainer);
+      });
+      return h;
+    };
+
+    const tkH=document.createElement('div');tkH.style.cssText='width:60px;flex-shrink:0';tkH.textContent='Ticker';
+    const thH=document.createElement('div');thH.style.cssText='flex:1';thH.textContent='Theme';
+    ph.append(tkH,thH,mkHCol('Peak ATR/50MA','atr_ma','110px'),mkHCol('Price','price','75px'),mkHCol('Vol %','vol_pct','70px'),mkHCol('Vol \u00d7','vol_x','65px'),mkHCol('AvgVol $M','avg_dvol','90px'),mkHCol('Last Seen','captured_at','100px'));
+    panel.appendChild(ph);
+
+    const note=document.createElement('div');
+    note.style.cssText='padding:4px 14px;font-size:9px;color:var(--text3);font-family:var(--mono);background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0';
+    note.textContent='\u26a1 Vol \u00d7 populated by live Sync only \u2014 backfilled rows show \u2014 for that column';
+    panel.appendChild(note);
+
+    const rowsContainer=document.createElement('div');
+    panel.appendChild(rowsContainer);
+    renderHistRows(sorted,rowsContainer);
+  });
+
+  container.appendChild(tabBar);
+  panels.forEach(p=>container.appendChild(p));
 }
 
 function buildExtension(minAtr, minVolPct, minDVol, direction, body){
