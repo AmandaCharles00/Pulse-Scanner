@@ -2596,17 +2596,6 @@ async function loadExtensionHistory(container){
   }
 
   try{
-    // Fetch all history (no date limit)
-    const data=await supaFetch('GET','/rest/v1/extension_history?select=*&order=captured_at.desc',null,{'Range-Unit':'items','Range':'0-49999','Prefer':'count=none'});
-    if(!data||!Array.isArray(data)){
-      container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--amber);font-family:var(--mono)">⚠ Could not load history. Make sure the extension_history table exists in Supabase.</div>';
-      return;
-    }
-    if(!data.length){
-      container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text2);font-family:var(--mono)">No history yet — history is saved automatically on each Sync.</div>';
-      return;
-    }
-
     // Fetch each bucket separately to avoid row limit issues
     container.innerHTML='';
 
