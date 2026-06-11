@@ -2631,11 +2631,9 @@ async function loadExtensionHistory(container){
   }
 
   try{
-    container.innerHTML='';
-    // Fetch all buckets
-    const allBucketData=[];
-    for(let i=0;i<buckets.length;i++){
-      const bk=buckets[i];
+    container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text2);font-family:var(--mono)"><span style="display:inline-block;width:10px;height:10px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;vertical-align:middle"></span>Loading history...</div>';
+    // Fetch all buckets in parallel
+    const allBucketData=await Promise.all(buckets.map(async bk=>{
       try{
         const bkData=await supaFetch('GET',
           '/rest/v1/extension_history?select=*&captured_at=gte.'+encodeURIComponent(bk.from)+'&captured_at=lt.'+encodeURIComponent(bk.to)+'&order=captured_at.desc',
@@ -2646,11 +2644,11 @@ async function loadExtensionHistory(container){
           if(!uniqueTickers.has(r.ticker)||Math.abs(r.atr_ma)>Math.abs(uniqueTickers.get(r.ticker).atr_ma))
             uniqueTickers.set(r.ticker,r);
         });
-        allBucketData.push({bk, sorted:[...uniqueTickers.values()].sort((a,b)=>b.atr_ma-a.atr_ma)});
+        return {bk, sorted:[...uniqueTickers.values()].sort((a,b)=>b.atr_ma-a.atr_ma)};
       }catch(e){
-        allBucketData.push({bk, sorted:[]});
+        return {bk, sorted:[]};
       }
-    }
+    }));
     // Cache for reuse
     window._extHistCache=allBucketData;
     window._extHistActiveTab=0;
