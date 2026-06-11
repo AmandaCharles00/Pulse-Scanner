@@ -2727,11 +2727,11 @@ async function loadExtensionHistory(container){
         const tkH=document.createElement('div');tkH.style.cssText='width:60px;flex-shrink:0';tkH.textContent='Ticker';
         const thH=document.createElement('div');thH.style.cssText='flex:1';thH.textContent='Theme';
         ph.append(tkH,thH,mkHCol('Peak ATR/50MA','atr_ma','110px'),mkHCol('Price','price','75px'),mkHCol('Vol %','vol_pct','70px'),mkHCol('Vol ×','vol_x','65px'),mkHCol('AvgVol $M','avg_dvol','90px'),mkHCol('Last Seen','captured_at','100px'));
+        panel.appendChild(ph);
         const note=document.createElement('div');
         note.style.cssText='padding:4px 14px;font-size:9px;color:var(--text3);font-family:var(--mono);background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0';
         note.textContent='⚡ Vol × populated by live Sync only — backfilled rows show — for that column';
         panel.appendChild(note);
-        panel.appendChild(ph);
         renderHistRows(sorted,ph.parentElement);
 
       }catch(e){
