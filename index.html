@@ -2660,7 +2660,7 @@ async function loadExtensionHistory(container){
         let histSort={col:'atr_ma',dir:'desc'};
 
         const renderHistRows=(data,container)=>{
-          while(container.children.length>1) container.removeChild(container.lastChild);
+          container.innerHTML='';
           data.forEach(r=>{
             const row=document.createElement('div');
             row.style.cssText='display:flex;align-items:center;padding:0 14px;height:32px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .08s';
@@ -2702,7 +2702,7 @@ async function loadExtensionHistory(container){
             if(arrow) arrow.textContent=histSort.col===h.dataset.col?(histSort.dir==='desc'?' ▼':' ▲'):'';
             h.style.color=histSort.col===h.dataset.col?'var(--blue)':'var(--text2)';
           });
-          renderHistRows(s,ph.parentElement);
+          renderHistRows(s,rowsContainer);
         };
 
         panel.innerHTML='';
@@ -2730,9 +2730,11 @@ async function loadExtensionHistory(container){
         panel.appendChild(ph);
         const note=document.createElement('div');
         note.style.cssText='padding:4px 14px;font-size:9px;color:var(--text3);font-family:var(--mono);background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0';
-        note.textContent='⚡ Vol × populated by live Sync only — backfilled rows show — for that column';
+        note.textContent='\u26a1 Vol \u00d7 populated by live Sync only \u2014 backfilled rows show \u2014 for that column';
         panel.appendChild(note);
-        renderHistRows(sorted,ph.parentElement);
+        const rowsContainer=document.createElement('div');
+        panel.appendChild(rowsContainer);
+        renderHistRows(sorted,rowsContainer);
 
       }catch(e){
         panel.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--red);font-family:var(--mono)">Error: '+e.message+'</div>';
