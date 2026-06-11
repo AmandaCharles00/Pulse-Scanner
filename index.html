@@ -1238,10 +1238,11 @@ async function backfillExtensionHistory(){
   if(window._extBackfilled) return;
   window._extBackfilled=true;
 
-  // Only backfill if table is empty
-  const existing=await supaFetch('GET','/rest/v1/extension_history?select=captured_at&limit=1');
+  // Only backfill if there's no data older than 7 days (i.e. only today's sync exists)
+  const cutoff=new Date(Date.now()-7*864e5).toISOString();
+  const existing=await supaFetch('GET','/rest/v1/extension_history?select=captured_at&captured_at=lt.'+cutoff+'&limit=1');
   if(existing&&Array.isArray(existing)&&existing.length>0){
-    console.log('Extension history already populated, skipping backfill');
+    console.log('Extension history has historical data, skipping backfill');
     return;
   }
 
