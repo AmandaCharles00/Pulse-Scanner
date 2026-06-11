@@ -1218,11 +1218,14 @@ async function saveExtensionHistory(){
       const volPct=d.dailyVol??null;
       const avgDVol=(d.price&&d.avgVolume)?(d.price*d.avgVolume/1e6):null;
       if(avgDVol&&avgDVol<80) return;
+      const volX=d.volume&&d.avgVolume?+(d.volume/d.avgVolume).toFixed(2):null;
       seen.add(tk);
       results.push({
         ticker:tk, theme:th.name,
         atr_ma:d.atrMA, price:d.price,
         vol_pct:volPct,
+        vol_x:volX,
+        avg_dvol:avgDVol?+avgDVol.toFixed(1):null,
         direction:d.atrMA>0?'above':'below',
         captured_at:now
       });
@@ -1321,6 +1324,7 @@ async function backfillExtensionHistory(force=false){
         atr_ma:+atrMA.toFixed(2),
         price:+bar.c.toFixed(2),
         vol_pct:dailyVol,
+        avg_dvol:avgDVol?+avgDVol.toFixed(1):null,
         direction:atrMA>0?'above':'below',
         captured_at:new Date(bar.t).toISOString()
       });
@@ -2667,12 +2671,17 @@ async function loadExtensionHistory(container){
             const atrCol=isAbove?'var(--green)':'var(--red)';
             const d=new Date(r.captured_at);
             const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+            const volX=r.vol_x!=null?parseFloat(r.vol_x):null;
+            const volXCol=volX>=2?'var(--green)':volX>=1.5?'var(--amber)':'var(--text2)';
+            const avgDvol=r.avg_dvol!=null?parseFloat(r.avg_dvol):null;
             row.innerHTML=
               '<div style="width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:11px;flex-shrink:0">'+r.ticker+'</div>'+
               '<div style="flex:1;font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+r.theme+'</div>'+
-              '<div style="width:90px;text-align:right;font-family:var(--mono);font-size:12px;color:'+atrCol+';font-weight:500;flex-shrink:0">'+(isAbove?'+':'')+parseFloat(r.atr_ma).toFixed(2)+'x</div>'+
-              '<div style="width:70px;text-align:right;font-family:var(--mono);font-size:11px;color:#fff;flex-shrink:0">'+(r.price?'$'+parseFloat(r.price).toFixed(2):'—')+'</div>'+
+              '<div style="width:110px;text-align:right;font-family:var(--mono);font-size:12px;color:'+atrCol+';font-weight:500;flex-shrink:0">'+(isAbove?'+':'')+parseFloat(r.atr_ma).toFixed(2)+'x</div>'+
+              '<div style="width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:#fff;flex-shrink:0">'+(r.price?'$'+parseFloat(r.price).toFixed(2):'—')+'</div>'+
               '<div style="width:70px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0">'+(r.vol_pct?parseFloat(r.vol_pct).toFixed(2)+'%':'—')+'</div>'+
+              '<div style="width:65px;text-align:right;font-family:var(--mono);font-size:11px;color:'+volXCol+';flex-shrink:0">'+(volX!=null?volX.toFixed(2)+'x':'—')+'</div>'+
+              '<div style="width:90px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0">'+(avgDvol!=null?'$'+avgDvol.toFixed(0)+'M':'—')+'</div>'+
               '<div style="width:100px;text-align:right;font-family:var(--mono);font-size:10px;color:var(--text2);flex-shrink:0">'+dateStr+'</div>';
             container.appendChild(row);
           });
@@ -2717,7 +2726,7 @@ async function loadExtensionHistory(container){
 
         const tkH=document.createElement('div');tkH.style.cssText='width:60px;flex-shrink:0';tkH.textContent='Ticker';
         const thH=document.createElement('div');thH.style.cssText='flex:1';thH.textContent='Theme';
-        ph.append(tkH,thH,mkHCol('Peak ATR/50MA','atr_ma','90px'),mkHCol('Price','price','70px'),mkHCol('Vol %','vol_pct','70px'),mkHCol('Last Seen','captured_at','100px'));
+        ph.append(tkH,thH,mkHCol('Peak ATR/50MA','atr_ma','110px'),mkHCol('Price','price','75px'),mkHCol('Vol %','vol_pct','70px'),mkHCol('Vol ×','vol_x','65px'),mkHCol('AvgVol $M','avg_dvol','90px'),mkHCol('Last Seen','captured_at','100px'));
         panel.appendChild(ph);
         renderHistRows(sorted,ph.parentElement);
 
