@@ -1234,7 +1234,7 @@ async function saveExtensionHistory(){
   });
   if(!results.length) return;
   try{
-    await supaFetch('POST','/rest/v1/extension_history',results,{
+    await supaFetch('POST','/rest/v1/extension_history?on_conflict=ticker,captured_at',results,{
       'Prefer':'resolution=merge-duplicates,return=minimal'
     });
     console.log('Extension history saved:',results.length,'entries');
@@ -1346,7 +1346,7 @@ async function backfillExtensionHistory(force=false){
 
   console.log('Upserting',deduped.length,'historical records...');
   for(let i=0;i<deduped.length;i+=500)
-    await supaFetch('POST','/rest/v1/extension_history',deduped.slice(i,i+500),{
+    await supaFetch('POST','/rest/v1/extension_history?on_conflict=ticker,captured_at',deduped.slice(i,i+500),{
       'Prefer':'resolution=merge-duplicates,return=minimal'
     });
   console.log('Backfill complete!');
