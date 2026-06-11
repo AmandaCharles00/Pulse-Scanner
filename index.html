@@ -2557,26 +2557,16 @@ async function loadExtensionHistory(container){
   // Build month buckets going back 12 months
   const buckets=[];
   const monthNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  // MTD first
   buckets.push({label:'This Month (MTD)', from:new Date(y,m,1).toISOString(), to:now.toISOString()});
-  // Then previous 11 months
   for(let i=1;i<=11;i++){
-    const bm=m-i;
-    const by=y+Math.floor(bm/12);
-    const realM=((bm%12)+12)%12;
-    const realY=bm<0?y-Math.ceil(Math.abs(bm)/12):y;
-    const fromDate=new Date(realY,realM,1);
-    const toDate=new Date(realY,realM+1,1);
-    buckets.push({
-      label:monthNames[realM]+' '+fromDate.getFullYear(),
-      from:fromDate.toISOString(),
-      to:toDate.toISOString()
-    });
+    const d1=new Date(y,m-i,1);
+    const d2=new Date(y,m-i+1,1);
+    buckets.push({label:monthNames[d1.getMonth()]+' '+d1.getFullYear(), from:d1.toISOString(), to:d2.toISOString()});
   }
 
   try{
     // Fetch all history (no date limit)
-    const data=await supaFetch('GET','/rest/v1/extension_history?select=*&order=captured_at.desc&limit=5000');
+    const data=await supaFetch('GET','/rest/v1/extension_history?select=*&order=captured_at.desc&limit=50000');
     if(!data||!Array.isArray(data)){
       container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--amber);font-family:var(--mono)">⚠ Could not load history. Make sure the extension_history table exists in Supabase.</div>';
       return;
