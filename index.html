@@ -2590,18 +2590,6 @@ async function loadExtensionHistory(container){
       return;
     }
 
-    // Debug: log first record and first few bucket ranges
-    if(data.length){
-      console.log('First record captured_at:', data[data.length-1].captured_at);
-      console.log('Sample buckets:', buckets.slice(0,3).map(b=>b.label+': '+b.from.slice(0,10)+' to '+b.to.slice(0,10)));
-      const sample=data[data.length-1];
-      const t=new Date(sample.captured_at).getTime();
-      buckets.forEach(bk=>{
-        const inBucket=t>=new Date(bk.from).getTime()&&t<new Date(bk.to).getTime();
-        if(inBucket) console.log('Sample belongs to bucket:', bk.label);
-      });
-    }
-
     container.innerHTML='';
 
     // Active bucket tab
@@ -2670,9 +2658,10 @@ async function loadExtensionHistory(container){
           const s=[...data].sort((a,b)=>{
             let av=parseFloat(a[histSort.col]??0);
             let bv=parseFloat(b[histSort.col]??0);
-            // For atr_ma sort by absolute value (extension magnitude regardless of direction)
+            // Always sort ATR/MA by absolute magnitude
             if(histSort.col==='atr_ma'){av=Math.abs(av);bv=Math.abs(bv);}
-            return histSort.dir==='desc'?bv-av:av-bv;
+            if(histSort.dir==='desc') return bv-av;
+            return av-bv;
           });
           // Update header arrows
           ph.querySelectorAll('[data-col]').forEach(h=>{
