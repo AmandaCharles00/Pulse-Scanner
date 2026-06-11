@@ -1234,16 +1234,18 @@ async function saveExtensionHistory(){
   }catch(e){console.warn('Extension history save failed:',e);}
 }
 
-async function backfillExtensionHistory(){
-  if(window._extBackfilled) return;
+async function backfillExtensionHistory(force=false){
+  if(window._extBackfilled&&!force) return;
   window._extBackfilled=true;
 
-  // Check oldest record — if all records are from last 7 days, backfill needed
-  const cutoff=new Date(Date.now()-7*864e5).toISOString();
-  const existing=await supaFetch('GET','/rest/v1/extension_history?select=captured_at&captured_at=lt.'+cutoff+'&limit=1');
-  if(existing&&Array.isArray(existing)&&existing.length>0){
-    console.log('Extension history has historical data, skipping backfill');
-    return;
+  if(!force){
+    // Only auto-backfill if table has no records older than 60 days
+    const cutoff=new Date(Date.now()-60*864e5).toISOString();
+    const existing=await supaFetch('GET','/rest/v1/extension_history?select=captured_at&captured_at=lt.'+cutoff+'&limit=1');
+    if(existing&&Array.isArray(existing)&&existing.length>0){
+      console.log('Extension history has historical data, skipping backfill');
+      return;
+    }
   }
 
   console.log('Backfilling extension history from historical bar data...');
@@ -1252,19 +1254,19 @@ async function backfillExtensionHistory(){
   const themeMap={};
   getThemesWithWatchlist().forEach(th=>th.tickers.forEach(tk=>{if(!themeMap[tk])themeMap[tk]=th.name;}));
 
-  let minDate=Infinity, maxDate=0, barsFound=0;
+  let minDate=Infinity,maxDate=0,barsFound=0;
   Object.keys(cache).forEach(ticker=>{
     const d=cache[ticker];
     if(!d||!d.bars||d.bars.length<65) return;
     if(isOTC(ticker)) return;
     const theme=themeMap[ticker];
     if(!theme) return;
-    const bars=d.bars;
     barsFound++;
-    if(bars[0].t<minDate) minDate=bars[0].t;
-    if(bars[bars.length-1].t>maxDate) maxDate=bars[bars.length-1].t;
+    const bars=d.bars;
+    if(bars[0]&&bars[0].t<minDate) minDate=bars[0].t;
+    if(bars[bars.length-1]&&bars[bars.length-1].t>maxDate) maxDate=bars[bars.length-1].t;
   });
-  console.log('Bars found for tickers:', barsFound, '| Date range:', new Date(minDate).toISOString().slice(0,10), 'to', new Date(maxDate).toISOString().slice(0,10));
+  console.log('Bars found for tickers:',barsFound,'| Date range:',barsFound?new Date(minDate).toISOString().slice(0,10)+' to '+new Date(maxDate).toISOString().slice(0,10):'none');
 
   Object.keys(cache).forEach(ticker=>{
     const d=cache[ticker];
@@ -2539,7 +2541,21 @@ function renderExtension(){
   const histToggleBtn=document.createElement('span');
   histToggleBtn.style.cssText='font-size:10px;color:var(--blue);font-family:var(--mono);margin-left:auto';
   histToggleBtn.textContent='▼ Show';
-  histHdr.append(histLbl,histToggleBtn);
+  const backfillBtn=document.createElement('button');
+  backfillBtn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-family:var(--mono);font-size:9px;padding:2px 7px;cursor:pointer;margin-left:8px';
+  backfillBtn.textContent='⟳ Backfill';
+  backfillBtn.title='Re-run historical backfill from bar data';
+  backfillBtn.addEventListener('click',async(e)=>{
+    e.stopPropagation();
+    if(!Object.keys(cache).length){alert('Sync first to load bar data');return;}
+    backfillBtn.textContent='Running...';backfillBtn.style.opacity='0.5';
+    window._extBackfilled=false;
+    await backfillExtensionHistory(true);
+    backfillBtn.textContent='⟳ Backfill';backfillBtn.style.opacity='1';
+    histBody.dataset.loaded='';
+    if(histOpen) await loadExtensionHistory(histBody);
+  });
+  histHdr.append(histLbl,backfillBtn,histToggleBtn);
   const histBody=document.createElement('div');
   histBody.style.cssText='display:none;max-height:340px;overflow-y:auto;background:var(--bg3)';
   let histOpen=false;
