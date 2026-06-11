@@ -2448,7 +2448,23 @@ function renderExtension(){
   const main=document.getElementById('main');
   const noData=Object.keys(cache).length===0;
 
+  // Reuse existing DOM so history panel survives tab switches
+  const existing=document.getElementById('ext-wrap');
+  if(existing){
+    main.innerHTML='';
+    main.appendChild(existing);
+    if(!noData) buildExtension(
+      parseFloat(existing.dataset.atr||3),
+      parseFloat(existing.dataset.volpct||0),
+      parseFloat(existing.dataset.dvol||80),
+      existing.dataset.dir||'above',
+      document.getElementById('ext-body')
+    );
+    return;
+  }
+
   const wrap=document.createElement('div');
+  wrap.id='ext-wrap';
   wrap.style.cssText='display:flex;flex-direction:column;height:100%;overflow:hidden';
 
   // Controls
@@ -2522,13 +2538,19 @@ function renderExtension(){
   countEl.id='ext-count';
   countEl.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono);margin-left:auto';
 
-  const rebuildExt=()=>buildExtension(
-    parseFloat(atrIn.value)||3,
-    parseFloat(volPctIn.value)||0,
-    parseFloat(dvolIn.value)||80,
-    extDirToggle.dataset.dir||'above',
-    body
-  );
+  const rebuildExt=()=>{
+    wrap.dataset.atr=atrIn.value;
+    wrap.dataset.volpct=volPctIn.value;
+    wrap.dataset.dvol=dvolIn.value;
+    wrap.dataset.dir=extDirToggle.dataset.dir||'above';
+    buildExtension(
+      parseFloat(atrIn.value)||3,
+      parseFloat(volPctIn.value)||0,
+      parseFloat(dvolIn.value)||80,
+      extDirToggle.dataset.dir||'above',
+      body
+    );
+  };
   atrIn.addEventListener('change',rebuildExt);
   volPctIn.addEventListener('change',rebuildExt);
   dvolIn.addEventListener('change',rebuildExt);
@@ -2573,6 +2595,7 @@ function renderExtension(){
   histWrap.append(histHdr,histBody);
 
   const body=document.createElement('div');
+  body.id='ext-body';
   body.style.cssText='flex:1;overflow-y:auto';
 
   wrap.append(ctrl,histWrap,body);
