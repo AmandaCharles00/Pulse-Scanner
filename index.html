@@ -206,7 +206,7 @@ tr:hover td{background:var(--bg3)}
 <script>
 const THEMES=[
   {id:'silver',name:'Silver',etf:'SLV',tickers:['SLV','PSLV','AG','PAAS','CDE','HL','MAG','FSM','EXK','WPM','SILJ','HYMC','SSRM','NGD']},
-  {id:'gold',name:'Gold',etf:'GLD',tickers:['GLD','IAU','GOLD','NEM','AEM','KGC','AU','SA','EQX','EGO','GFI','IAG','ARMN','ORLA','AAUC','FNV','RGLD','WPM','HMY','BTG','SSRM']},
+  {id:'gold',name:'Gold',etf:'GLD',tickers:['GLD','IAU','GOLD','NEM','AEM','KGC','AU','SA','EQX','EGO','GFI','IAG','ORLA','FNV','RGLD','WPM','HMY','BTG','SSRM']},
   {id:'prec_metals',name:'Other Precious Metals & Mining',etf:'GDX',tickers:['SBSW','UUUU','CCJ','NXE','DNN','URG','UEC','PLG','LTBR','UAMY']},
   {id:'oil_drill',name:'Oil & Gas Drilling',etf:'XES',tickers:['RIG','VAL','NE','HP','PTEN','DO','NBR','OII','BORR','HAL']},
   {id:'nuclear',name:'Nuclear Energy',etf:'URA',tickers:['CCJ','NNE','SMR','BWXT','OKLO','UEC','DNN','URG','UUUU','LEU','FLNC','VST','GEV','TLN','AMSC']},
@@ -214,7 +214,7 @@ const THEMES=[
   {id:'res_const',name:'Residential Construction',etf:'ITB',tickers:['DHI','LEN','PHM','TOL','NVR','MDC','LGIH','SKY','TMHC','BLD','IBP']},
   {id:'ind_metals',name:'Other Industrial Metals & Mining',etf:'XME',tickers:['FCX','SCCO','AA','HBM','TECK','CENX','AMR','ARCH','BTU','CEIX','HCC','NUE','STLD']},
   {id:'marine',name:'Marine Shipping',etf:'BOAT',tickers:['ZIM','MATX','DAC','GSL','SBLK','GOGL','STNG','TNK','FRO','INSW']},
-  {id:'defense',name:'Defense',etf:'SHLD',tickers:['LMT','RTX','NOC','GD','BA','KTOS','CACI','LDOS','DRS','HII','LHX','AXON','PLTR','BWXT','HWM','ARBE']},
+  {id:'defense',name:'Defense',etf:'SHLD',tickers:['LMT','RTX','NOC','GD','BA','KTOS','CACI','LDOS','DRS','HII','LHX','AXON','PLTR','BWXT','HWM']},
   {id:'robotics',name:'Robotics / Automation',etf:'ROBO',tickers:['ISRG','ROK','NVTS','AMBA','RDVT','CGNX','TER','BRZE','PATH','ACMR','ONDS','SYM','PONY','AEVA']},
   {id:'semis',name:'Semiconductors',etf:'SMH',tickers:['NVDA','AMD','AVGO','MRVL','AMAT','LRCX','KLAC','ASML','TER','MPWR','QCOM','ON','SWKS','INTC','MU','TSM','ARM','MCHP','ADI','TXN','GFS','ENTG','CRDO','WOLF','HIMX','APH','KEYS','RMBS','SMTC','TE','AMKR','PDFS','MXL','KLIC','TSEM']},
   {id:'memory',name:'Memory',etf:'DRAM',tickers:['MU','WDC','SNDK','SMCI','MRAM']},
@@ -232,7 +232,7 @@ const THEMES=[
   {id:'re_dev',name:'Real Estate Development',etf:'ITB',tickers:['CBRE','JLL','FPH','HHH','JBGS','Z']},
   {id:'luxury',name:'Luxury Goods',etf:'',tickers:['CPRI','TPR','RL','PVH','MOV','GOOS','VFC','WRBY','DECK']},
   {id:'biotech',name:'Oncology / Biotech',etf:'XBI',tickers:['MRNA','BNTX','AGEN','KYMR','IMVT','RCUS','TGTX','ZYME','BEAM','EDIT','NTLA','CRSP','FATE','CYTK','SRPT','ALNY','ARQT','KURA','MLTX','ZURA','CHRS','MRUS','FGEN','RIGL','QURE','BCAB','SNDX','WVE','OVID','RZLT','TARS','NKTR','CRBP','PYXS','CDTX','CGON','ABVX','COGT']},
-  {id:'glp1',name:'GLP-1 / Weight Loss',etf:'',tickers:['NVO','LLY','VKTX','HIMS','RDVT','AMRN','CALT']},
+  {id:'glp1',name:'GLP-1 / Weight Loss',etf:'',tickers:['NVO','LLY','VKTX','HIMS','AMRN','CALT']},
   {id:'util_indep',name:'Utilities - Indep Power',etf:'IDU',tickers:['VST','NRG','NEE','CEG','AES','ORA','GEV','CWEN','RUN','ETR','PCG','EXC','PPL','D','SO','DUK','GPRE','ETN','FIX','HUBB','MYRG','CAT','WLDN']},
   {id:'cons_cyc',name:'Consumer Cyclical',etf:'XLY',tickers:['HD','MCD','LOW','NKE','BKNG','TJX','SBUX','CMG','YUM','ABNB','RCL','CCL','MGM','WYNN','LVS','ORLY','AZO','DKS','EBAY','ETSY','LYFT','UBER','DASH','PDD','CAR','PTON']},
   {id:'cons_disc',name:'Retail / Apparel',etf:'XRT',tickers:['WMT','TGT','COST','DLTR','DG','ROST','ANF','AEO','LULU','URBN','GAP','VSXY']},
@@ -240,7 +240,7 @@ const THEMES=[
   {id:'restaurants',name:'Restaurants / Leisure',etf:'EATZ',tickers:['MCD','SBUX','CMG','YUM','QSR','DPZ','SHAK','JACK','CAKE','CAVA','EAT']},
   {id:'med_devices',name:'Medical Devices',etf:'IHI',tickers:['MDT','ABT','ISRG','SYK','BSX','EW','ZBH','DXCM','PODD','INMD','TNDM','GMED','ALGN','NTRA','ATEC','IRTC','NVRO','RVTY','TMDX','GRAL','WGS','HNGE']},
   {id:'pharma',name:'Pharmaceuticals',etf:'PPH',tickers:['JNJ','PFE','MRK','ABBV','BMY','AMGN','GILD','BIIB','REGN','VRTX','GSK','AZN','TEVA','GMAB','JAZZ','LNTH']},
-  {id:'hospitals',name:'Healthcare / Hospitals',etf:'XLV',tickers:['UNH','CVS','CI','HUM','CNC','MOH','ELV','HCA','THC','UHS','TEM','OMCL','GDRX','AMWL','OSCR']},
+  {id:'hospitals',name:'Healthcare / Hospitals',etf:'XLV',tickers:['UNH','CVS','CI','HUM','CNC','MOH','ELV','HCA','THC','UHS','TEM','OMCL','GDRX','OSCR']},
   {id:'banks',name:'Banking',etf:'KBE',tickers:['JPM','BAC','WFC','C','GS','MS','USB','PNC','TFC','FITB','HBAN','KEY','CFG','RF','MTB','ZION']},
   {id:'insurance',name:'Insurance',etf:'KIE',tickers:['AIG','MET','PRU','AFL','ALL','TRV','CB','PGR','HIG','ACGL']},
   {id:'asset_mgmt',name:'Asset Management',etf:'IAI',tickers:['BLK','BX','APO','KKR','CG','ARES','BAM','TPG','OWL','IVZ']},
@@ -744,7 +744,7 @@ async function doSync(){
   const workers=Array.from({length:12},async()=>{while(idx2<tasks.length)await tasks[idx2++]();});
   await Promise.all(workers);
 
-  buildStats();buildSectorStats();checkAlerts();checkAndPlayAlert();saveCache();
+  buildStats();buildSectorStats();checkAlerts();checkAndPlayAlert();saveCache();saveExtensionHistory();
   syncing=false;btn.textContent='⟳ Sync';btn.classList.remove('busy');
   renderMain();scheduleAutoRefresh();
 }
@@ -1200,7 +1200,40 @@ function renderNote(note,i,container){
   return card;
 }
 
-// ── ALERT SETTINGS ────────────────────────────────────────────────────────────
+// ── EXTENSION HISTORY ─────────────────────────────────────────────────────────
+async function saveExtensionHistory(){
+  // Capture current extension results (default thresholds: 3x ATR, 4% vol, $80M dvol, above)
+  const results=[];
+  const seen=new Set();
+  const now=new Date().toISOString();
+  getThemesWithWatchlist().forEach(th=>{
+    th.tickers.forEach(tk=>{
+      if(seen.has(tk)) return;
+      const d=cache[tk];
+      if(!d||d.stale||d.price==null||d.atrMA==null) return;
+      if(isOTC(tk)) return;
+      if(Math.abs(d.atrMA)<3) return;
+      const volPct=d.dailyVol??null;
+      const avgDVol=(d.price&&d.avgVolume)?(d.price*d.avgVolume/1e6):null;
+      if(avgDVol&&avgDVol<80) return;
+      seen.add(tk);
+      results.push({
+        ticker:tk, theme:th.name,
+        atr_ma:d.atrMA, price:d.price,
+        vol_pct:volPct,
+        direction:d.atrMA>0?'above':'below',
+        captured_at:now
+      });
+    });
+  });
+  if(!results.length) return;
+  try{
+    await supaFetch('POST','/rest/v1/extension_history',results);
+    console.log('Extension history saved:',results.length,'entries');
+  }catch(e){console.warn('Extension history save failed:',e);}
+}
+
+
 function renderAlertSettings(){
   const main=document.getElementById('main');
   const asv=document.createElement('div');asv.className='asv';
@@ -2392,7 +2425,30 @@ function renderExtension(){
   const body=document.createElement('div');
   body.style.cssText='flex:1;overflow-y:auto';
 
-  wrap.append(ctrl,body);
+  // History panel — collapsible, loads from Supabase
+  const histWrap=document.createElement('div');
+  histWrap.style.cssText='flex-shrink:0;border-top:2px solid var(--border2)';
+  const histHdr=document.createElement('div');
+  histHdr.style.cssText='display:flex;align-items:center;gap:8px;padding:7px 14px;background:var(--bg2);cursor:pointer;user-select:none';
+  const histLbl=document.createElement('span');
+  histLbl.style.cssText='font-size:11px;color:var(--text2);font-family:var(--mono);letter-spacing:.05em';
+  histLbl.textContent='📋 EXTENSION HISTORY';
+  const histToggleBtn=document.createElement('span');
+  histToggleBtn.style.cssText='font-size:10px;color:var(--blue);font-family:var(--mono);margin-left:auto';
+  histToggleBtn.textContent='▼ Show';
+  histHdr.append(histLbl,histToggleBtn);
+  const histBody=document.createElement('div');
+  histBody.style.cssText='display:none;max-height:340px;overflow-y:auto;background:var(--bg3)';
+  let histOpen=false;
+  histHdr.addEventListener('click',async()=>{
+    histOpen=!histOpen;
+    histToggleBtn.textContent=histOpen?'▲ Hide':'▼ Show';
+    histBody.style.display=histOpen?'block':'none';
+    if(histOpen&&!histBody.dataset.loaded){histBody.dataset.loaded='1';await loadExtensionHistory(histBody);}
+  });
+  histWrap.append(histHdr,histBody);
+
+  wrap.append(ctrl,body,histWrap);
   main.innerHTML='';main.appendChild(wrap);
 
   if(noData){
@@ -2400,6 +2456,101 @@ function renderExtension(){
     return;
   }
   buildExtension(3, 4, 80, 'above', body);
+}
+
+async function loadExtensionHistory(container){
+  container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text2);font-family:var(--mono)">Loading history...</div>';
+  const now=new Date();
+  const y=now.getFullYear(),m=now.getMonth();
+  // Build month buckets
+  const buckets=[
+    {label:'This Month (MTD)', from:new Date(y,m,1).toISOString(), to:now.toISOString()},
+    {label:'Last Month', from:new Date(y,m-1,1).toISOString(), to:new Date(y,m,1).toISOString()},
+    {label:'2 Months Ago', from:new Date(y,m-2,1).toISOString(), to:new Date(y,m-1,1).toISOString()},
+    {label:'3 Months Ago', from:new Date(y,m-3,1).toISOString(), to:new Date(y,m-2,1).toISOString()},
+  ];
+
+  try{
+    // Fetch last 4 months of history
+    const from4mo=new Date(y,m-3,1).toISOString();
+    const data=await supaFetch('GET','/rest/v1/extension_history?select=*&captured_at=gte.'+from4mo+'&order=captured_at.desc&limit=2000');
+    if(!data||!Array.isArray(data)){
+      container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--amber);font-family:var(--mono)">⚠ Could not load history. Make sure the extension_history table exists in Supabase.</div>';
+      return;
+    }
+    if(!data.length){
+      container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text2);font-family:var(--mono)">No history yet — history is saved automatically on each Sync.</div>';
+      return;
+    }
+
+    container.innerHTML='';
+
+    // Active bucket tab
+    let activeBucket=0;
+    const tabBar=document.createElement('div');
+    tabBar.style.cssText='display:flex;border-bottom:1px solid var(--border2);background:var(--bg2)';
+    const panels=[];
+
+    buckets.forEach((bk,i)=>{
+      // Count unique tickers in this bucket
+      const bkData=data.filter(r=>r.captured_at>=bk.from&&r.captured_at<bk.to);
+      const uniqueTickers=new Map();
+      bkData.forEach(r=>{
+        if(!uniqueTickers.has(r.ticker)||Math.abs(r.atr_ma)>Math.abs(uniqueTickers.get(r.ticker).atr_ma))
+          uniqueTickers.set(r.ticker,r);
+      });
+      const sorted=[...uniqueTickers.values()].sort((a,b)=>Math.abs(b.atr_ma)-Math.abs(a.atr_ma));
+
+      const tab=document.createElement('button');
+      tab.style.cssText='background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text2);font-family:var(--mono);font-size:10px;padding:6px 12px;cursor:pointer;white-space:nowrap';
+      tab.textContent=bk.label+' ('+sorted.length+')';
+      tab.addEventListener('click',()=>{
+        tabBar.querySelectorAll('button').forEach(b=>{b.style.borderBottomColor='transparent';b.style.color='var(--text2)';});
+        tab.style.borderBottomColor='var(--blue)';tab.style.color='var(--blue)';
+        panels.forEach((p,pi)=>p.style.display=pi===i?'block':'none');
+      });
+      if(i===0){tab.style.borderBottomColor='var(--blue)';tab.style.color='var(--blue)';}
+      tabBar.appendChild(tab);
+
+      // Panel
+      const panel=document.createElement('div');
+      panel.style.cssText='display:'+(i===0?'block':'none');
+      if(!sorted.length){
+        panel.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text2);font-family:var(--mono)">No extension events recorded this period.</div>';
+      } else {
+        // Mini header
+        const ph=document.createElement('div');
+        ph.style.cssText='display:flex;align-items:center;padding:0 14px;height:24px;font-size:9px;color:var(--text2);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:3';
+        ph.innerHTML='<div style="width:60px;flex-shrink:0">Ticker</div><div style="flex:1">Theme</div><div style="width:90px;text-align:right;flex-shrink:0">Peak ATR/50MA</div><div style="width:70px;text-align:right;flex-shrink:0">Price</div><div style="width:70px;text-align:right;flex-shrink:0">Vol %</div><div style="width:100px;text-align:right;flex-shrink:0">Last Seen</div>';
+        panel.appendChild(ph);
+        sorted.forEach(r=>{
+          const row=document.createElement('div');
+          row.style.cssText='display:flex;align-items:center;padding:0 14px;height:32px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .08s';
+          row.addEventListener('mouseenter',()=>row.style.background='var(--bg4)');
+          row.addEventListener('mouseleave',()=>row.style.background='');
+          row.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
+          const isAbove=r.atr_ma>0;
+          const atrCol=isAbove?'var(--green)':'var(--red)';
+          const d=new Date(r.captured_at);
+          const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+          row.innerHTML=
+            '<div style="width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:11px;flex-shrink:0">'+r.ticker+'</div>'+
+            '<div style="flex:1;font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+r.theme+'</div>'+
+            '<div style="width:90px;text-align:right;font-family:var(--mono);font-size:12px;color:'+atrCol+';font-weight:500;flex-shrink:0">'+(isAbove?'+':'')+parseFloat(r.atr_ma).toFixed(2)+'x</div>'+
+            '<div style="width:70px;text-align:right;font-family:var(--mono);font-size:11px;color:#fff;flex-shrink:0">'+( r.price?'$'+parseFloat(r.price).toFixed(2):'—')+'</div>'+
+            '<div style="width:70px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0">'+(r.vol_pct?parseFloat(r.vol_pct).toFixed(2)+'%':'—')+'</div>'+
+            '<div style="width:100px;text-align:right;font-family:var(--mono);font-size:10px;color:var(--text2);flex-shrink:0">'+dateStr+'</div>';
+          panel.appendChild(row);
+        });
+      }
+      panels.push(panel);
+    });
+
+    container.appendChild(tabBar);
+    panels.forEach(p=>container.appendChild(p));
+  }catch(e){
+    container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--red);font-family:var(--mono)">Error loading history: '+e.message+'</div>';
+  }
 }
 
 function buildExtension(minAtr, minVolPct, minDVol, direction, body){
