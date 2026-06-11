@@ -2558,7 +2558,7 @@ async function loadExtensionHistory(container){
   const buckets=[];
   const monthNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   buckets.push({label:'This Month (MTD)', from:new Date(y,m,1).toISOString(), to:now.toISOString()});
-  for(let i=1;i<=11;i++){
+  for(let i=1;i<=12;i++){
     const d1=new Date(y,m-i,1);
     const d2=new Date(y,m-i+1,1);
     buckets.push({label:monthNames[d1.getMonth()]+' '+d1.getFullYear(), from:d1.toISOString(), to:d2.toISOString()});
@@ -2574,6 +2574,18 @@ async function loadExtensionHistory(container){
     if(!data.length){
       container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text2);font-family:var(--mono)">No history yet — history is saved automatically on each Sync.</div>';
       return;
+    }
+
+    // Debug: log first record and first few bucket ranges
+    if(data.length){
+      console.log('First record captured_at:', data[data.length-1].captured_at);
+      console.log('Sample buckets:', buckets.slice(0,3).map(b=>b.label+': '+b.from.slice(0,10)+' to '+b.to.slice(0,10)));
+      const sample=data[data.length-1];
+      const t=new Date(sample.captured_at).getTime();
+      buckets.forEach(bk=>{
+        const inBucket=t>=new Date(bk.from).getTime()&&t<new Date(bk.to).getTime();
+        if(inBucket) console.log('Sample belongs to bucket:', bk.label);
+      });
     }
 
     container.innerHTML='';
