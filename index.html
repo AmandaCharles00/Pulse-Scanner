@@ -662,6 +662,7 @@ async function doSync(){
         if(!cache[ticker].price) cache[ticker].price=+last.toFixed(2);
         cache[ticker].closes=bars.map(b=>b.c).filter(v=>v!=null);
         cache[ticker].closeDates=bars.filter(b=>b.c!=null).map(b=>b.t);
+        cache[ticker].bars=bars; // store for historical backfill
         cache[ticker]['1W']=pct(anchor(7),last);cache[ticker]['1M']=pct(anchor(30),last);
         cache[ticker]['3M']=pct(anchor(90),last);cache[ticker]['6M']=pct(anchor(180),last);cache[ticker].YTD=pct(anchor('ytd'),last);
         if(prev&&(cache[ticker].today==null||cache[ticker].today===0))cache[ticker].today=+((last-prev)/prev*100).toFixed(2);
@@ -744,7 +745,7 @@ async function doSync(){
   const workers=Array.from({length:12},async()=>{while(idx2<tasks.length)await tasks[idx2++]();});
   await Promise.all(workers);
 
-  buildStats();buildSectorStats();checkAlerts();checkAndPlayAlert();saveCache();saveExtensionHistory();
+  buildStats();buildSectorStats();checkAlerts();checkAndPlayAlert();saveCache();saveExtensionHistory();backfillExtensionHistory();
   syncing=false;btn.textContent='⟳ Sync';btn.classList.remove('busy');
   renderMain();scheduleAutoRefresh();
 }
@@ -854,7 +855,7 @@ function saveCache(){
     // Exclude closes/closeDates arrays from localStorage — too large, recomputed on sync
     const slim={};
     Object.keys(cache).forEach(tk=>{
-      const {closes,closeDates,...rest}=cache[tk];
+      const {closes,closeDates,bars,...rest}=cache[tk];
       slim[tk]=rest;
     });
     localStorage.setItem('tt_cache',JSON.stringify(slim));
@@ -1233,8 +1234,98 @@ async function saveExtensionHistory(){
   }catch(e){console.warn('Extension history save failed:',e);}
 }
 
+async function backfillExtensionHistory(){
+  if(window._extBackfilled) return;
+  window._extBackfilled=true;
 
-function renderAlertSettings(){
+  // Only backfill if table is empty
+  const existing=await supaFetch('GET','/rest/v1/extension_history?select=captured_at&limit=1');
+  if(existing&&Array.isArray(existing)&&existing.length>0){
+    console.log('Extension history already populated, skipping backfill');
+    return;
+  }
+
+  console.log('Backfilling extension history from historical bar data...');
+  const MIN_ATR=3, MIN_DVOL=80;
+  const records=[];
+  const themeMap={};
+  getThemesWithWatchlist().forEach(th=>th.tickers.forEach(tk=>{if(!themeMap[tk])themeMap[tk]=th.name;}));
+
+  Object.keys(cache).forEach(ticker=>{
+    const d=cache[ticker];
+    if(!d||!d.bars||d.bars.length<65) return;
+    if(isOTC(ticker)) return;
+    const theme=themeMap[ticker];
+    if(!theme) return;
+    const bars=d.bars;
+
+    for(let i=64;i<bars.length;i++){
+      const bar=bars[i];
+      if(!bar.c||!bar.h||!bar.l) continue;
+
+      // Rolling ATR(14)
+      const trW=[];
+      for(let j=Math.max(1,i-27);j<=i;j++){
+        const b=bars[j],pc2=bars[j-1].c;
+        if(b.h!=null&&b.l!=null&&pc2!=null)
+          trW.push(Math.min(Math.max(b.h-b.l,Math.abs(b.h-pc2),Math.abs(b.l-pc2)),b.c*0.30));
+      }
+      if(trW.length<14) continue;
+      let atr=trW.slice(0,14).reduce((s,v)=>s+v,0)/14;
+      for(let j=14;j<trW.length;j++) atr=(atr*13+trW[j])/14;
+      if(atr<=0) continue;
+
+      // Rolling EMA(50)
+      const cw=bars.slice(Math.max(0,i-99),i+1).map(b=>b.c).filter(v=>v!=null);
+      if(cw.length<50) continue;
+      const k=2/51;
+      let ema50=cw.slice(0,50).reduce((s,v)=>s+v,0)/50;
+      for(let j=50;j<cw.length;j++) ema50=cw[j]*k+ema50*(1-k);
+
+      const atrMA=(bar.c-ema50)/atr;
+      if(Math.abs(atrMA)<MIN_ATR) continue;
+
+      // Daily vol
+      const vw=bars.slice(Math.max(1,i-20),i+1);
+      const hlP=[];
+      for(let j=1;j<vw.length;j++){
+        const pv=vw[j-1].c,b2=vw[j];
+        if(pv&&b2.h!=null&&b2.l!=null) hlP.push((b2.h-b2.l)/pv*100);
+      }
+      const dailyVol=hlP.length?+(hlP.reduce((s,v)=>s+v,0)/hlP.length).toFixed(2):null;
+
+      // Avg dollar vol filter
+      const avgDVol=d.avgVolume?(bar.c*d.avgVolume/1e6):null;
+      if(avgDVol&&avgDVol<MIN_DVOL) continue;
+
+      records.push({
+        ticker, theme,
+        atr_ma:+atrMA.toFixed(2),
+        price:+bar.c.toFixed(2),
+        vol_pct:dailyVol,
+        direction:atrMA>0?'above':'below',
+        captured_at:new Date(bar.t).toISOString()
+      });
+    }
+  });
+
+  if(!records.length){console.log('No historical extension events found');return;}
+
+  // Deduplicate — one record per ticker per day
+  const seen=new Set();
+  const deduped=records.filter(r=>{
+    const key=r.ticker+'|'+r.captured_at.slice(0,10);
+    if(seen.has(key)) return false;
+    seen.add(key); return true;
+  });
+
+  console.log('Inserting',deduped.length,'historical records...');
+  for(let i=0;i<deduped.length;i+=500)
+    await supaFetch('POST','/rest/v1/extension_history',deduped.slice(i,i+500));
+  console.log('Backfill complete!');
+}
+
+
   const main=document.getElementById('main');
   const asv=document.createElement('div');asv.className='asv';
 
@@ -2557,8 +2648,10 @@ async function loadExtensionHistory(container){
 
         const sortAndRender=(data,ph)=>{
           const s=[...data].sort((a,b)=>{
-            const av=Math.abs(parseFloat(a[histSort.col]??0));
-            const bv=Math.abs(parseFloat(b[histSort.col]??0));
+            let av=parseFloat(a[histSort.col]??0);
+            let bv=parseFloat(b[histSort.col]??0);
+            // For atr_ma sort by absolute value (extension magnitude regardless of direction)
+            if(histSort.col==='atr_ma'){av=Math.abs(av);bv=Math.abs(bv);}
             return histSort.dir==='desc'?bv-av:av-bv;
           });
           // Update header arrows
