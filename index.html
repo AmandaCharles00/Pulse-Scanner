@@ -2579,8 +2579,16 @@ function renderExtension(){
     await backfillExtensionHistory(true);
     backfillBtn.textContent='⟳ Backfill';backfillBtn.style.opacity='1';
     window._extHistCache=null;
-    // Re-load history without touching histOpen or display
-    if(histOpen) await loadExtensionHistory(histBody);
+    const tabToRestore=window._extHistActiveTab||0;
+    // Always reload and keep panel open after backfill
+    histOpen=true;
+    window._extHistOpen=true;
+    histToggleBtn.textContent='▲ Hide';
+    histBody.style.display='block';
+    await loadExtensionHistory(histBody);
+    // Restore the tab that was active before backfill
+    window._extHistActiveTab=tabToRestore;
+    if(window._extHistCache) renderExtHistFromCache(histBody,window._extHistCache,tabToRestore);
   });
 
   histHdr.append(histLbl,backfillBtn,histToggleBtn);
