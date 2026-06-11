@@ -259,7 +259,7 @@ const THEMES=[
 const SUPA_URL='https://bmeqpzytgedymtkwtnis.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtZXFwenl0Z2VkeW10a3d0bmlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MTI4OTAsImV4cCI6MjA5MzE4ODg5MH0.z0zXbMZd1zTXQuKYV2-yRhAzFmoqPhGp8r025KCdC5M';
 
-async function supaFetch(method, path, body=null){
+async function supaFetch(method, path, body=null, extraHeaders={}){
   const opts={
     method,
     mode:'cors',
@@ -267,7 +267,8 @@ async function supaFetch(method, path, body=null){
       'Content-Type':'application/json',
       'apikey':SUPA_KEY,
       'Authorization':'Bearer '+SUPA_KEY,
-      'Prefer':'return=representation'
+      'Prefer':'return=representation',
+      ...extraHeaders
     },
   };
   if(body) opts.body=JSON.stringify(body);
@@ -2596,7 +2597,7 @@ async function loadExtensionHistory(container){
 
   try{
     // Fetch all history (no date limit)
-    const data=await supaFetch('GET','/rest/v1/extension_history?select=*&order=captured_at.desc&limit=50000');
+    const data=await supaFetch('GET','/rest/v1/extension_history?select=*&order=captured_at.desc',null,{'Range-Unit':'items','Range':'0-49999','Prefer':'count=none'});
     if(!data||!Array.isArray(data)){
       container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--amber);font-family:var(--mono)">⚠ Could not load history. Make sure the extension_history table exists in Supabase.</div>';
       return;
