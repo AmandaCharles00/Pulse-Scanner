@@ -1318,8 +1318,10 @@ async function backfillExtensionHistory(force=false){
       }
       const dailyVol=hlP.length?+(hlP.reduce((s,v)=>s+v,0)/hlP.length).toFixed(2):null;
 
-      // Avg dollar vol filter
-      const avgDVol=d.avgVolume?(bar.c*d.avgVolume/1e6):null;
+      // Rolling 20-bar avg dollar volume
+      const volBars=bars.slice(Math.max(0,i-19),i+1);
+      const avgVol20=volBars.reduce((s,b)=>s+(b.v||0),0)/volBars.length;
+      const avgDVol=avgVol20?(bar.c*avgVol20/1e6):null;
       if(avgDVol&&avgDVol<MIN_DVOL) continue;
 
       records.push({
