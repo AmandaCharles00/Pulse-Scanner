@@ -2642,34 +2642,38 @@ async function exportExtensionHistoryXLS(){
     });
   }
 
-  // Fetch all records from Supabase in batches
+  // Use cached data if available, otherwise fetch
   let allRecords=[];
-  let offset=0;
-  const pageSize=5000;
-  while(true){
-    const batch=await supaFetch('GET',
-      '/rest/v1/extension_history?select=ticker,theme,atr_ma,captured_at&order=captured_at.asc',
-      null,{'Range-Unit':'items','Range':`${offset}-${offset+pageSize-1}`}
-    );
-    if(!batch||!batch.length) break;
-    allRecords=allRecords.concat(batch);
-    if(batch.length<pageSize) break;
-    offset+=pageSize;
+  if(window._extHistCache&&window._extHistCache.length){
+    // Flatten all bucket data from cache
+    window._extHistCache.forEach(({bk,sorted})=>{
+      sorted.forEach(r=>allRecords.push(r));
+    });
+  } else {
+    // Fetch each month bucket same as history panel
+    const now=new Date();
+    const y=now.getFullYear(),m=now.getMonth();
+    const buckets=[];
+    buckets.push({from:new Date(y,m,1).toISOString(),to:now.toISOString()});
+    for(let i=1;i<=12;i++){
+      buckets.push({from:new Date(y,m-i,1).toISOString(),to:new Date(y,m-i+1,1).toISOString()});
+    }
+    for(const bk of buckets){
+      try{
+        const data=await supaFetch('GET',
+          '/rest/v1/extension_history?select=ticker,theme,atr_ma,captured_at&captured_at=gte.'+encodeURIComponent(bk.from)+'&captured_at=lt.'+encodeURIComponent(bk.to)+'&order=captured_at.desc',
+          null,{'Range-Unit':'items','Range':'0-4999'}
+        );
+        if(data&&data.length) allRecords=allRecords.concat(data);
+      }catch(e){console.warn('Export fetch error:',e);}
+    }
   }
 
-  if(!allRecords.length){alert('No history data found.');return;}
+  console.log('Export: total records fetched:',allRecords.length);
+  if(!allRecords.length){alert('No history data found. Open Extension History first.');return;}
 
-  // Build theme → sector map from THEMES
-  const themeToSector={};
-  (window.SECTOR_GROUPS||[]).forEach(sg=>{
-    sg.themes.forEach(tid=>{themeToSector[tid]=sg.name;});
-  });
-  // Fallback: just use theme name as sector if no sector map
-  const themeNameMap={};
-  getThemesWithWatchlist().forEach(th=>{themeNameMap[th.name]=th.name;});
-
-  // Group by ticker — keep peak ATR/MA per month
-  const tickerMap={}; // ticker -> { theme, appearances: [{month, lastSeen, peakATR}] }
+  // Group by ticker — keep peak ATR/MA per calendar month
+  const tickerMap={};
   allRecords.forEach(r=>{
     const d=new Date(r.captured_at);
     const monthKey=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
@@ -2677,20 +2681,24 @@ async function exportExtensionHistoryXLS(){
     const lastSeen=d.toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'2-digit'});
     if(!tickerMap[r.ticker]) tickerMap[r.ticker]={theme:r.theme,months:{}};
     const existing=tickerMap[r.ticker].months[monthKey];
-    if(!existing||Math.abs(r.atr_ma)>Math.abs(existing.peakATR)){
-      tickerMap[r.ticker].months[monthKey]={monthLabel,lastSeen,peakATR:parseFloat(r.atr_ma)};
+    const atrVal=parseFloat(r.atr_ma);
+    if(!existing||Math.abs(atrVal)>Math.abs(existing.peakATR)){
+      tickerMap[r.ticker].months[monthKey]={monthLabel,lastSeen,peakATR:atrVal};
     }
   });
+
+  console.log('Export: unique tickers:',Object.keys(tickerMap).length);
 
   // Filter to tickers with 3+ distinct months
   const qualified=Object.entries(tickerMap)
     .filter(([,v])=>Object.keys(v.months).length>=3)
     .sort((a,b)=>Object.keys(b[1].months).length-Object.keys(a[1].months).length);
 
+  console.log('Export: qualified tickers (3+):',qualified.length);
   if(!qualified.length){alert('No tickers with 3+ appearances found.');return;}
 
   // Get all unique months sorted
-  const allMonths=[...new Set(allRecords.map(r=>{
+  const allMonthKeys=[...new Set(allRecords.map(r=>{
     const d=new Date(r.captured_at);
     return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
   }))].sort();
@@ -2702,25 +2710,20 @@ async function exportExtensionHistoryXLS(){
     monthLabels[k]=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]+' '+d.getFullYear();
   });
 
-  // Build header row: Ticker, Theme, Appearances, then per month: LAST SEEN, PEAK ATR/50MA
+  // Build rows
   const headerRow1=['Ticker','Theme','Appearances'];
   const headerRow2=['','',''];
-  allMonths.forEach(mk=>{
+  allMonthKeys.forEach(mk=>{
     headerRow1.push(monthLabels[mk]||mk,'');
     headerRow2.push('Last Seen','Peak ATR/50MA');
   });
 
   const rows=[headerRow1,headerRow2];
-
   qualified.forEach(([ticker,data])=>{
-    const row=[ticker, data.theme, Object.keys(data.months).length];
-    allMonths.forEach(mk=>{
-      const m=data.months[mk];
-      if(m){
-        row.push(m.lastSeen, m.peakATR);
-      } else {
-        row.push('','');
-      }
+    const row=[ticker,data.theme,Object.keys(data.months).length];
+    allMonthKeys.forEach(mk=>{
+      const mo=data.months[mk];
+      row.push(mo?mo.lastSeen:'', mo?mo.peakATR:'');
     });
     rows.push(row);
   });
@@ -2728,19 +2731,14 @@ async function exportExtensionHistoryXLS(){
   // Build workbook
   const wb=window.XLSX.utils.book_new();
   const ws=window.XLSX.utils.aoa_to_sheet(rows);
-
-  // Merge header cells for each month (pairs)
   if(!ws['!merges']) ws['!merges']=[];
-  allMonths.forEach((mk,i)=>{
+  allMonthKeys.forEach((mk,i)=>{
     const col=3+i*2;
     ws['!merges'].push({s:{r:0,c:col},e:{r:0,c:col+1}});
   });
-
-  // Column widths
   const wscols=[{wch:8},{wch:28},{wch:12}];
-  allMonths.forEach(()=>{wscols.push({wch:12},{wch:14});});
+  allMonthKeys.forEach(()=>{wscols.push({wch:12},{wch:14});});
   ws['!cols']=wscols;
-
   window.XLSX.utils.book_append_sheet(wb,ws,'Extension Recurrence');
   window.XLSX.writeFile(wb,'extension_recurrence.xlsx');
 }
