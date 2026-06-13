@@ -2599,8 +2599,19 @@ function renderExtension(){
   exportBtn.title='Download recurrence report as Excel';
   exportBtn.addEventListener('click',async(e)=>{
     e.stopPropagation();
+    const EXPORT_URL='https://pulse-export.vercel.app/api/export';
     exportBtn.textContent='Building...';exportBtn.style.opacity='0.5';
-    await exportExtensionHistoryXLS();
+    try{
+      const resp=await fetch(EXPORT_URL);
+      if(!resp.ok) throw new Error('Server error '+resp.status);
+      const blob=await resp.blob();
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url;a.download='extension_recurrence.xlsx';a.click();
+      URL.revokeObjectURL(url);
+    }catch(err){
+      alert('Export failed: '+err.message+'\n\nMake sure the export server is deployed at:\n'+EXPORT_URL);
+    }
     exportBtn.textContent='↓ Export XLS';exportBtn.style.opacity='1';
   });
   histHdr.append(histLbl,backfillBtn,exportBtn,histToggleBtn);
