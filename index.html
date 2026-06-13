@@ -2633,7 +2633,6 @@ function renderExtension(){
 }
 
 async function exportExtensionHistoryXLS(){
-  // Load SheetJS
   if(!window.XLSX){
     await new Promise((res,rej)=>{
       const s=document.createElement('script');
@@ -2642,105 +2641,156 @@ async function exportExtensionHistoryXLS(){
     });
   }
 
-  // Use cached data if available, otherwise fetch
+  // Gather all records from cache or Supabase
   let allRecords=[];
   if(window._extHistCache&&window._extHistCache.length){
-    // Flatten all bucket data from cache
-    window._extHistCache.forEach(({bk,sorted})=>{
-      sorted.forEach(r=>allRecords.push(r));
-    });
+    window._extHistCache.forEach(({sorted})=>sorted.forEach(r=>allRecords.push(r)));
   } else {
-    // Fetch each month bucket same as history panel
-    const now=new Date();
-    const y=now.getFullYear(),m=now.getMonth();
-    const buckets=[];
-    buckets.push({from:new Date(y,m,1).toISOString(),to:now.toISOString()});
-    for(let i=1;i<=12;i++){
-      buckets.push({from:new Date(y,m-i,1).toISOString(),to:new Date(y,m-i+1,1).toISOString()});
-    }
+    const now=new Date(),y=now.getFullYear(),m=now.getMonth();
+    const buckets=[{from:new Date(y,m,1).toISOString(),to:now.toISOString()}];
+    for(let i=1;i<=12;i++) buckets.push({from:new Date(y,m-i,1).toISOString(),to:new Date(y,m-i+1,1).toISOString()});
     for(const bk of buckets){
       try{
         const data=await supaFetch('GET',
           '/rest/v1/extension_history?select=ticker,theme,atr_ma,captured_at&captured_at=gte.'+encodeURIComponent(bk.from)+'&captured_at=lt.'+encodeURIComponent(bk.to)+'&order=captured_at.desc',
-          null,{'Range-Unit':'items','Range':'0-4999'}
-        );
+          null,{'Range-Unit':'items','Range':'0-4999'});
         if(data&&data.length) allRecords=allRecords.concat(data);
-      }catch(e){console.warn('Export fetch error:',e);}
+      }catch(e){}
     }
   }
-
-  console.log('Export: total records fetched:',allRecords.length);
   if(!allRecords.length){alert('No history data found. Open Extension History first.');return;}
 
-  // Group by ticker — keep peak ATR/MA per calendar month
+  // Get ordered month list
+  const monthSet=new Set();
+  allRecords.forEach(r=>{const d=new Date(r.captured_at);monthSet.add(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'));});
+  const monthKeys=[...monthSet].sort();
+  const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const monthLabel=mk=>{const[y,m]=mk.split('-');return MN[parseInt(m)-1]+' '+y;};
+
+  // Build ticker map — peak ATR per month
   const tickerMap={};
   allRecords.forEach(r=>{
     const d=new Date(r.captured_at);
-    const monthKey=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-    const monthLabel=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]+' '+d.getFullYear();
-    const lastSeen=d.toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'2-digit'});
+    const mk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    const ls=d.toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'2-digit'});
     if(!tickerMap[r.ticker]) tickerMap[r.ticker]={theme:r.theme,months:{}};
-    const existing=tickerMap[r.ticker].months[monthKey];
-    const atrVal=parseFloat(r.atr_ma);
-    if(!existing||Math.abs(atrVal)>Math.abs(existing.peakATR)){
-      tickerMap[r.ticker].months[monthKey]={monthLabel,lastSeen,peakATR:atrVal};
-    }
+    const atr=parseFloat(r.atr_ma);
+    const ex=tickerMap[r.ticker].months[mk];
+    if(!ex||Math.abs(atr)>Math.abs(ex.atr)) tickerMap[r.ticker].months[mk]={ls,atr};
   });
 
-  console.log('Export: unique tickers:',Object.keys(tickerMap).length);
-
-  // Filter to tickers with 3+ distinct months
+  // Filter 3+ months, compute direction/consistency/trend
   const qualified=Object.entries(tickerMap)
     .filter(([,v])=>Object.keys(v.months).length>=3)
-    .sort((a,b)=>Object.keys(b[1].months).length-Object.keys(a[1].months).length);
+    .map(([ticker,v])=>{
+      const entries=Object.entries(v.months).sort((a,b)=>a[0].localeCompare(b[0]));
+      const atrs=entries.map(([,m])=>m.atr);
+      const above=atrs.filter(a=>a>0).length, below=atrs.filter(a=>a<0).length;
+      const total=atrs.length;
+      const direction=above>=below?'Above MA':'Below MA';
+      const consistency=Math.round((above>=below?above:below)/total*100);
+      // Trend: linear regression slope normalized by mean abs ATR
+      let trend='Stable';
+      if(atrs.length>=3){
+        const n=atrs.length, xs=[...Array(n).keys()];
+        const mx=xs.reduce((s,x)=>s+x,0)/n, my=atrs.reduce((s,y)=>s+y,0)/n;
+        const num=xs.reduce((s,x,i)=>s+(x-mx)*(atrs[i]-my),0);
+        const den=xs.reduce((s,x)=>s+(x-mx)**2,0);
+        const slope=den>0?num/den:0;
+        const meanAbs=atrs.reduce((s,a)=>s+Math.abs(a),0)/n;
+        const norm=meanAbs>0?slope/meanAbs:0;
+        if(norm>0.08) trend='↑ Escalating';
+        else if(norm<-0.08) trend='↓ Fading';
+        else trend='→ Stable';
+      }
+      return {ticker,theme:v.theme,appearances:total,direction,consistency,trend,months:v.months};
+    })
+    .sort((a,b)=>b.appearances-a.appearances);
 
-  console.log('Export: qualified tickers (3+):',qualified.length);
   if(!qualified.length){alert('No tickers with 3+ appearances found.');return;}
 
-  // Get all unique months sorted
-  const allMonthKeys=[...new Set(allRecords.map(r=>{
-    const d=new Date(r.captured_at);
-    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-  }))].sort();
+  const XL=window.XLSX;
+  const wb=XL.utils.book_new();
 
-  const monthLabels={};
-  allRecords.forEach(r=>{
-    const d=new Date(r.captured_at);
-    const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-    monthLabels[k]=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]+' '+d.getFullYear();
-  });
+  // ── Styles helper ──
+  const S=(v,s)=>({v,s});
 
-  // Build rows
-  const headerRow1=['Ticker','Theme','Appearances'];
-  const headerRow2=['','',''];
-  allMonthKeys.forEach(mk=>{
-    headerRow1.push(monthLabels[mk]||mk,'');
-    headerRow2.push('Last Seen','Peak ATR/50MA');
-  });
+  // ── SHEET 1: ABOUT ──
+  const escalating=qualified.filter(t=>t.trend.includes('Escalating')).length;
+  const fading=qualified.filter(t=>t.trend.includes('Fading')).length;
+  const aboveCt=qualified.filter(t=>t.direction==='Above MA').length;
+  const belowCt=qualified.filter(t=>t.direction==='Below MA').length;
 
-  const rows=[headerRow1,headerRow2];
-  qualified.forEach(([ticker,data])=>{
-    const row=[ticker,data.theme,Object.keys(data.months).length];
-    allMonthKeys.forEach(mk=>{
-      const mo=data.months[mk];
-      row.push(mo?mo.lastSeen:'', mo?mo.peakATR:'');
+  const aboutRows=[
+    ['PULSE SCANNER — Extension Recurrence Report'],
+    ['Tickers appearing 3+ times on the ATR/50MA Extension Scanner'],
+    [],
+    [`${qualified.length} Tickers`,`${monthLabel(monthKeys[0])} — ${monthLabel(monthKeys[monthKeys.length-1])}`,`${aboveCt} Above / ${belowCt} Below`,`${escalating} Escalating / ${fading} Fading`],
+    ['','','',''],
+    ['COLUMNS EXPLAINED'],
+    ['▸  Appearances — Number of distinct months the ticker was 3x+ ATR from its 50MA.'],
+    ['▸  Direction — Dominant direction: Above MA (bullish extension) or Below MA (bearish/oversold).'],
+    ['▸  Consistency % — What % of appearances were in the dominant direction. 100% = always same way.'],
+    ['▸  Trend — Is the extension magnitude growing or shrinking over time?'],
+    ['       ↑ Escalating = recent months show stronger extensions than earlier months.'],
+    ['       ↓ Fading = extensions getting smaller — possible trend exhaustion or mean reversion.'],
+    ['       → Stable = consistent magnitude with no clear directional change.'],
+    ['▸  Peak ATR/50MA — Most extreme reading that month. Positive = above 50MA. Negative = below.'],
+    [],
+    ['PRACTICAL TRADING USES'],
+    ['1.  Mean Reversion Setups','If a ticker has gone -5x below its 50MA 8 of 13 months and just hit -4x again, you have historical precedent it recovers. Pattern-match against its own behavior, not intuition.'],
+    ['2.  Avoid Fighting the Trend','A name extending above its 50MA 11 months in a row is not a short. Knowing its history prevents you from fading a freight train.'],
+    ['3.  Sector Rotation Timing','When Gold names cluster in the same months, that confirms a macro move. If they cluster again, you have a roadmap for what follows.'],
+    ['4.  Position Sizing','Names hitting 6-8x ATR extensions regularly have a wider normal range. Size them smaller to keep risk consistent.'],
+    ['5.  Watchlist Prioritization','You already know which names are historically active — no need to scan 600+ tickers cold every session.'],
+    ['6.  Re-Entry Candidates','Names that appeared, disappeared 2-3 months, then reappeared are often the best setups — reset near MA then re-extended.'],
+    ['7.  Escalating Names to Watch','Tickers marked Escalating are extending further over time — momentum is building. High-conviction trend candidates.'],
+    ['8.  Fading Names for Exits','Tickers marked Fading show weaker extensions recently. If holding based on extension, this signals the move may be exhausting.'],
+    [],
+    ['HOW TO READ THE DATA TAB'],
+    ['▸  Sort by Appearances (desc) to find the most chronically active tickers.'],
+    ['▸  Sort by Consistency % to separate pure directional names from oscillators.'],
+    ['▸  Sort by Trend to find Escalating names building momentum right now.'],
+    ['▸  Empty ATR cells = ticker was within 3x ATR of 50MA that month (not extended).'],
+    ['▸  A gap between two populated months = potential re-entry setup after a reset.'],
+    ['▸  Negative ATR values = below 50MA. Positive = above. Bold = 5x+ extension.'],
+  ];
+
+  const wsAbout=XL.utils.aoa_to_sheet(aboutRows);
+  wsAbout['!cols']=[{wch:55},{wch:80}];
+  XL.utils.book_append_sheet(wb,wsAbout,'About This Report');
+
+  // ── SHEET 2: DATA ──
+  const headerRow1=['Ticker','Theme','Appearances','Direction','Consistency %','Trend'];
+  const headerRow2=['','','','','',''];
+  monthKeys.forEach(mk=>{headerRow1.push(monthLabel(mk),'');headerRow2.push('Last Seen','Peak ATR/50MA');});
+
+  const dataRows=[headerRow1,headerRow2];
+  qualified.forEach(t=>{
+    const row=[t.ticker,t.theme,t.appearances,t.direction,t.consistency+'%',t.trend];
+    monthKeys.forEach(mk=>{
+      const m=t.months[mk];
+      row.push(m?m.ls:'', m?m.atr:'');
     });
-    rows.push(row);
+    dataRows.push(row);
   });
 
-  // Build workbook
-  const wb=window.XLSX.utils.book_new();
-  const ws=window.XLSX.utils.aoa_to_sheet(rows);
-  if(!ws['!merges']) ws['!merges']=[];
-  allMonthKeys.forEach((mk,i)=>{
-    const col=3+i*2;
-    ws['!merges'].push({s:{r:0,c:col},e:{r:0,c:col+1}});
+  const wsData=XL.utils.aoa_to_sheet(dataRows);
+
+  // Merges for month header pairs
+  if(!wsData['!merges']) wsData['!merges']=[];
+  monthKeys.forEach((mk,i)=>{
+    const col=6+i*2;
+    wsData['!merges'].push({s:{r:0,c:col},e:{r:0,c:col+1}});
   });
-  const wscols=[{wch:8},{wch:28},{wch:12}];
-  allMonthKeys.forEach(()=>{wscols.push({wch:12},{wch:14});});
-  ws['!cols']=wscols;
-  window.XLSX.utils.book_append_sheet(wb,ws,'Extension Recurrence');
-  window.XLSX.writeFile(wb,'extension_recurrence.xlsx');
+
+  // Col widths
+  const wscols=[{wch:9},{wch:26},{wch:13},{wch:12},{wch:14},{wch:14}];
+  monthKeys.forEach(()=>{wscols.push({wch:11},{wch:14});});
+  wsData['!cols']=wscols;
+
+  XL.utils.book_append_sheet(wb,wsData,'Extension Recurrence');
+  XL.writeFile(wb,'extension_recurrence.xlsx');
 }
 
 async function loadExtensionHistory(container){
