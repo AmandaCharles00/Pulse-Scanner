@@ -1139,17 +1139,45 @@ const NOTE_COLORS=['#2a2440','#1a3040','#2a3520','#3a2a20','#2a2a3a','#1e3830'];
 const NOTE_BORDERS=['rgba(139,92,246,0.4)','rgba(45,140,255,0.4)','rgba(0,201,122,0.4)','rgba(245,166,35,0.4)','rgba(100,120,200,0.4)','rgba(0,180,160,0.4)'];
 
 async function loadNotes(container){
-  const data=await supaFetch('GET','/rest/v1/pulse_notes?select=*&order=created_at.desc&limit=50');
+  const data=await supaFetch('GET','/rest/v1/pulse_notes?select=*&order=created_at.desc&limit=100');
   if(!data||!Array.isArray(data)){
     container.innerHTML='<div style="font-size:11px;color:var(--red);font-family:var(--mono)">Could not load notes — check Supabase table "pulse_notes" exists.</div>';
     return;
   }
   container.innerHTML='';
-  if(!data.length){
-    container.innerHTML='<div style="font-size:11px;color:var(--text2);font-family:var(--mono);padding:8px 0">No notes yet — be the first to post!</div>';
-    return;
-  }
-  data.forEach((note,i)=>container.appendChild(renderNote(note,i,container)));
+
+  const CATS=[
+    {key:'long',  label:'📈 Long Ideas',   border:'rgba(0,201,122,0.5)',  bg:'#0a2a1a'},
+    {key:'short', label:'📉 Short Ideas',  border:'rgba(255,61,85,0.5)',  bg:'#2a0a10'},
+    {key:'general',label:'💬 General Notes',border:'rgba(45,140,255,0.4)',bg:'#0a1a2a'},
+  ];
+
+  CATS.forEach(cat=>{
+    const catNotes=data.filter(n=>(n.category||'general')===cat.key);
+
+    // Section header
+    const hdr=document.createElement('div');
+    hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:'+cat.bg+';border:1px solid '+cat.border+';border-radius:6px 6px 0 0;margin-top:14px';
+    const hlbl=document.createElement('span');
+    hlbl.style.cssText='font-size:11px;font-family:var(--mono);font-weight:600;color:#fff;letter-spacing:.05em;text-transform:uppercase';
+    hlbl.textContent=cat.label+' ('+catNotes.length+')';
+    hdr.appendChild(hlbl);
+    container.appendChild(hdr);
+
+    // Notes grid for this category
+    const grid=document.createElement('div');
+    grid.style.cssText='display:flex;flex-wrap:wrap;gap:10px;padding:10px 0 4px 0;min-height:40px;border-left:1px solid '+cat.border+';border-right:1px solid '+cat.border+';border-bottom:1px solid '+cat.border+';border-radius:0 0 6px 6px;padding:10px;background:rgba(0,0,0,0.15);margin-bottom:4px';
+
+    if(!catNotes.length){
+      const empty=document.createElement('div');
+      empty.style.cssText='font-size:11px;color:var(--text2);font-family:var(--mono);padding:4px 0';
+      empty.textContent='No '+cat.label.toLowerCase()+' yet.';
+      grid.appendChild(empty);
+    } else {
+      catNotes.forEach((note,i)=>grid.appendChild(renderNote(note,i,container)));
+    }
+    container.appendChild(grid);
+  });
 }
 
 function renderNote(note,i,container){
@@ -1461,6 +1489,14 @@ function renderAlertSettings(){
   noteTextIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--sans);font-size:12px;padding:6px 8px;width:260px;height:60px;outline:none;resize:vertical;line-height:1.5';
   noteTextIn.addEventListener('focus',()=>noteTextIn.style.borderColor='var(--blue)');
   noteTextIn.addEventListener('blur',()=>noteTextIn.style.borderColor='var(--border2)');
+  // Category selector
+  const catSel=document.createElement('select');
+  catSel.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;outline:none;cursor:pointer';
+  [['long','📈 Long Idea'],['short','📉 Short Idea'],['general','💬 General']].forEach(([val,lbl])=>{
+    const opt=document.createElement('option');
+    opt.value=val;opt.textContent=lbl;catSel.appendChild(opt);
+  });
+
   const postBtn=document.createElement('button');
   postBtn.className='sbtn';postBtn.textContent='Post Note';
   postBtn.style.alignSelf='flex-end';
@@ -1468,14 +1504,15 @@ function renderAlertSettings(){
     const author=authorIn.value.trim()||'Anonymous';
     const ticker=tickerNoteIn.value.trim().toUpperCase()||null;
     const text=noteTextIn.value.trim();
+    const category=catSel.value;
     if(!text)return;
     postBtn.textContent='Posting...';postBtn.style.opacity='0.5';
-    const note={author,ticker,text,created_at:new Date().toISOString()};
+    const note={author,ticker,text,category,created_at:new Date().toISOString()};
     const res=await supaFetch('POST','/rest/v1/pulse_notes',[note]);
     if(res){noteTextIn.value='';tickerNoteIn.value='';loadNotes(notesGrid);}
     postBtn.textContent='Post Note';postBtn.style.opacity='1';
   });
-  addNoteRow.append(authorIn,tickerNoteIn,noteTextIn,postBtn);
+  addNoteRow.append(authorIn,catSel,tickerNoteIn,noteTextIn,postBtn);
   s4.appendChild(addNoteRow);
   asv.appendChild(s4);
 
