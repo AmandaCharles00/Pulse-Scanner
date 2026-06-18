@@ -1155,18 +1155,22 @@ async function loadNotes(container){
   CATS.forEach(cat=>{
     const catNotes=data.filter(n=>(n.category||'general')===cat.key);
 
+    // Section wrapper (header + scrollable card area, fixed height ~2 rows)
+    const section=document.createElement('div');
+    section.style.cssText='margin-top:16px;border:1px solid '+cat.border+';border-radius:8px;overflow:hidden';
+
     // Section header
     const hdr=document.createElement('div');
-    hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:'+cat.bg+';border:1px solid '+cat.border+';border-radius:6px 6px 0 0;margin-top:14px';
+    hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:'+cat.bg;
     const hlbl=document.createElement('span');
     hlbl.style.cssText='font-size:11px;font-family:var(--mono);font-weight:600;color:#fff;letter-spacing:.05em;text-transform:uppercase';
     hlbl.textContent=cat.label+' ('+catNotes.length+')';
     hdr.appendChild(hlbl);
-    container.appendChild(hdr);
+    section.appendChild(hdr);
 
-    // Notes grid for this category
+    // Notes grid for this category — fixed height for ~2 rows, scrolls if more
     const grid=document.createElement('div');
-    grid.style.cssText='display:flex;flex-wrap:wrap;gap:10px;padding:10px 0 4px 0;min-height:40px;border-left:1px solid '+cat.border+';border-right:1px solid '+cat.border+';border-bottom:1px solid '+cat.border+';border-radius:0 0 6px 6px;padding:10px;background:rgba(0,0,0,0.15);margin-bottom:4px';
+    grid.style.cssText='display:flex;flex-wrap:wrap;align-content:flex-start;gap:10px;padding:10px;min-height:170px;max-height:340px;overflow-y:auto;background:rgba(0,0,0,0.15)';
 
     if(!catNotes.length){
       const empty=document.createElement('div');
@@ -1176,7 +1180,8 @@ async function loadNotes(container){
     } else {
       catNotes.forEach((note,i)=>grid.appendChild(renderNote(note,i,container)));
     }
-    container.appendChild(grid);
+    section.appendChild(grid);
+    container.appendChild(section);
   });
 }
 
