@@ -135,7 +135,7 @@ tr:hover td{background:var(--bg3)}
   <div class="tab" id="tab-scan" onclick="setTab('scan')">50MA Scan</div>
   <div class="tab" id="tab-gaps" onclick="setTab('gaps')">Morning Gaps</div>
   <div class="tab" id="tab-ext" onclick="setTab('ext')">Extension</div>
-  <div class="tab" id="tab-earnings" onclick="setTab('earnings')">Earnings Setup</div>
+  <div class="tab" id="tab-earnings" onclick="setTab('earnings')">Earnings Gaps</div>
   <div class="tab" id="tab-positions" onclick="setTab('positions')">Positions</div>
   <div class="right">
     <input class="si" id="gsearch" placeholder="Search or AAPL/QQQ..." oninput="onSearch(this.value)">
@@ -3831,21 +3831,15 @@ function renderEarningsSetup(){
   const main=document.getElementById('main');const noData=Object.keys(cache).length===0;
   const wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;height:100%;overflow:hidden';
   const ctrl=document.createElement('div');ctrl.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border2);background:var(--bg2);flex-shrink:0;flex-wrap:wrap';
+
   const lbl1=document.createElement('span');lbl1.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';lbl1.textContent='Min Gap %';
-  const gapIn=document.createElement('input');gapIn.type='number';gapIn.value='10';gapIn.min='5';gapIn.step='1';gapIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:55px;outline:none;text-align:right';
+  const gapIn=document.createElement('input');gapIn.type='number';gapIn.value='10';gapIn.min='1';gapIn.step='1';gapIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:55px;outline:none;text-align:right';
   const sep1=document.createElement('span');sep1.style.cssText='color:var(--border2);margin:0 4px';sep1.textContent='|';
-  const lbl2=document.createElement('span');lbl2.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';lbl2.textContent='20MA within';
-  const maIn=document.createElement('input');maIn.type='number';maIn.value='3';maIn.min='0.5';maIn.step='0.5';maIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:55px;outline:none;text-align:right';
-  const lbl2b=document.createElement('span');lbl2b.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';lbl2b.textContent='% of price';
+
+  const lbl2=document.createElement('span');lbl2.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';lbl2.textContent='Min Vol ×';
+  const volIn=document.createElement('input');volIn.type='number';volIn.value='2';volIn.min='1';volIn.step='0.5';volIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:55px;outline:none;text-align:right';
   const sep2=document.createElement('span');sep2.style.cssText='color:var(--border2);margin:0 4px';sep2.textContent='|';
-  const lbl3=document.createElement('span');lbl3.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';lbl3.textContent='Min ATR%';
-  const atrIn=document.createElement('input');atrIn.type='number';atrIn.value='4';atrIn.min='0';atrIn.step='0.5';atrIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:55px;outline:none;text-align:right';
-  const lbl3b=document.createElement('span');lbl3b.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';lbl3b.textContent='%';
-  const sep3=document.createElement('span');sep3.style.cssText='color:var(--border2);margin:0 4px';sep3.textContent='|';
-  const lbl4=document.createElement('span');lbl4.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';lbl4.textContent='Min AvgVol $';
-  const dvolIn=document.createElement('input');dvolIn.type='number';dvolIn.value='80';dvolIn.min='0';dvolIn.step='10';dvolIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:65px;outline:none;text-align:right';
-  const lbl4b=document.createElement('span');lbl4b.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';lbl4b.textContent='M/day';
-  const sep4=document.createElement('span');sep4.style.cssText='color:var(--border2);margin:0 4px';sep4.textContent='|';
+
   const dirLbl=document.createElement('span');dirLbl.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';dirLbl.textContent='Gap:';
   const dirToggleE=document.createElement('div');dirToggleE.style.cssText='display:flex;gap:2px';dirToggleE.dataset.dir='both';
   const eDirBtns=[];
@@ -3853,55 +3847,52 @@ function renderEarningsSetup(){
   const eBtnBoth=mkEDir('Both','both','var(--blue)','var(--bd)');eBtnBoth.style.background='var(--bd)';eBtnBoth.style.borderColor='var(--blue)';eBtnBoth.style.color='var(--blue)';
   mkEDir('▲ Gap Up','up','var(--green)','var(--gd)');mkEDir('▼ Gap Down','down','var(--red)','var(--rd)');
   dirToggleE.append(...eDirBtns);
+
   const countEl=document.createElement('span');countEl.id='earnings-count';countEl.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono);margin-left:auto';
-  const rebuildEarnings=()=>buildEarningsSetup(parseFloat(gapIn.value)||10,parseFloat(maIn.value)||3,parseFloat(atrIn.value)||4,parseFloat(dvolIn.value)||80,dirToggleE.dataset.dir||'both',body);
-  gapIn.addEventListener('change',rebuildEarnings);maIn.addEventListener('change',rebuildEarnings);atrIn.addEventListener('change',rebuildEarnings);dvolIn.addEventListener('change',rebuildEarnings);
-  ctrl.append(lbl1,gapIn,sep1,lbl2,maIn,lbl2b,sep2,lbl3,atrIn,lbl3b,sep3,lbl4,dvolIn,lbl4b,sep4,dirLbl,dirToggleE,countEl);
+
+  const rebuildEarnings=()=>buildEarningsSetup(parseFloat(gapIn.value)||10,parseFloat(volIn.value)||2,dirToggleE.dataset.dir||'both',body);
+  gapIn.addEventListener('change',rebuildEarnings);volIn.addEventListener('change',rebuildEarnings);
+
+  ctrl.append(lbl1,gapIn,sep1,lbl2,volIn,sep2,dirLbl,dirToggleE,countEl);
   const body=document.createElement('div');body.style.cssText='flex:1;overflow-y:auto';
   wrap.append(ctrl,body);main.innerHTML='';main.appendChild(wrap);
   if(noData){body.innerHTML='<div class="state">No data — hit Sync first</div>';return;}
-  buildEarningsSetup(10,3,4,80,'both',body);
+  buildEarningsSetup(10,2,'both',body);
 }
-function buildEarningsSetup(minGap,maThresh,minAtrPct,minDVol,gapDir,body){
+function buildEarningsSetup(minGap,minVolX,gapDir,body){
   const results=[];const seen=new Set();
   getThemesWithWatchlist().forEach(th=>{th.tickers.forEach(tk=>{
     if(seen.has(tk))return;const d=cache[tk];
-    if(!d||d.stale||d.price==null||!d.earningsGap)return;if(isOTC(tk))return;
-    const egap=d.earningsGap;
-    if(Math.abs(egap.pct)<minGap)return;
-    if(gapDir==='up'&&egap.pct<0)return;if(gapDir==='down'&&egap.pct>0)return;
-    if(egap.isGapUp&&d.price<egap.midpoint)return;if(!egap.isGapUp&&d.price>egap.midpoint)return;
-    if(!d.ma20)return;const pctFrom20=Math.abs((d.price-d.ma20)/d.price*100);if(pctFrom20>maThresh)return;
-    const pctFrom50=d.ma50?Math.abs((d.price-d.ma50)/d.price*100):null;
-    const atrPct=d.dailyVol??null;if(minAtrPct>0&&(!atrPct||atrPct<minAtrPct))return;
-    const avgDVol=(d.price&&d.avgVolume)?(d.price*d.avgVolume/1e6):null;if(minDVol>0&&(!avgDVol||avgDVol<minDVol))return;
+    if(!d||d.stale||d.price==null)return;if(isOTC(tk))return;
+    // Only today's move — d.today is today's % change from prior close
+    if(d.today==null)return;
+    if(Math.abs(d.today)<minGap)return;
+    if(gapDir==='up'&&d.today<0)return;if(gapDir==='down'&&d.today>0)return;
+    const volX=d.volume&&d.avgVolume?d.volume/d.avgVolume:null;
+    if(!volX||volX<minVolX)return;
     seen.add(tk);
-    results.push({ticker:tk,theme:th.name,price:d.price,ma20:d.ma20,ma50:d.ma50,pctFrom20,pctFrom50:pctFrom50??null,gap:egap,atr:d.atr,atrPct:d.dailyVol,atrMA:d.atrMA,today:d.today,avgDVol,volX:d.volume&&d.avgVolume?d.volume/d.avgVolume:null,...d});
+    results.push({ticker:tk,theme:th.name,price:d.price,today:d.today,volX,volume:d.volume,avgVolume:d.avgVolume,atr:d.atr,atrMA:d.atrMA,atrPct:d.dailyVol});
   });});
-  results.sort((a,b)=>b.gap.date.localeCompare(a.gap.date)||Math.abs(b.gap.pct)-Math.abs(a.gap.pct));
+  results.sort((a,b)=>Math.abs(b.today)-Math.abs(a.today));
   const countEl=document.getElementById('earnings-count');if(countEl)countEl.textContent=results.length+' matches';
   body.innerHTML='';
-  if(!results.length){body.innerHTML='<div class="state" style="padding:30px;color:var(--text2)">No earnings setups found<br><span style="font-size:10px">Try widening the MA threshold or lowering the min gap %</span></div>';return;}
+  if(!results.length){body.innerHTML='<div class="state" style="padding:30px;color:var(--text2)">No gaps ≥'+minGap+'% with '+minVolX+'x+ volume today<br><span style="font-size:10px">This view only shows moves happening TODAY — check back after market open</span></div>';return;}
   const hdr=document.createElement('div');hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
-  hdr.innerHTML='<div style="width:60px;flex-shrink:0">Ticker</div><div style="flex:1">Theme</div><div style="width:75px;text-align:right;flex-shrink:0">Price</div><div style="width:80px;text-align:right;flex-shrink:0">Gap Date</div><div style="width:75px;text-align:right;flex-shrink:0">Gap %</div><div style="width:75px;text-align:right;flex-shrink:0">% fr 20MA</div><div style="width:75px;text-align:right;flex-shrink:0">% fr 50MA</div><div style="width:65px;text-align:right;flex-shrink:0">ATR%</div><div style="width:90px;text-align:right;flex-shrink:0">ATR/50MA</div><div style="width:70px;text-align:right;flex-shrink:0">Vol x</div><div style="width:75px;text-align:right;flex-shrink:0">Today</div>';
+  hdr.innerHTML='<div style="width:60px;flex-shrink:0">Ticker</div><div style="flex:1">Theme</div><div style="width:80px;text-align:right;flex-shrink:0">Price</div><div style="width:90px;text-align:right;flex-shrink:0">Today %</div><div style="width:70px;text-align:right;flex-shrink:0">Vol ×</div><div style="width:65px;text-align:right;flex-shrink:0">ATR%</div><div style="width:90px;text-align:right;flex-shrink:0">ATR/50MA</div>';
   body.appendChild(hdr);
   results.forEach(r=>{
-    const isGapUp=r.gap.pct>0;
-    const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;padding:0 14px;height:36px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .08s';
+    const isUp=r.today>0;
+    const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;padding:0 14px;height:38px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .08s';
     row.addEventListener('mouseenter',()=>row.style.background='var(--bg3)');row.addEventListener('mouseleave',()=>row.style.background='');
     row.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
     const tk=document.createElement('div');tk.style.cssText='width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:11px;flex-shrink:0';tk.textContent=r.ticker;
     const th=document.createElement('div');th.style.cssText='flex:1;font-size:11px;color:#cdd6e8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';th.textContent=r.theme;
-    const price=document.createElement('div');price.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:#fff;flex-shrink:0';price.textContent='$'+r.price.toFixed(2);
-    const gapDate=document.createElement('div');gapDate.style.cssText='width:80px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';gapDate.textContent=r.gap.date;
-    const gapPct=document.createElement('div');gapPct.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;font-weight:500;flex-shrink:0;color:'+(isGapUp?'var(--green)':'var(--red)');gapPct.textContent=(isGapUp?'+':'')+r.gap.pct.toFixed(1)+'%';
-    const pct20=document.createElement('div');pct20.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';pct20.style.color=r.pctFrom20<1?'var(--green)':r.pctFrom20<2?'var(--amber)':'var(--text2)';pct20.textContent=r.pctFrom20.toFixed(2)+'%';
-    const pct50=document.createElement('div');pct50.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';pct50.style.color=r.pctFrom50!=null?(r.pctFrom50<1?'var(--green)':r.pctFrom50<2?'var(--amber)':'var(--text2)'):'var(--text2)';pct50.textContent=r.pctFrom50!=null?r.pctFrom50.toFixed(2)+'%':'—';
+    const price=document.createElement('div');price.style.cssText='width:80px;text-align:right;font-family:var(--mono);font-size:11px;color:#fff;flex-shrink:0';price.textContent='$'+r.price.toFixed(2);
+    const todayEl=document.createElement('div');todayEl.style.cssText='width:90px;text-align:right;font-family:var(--mono);font-size:13px;font-weight:600;flex-shrink:0;color:'+(isUp?'var(--green)':'var(--red)');todayEl.textContent=(isUp?'+':'')+r.today.toFixed(2)+'%';
+    const vol=document.createElement('div');vol.style.cssText='width:70px;text-align:right;flex-shrink:0';vol.appendChild(volChip(r.volume,r.avgVolume));
     const atrPctEl=document.createElement('div');atrPctEl.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';atrPctEl.style.color=r.atrPct>=8?'var(--green)':r.atrPct>=4?'#fff':'#c0cce0';atrPctEl.textContent=r.atrPct?r.atrPct.toFixed(1)+'%':'—';
     const atrMAEl=document.createElement('div');atrMAEl.style.cssText='width:90px;text-align:right;flex-shrink:0';atrMAEl.appendChild(atrBar(r.atrMA??null));
-    const vol=document.createElement('div');vol.style.cssText='width:70px;text-align:right;flex-shrink:0';vol.appendChild(volChip(r.volume,r.avgVolume));
-    const today=document.createElement('div');today.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';today.className=pc(r.today);today.textContent=f2(r.today);
-    row.append(tk,th,price,gapDate,gapPct,pct20,pct50,atrPctEl,atrMAEl,vol,today);body.appendChild(row);
+    row.append(tk,th,price,todayEl,vol,atrPctEl,atrMAEl);body.appendChild(row);
   });
 }
 // ── MULTI-SELECT ──────────────────────────────────────────────────────────────
