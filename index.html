@@ -1765,7 +1765,7 @@ function buildScanResults(thresh, volOnly, minAtrPct, minDVol, direction, scanTF
   // Header
   const hdr=document.createElement('div');
   hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
-  const h50Static=(t,w,extra='')=>{const d=document.createElement('div');d.style.cssText='width:'+w+';text-align:right;flex-shrink:0;'+extra;d.textContent=t;return d;};
+  const h50Static=(t,w,extra='')=>{const d=document.createElement('div');d.style.cssText='width:'+w+';text-align:right;flex-shrink:0;'+extra;d.textContent=t;addColumnTip(d,t);return d;};
   const h50Left=(t,w)=>{const d=document.createElement('div');d.style.cssText='width:'+w+';flex-shrink:0';d.textContent=t;return d;};
   hdr.append(
     h50Left('Ticker','60px'),
@@ -2974,6 +2974,7 @@ function renderExtHistFromCache(container, allBucketData, activeTabIdx){
       const arrow=document.createElement('span');arrow.className='sort-arrow';
       arrow.textContent=histSort.col===col?(histSort.dir==='desc'?' \u25bc':' \u25b2'):'';
       h.textContent=label;h.appendChild(arrow);
+      addColumnTip(h,label.replace('Peak ',''));
       h.addEventListener('click',()=>{
         histSort.dir=histSort.col===col&&histSort.dir==='desc'?'asc':'desc';
         histSort.col=col;
@@ -3622,9 +3623,11 @@ async function removeFromWatchlist(ticker){
 // ── TOOLTIPS ─────────────────────────────────────────────────────────────────
 const COLUMN_TIPS = {
   "Vol ×":     "Today's volume divided by yesterday's volume. Values above 1.5x (amber) or 2x (green) indicate elevated activity.",
+  "Vol x":     "Today's volume divided by yesterday's volume. Values above 1.5x (amber) or 2x (green) indicate elevated activity.",
   "ATR":       "14-period Average True Range in dollars. Measures the average daily price movement range over the last 14 trading days.",
   "Vol %":     "ATR divided by Price x 100. Shows daily volatility as a percentage of price — useful for comparing stocks at different price levels.",
   "ATR/50MA":  "(Price minus 50-day MA) divided by ATR. How many ATR units price is above (+) or below (-) the 50-day moving average. Matches the TradingView companion script.",
+  "ATR/20MA":  "(Price minus 20-day MA) divided by ATR. How many ATR units price is above (+) or below (-) the 20-day moving average.",
   "RS":        "Relative Strength score 1-99. Weighted rank across 5 timeframes (Today x2, 1W x2, 1M x1.5, 3M x1, YTD x0.5). Higher = stronger momentum.",
   "% from Entry": "(Current Price minus Entry Price) divided by Entry Price x 100. For shorts, sign is flipped — a price increase shows as a loss.",
   "P&L %":     "Unrealized gain/loss as a percentage of your cost basis (Entry Price x Shares).",
@@ -3684,6 +3687,72 @@ function mkH(label, col){
   }
   h.style.textAlign=col==='ticker'?'left':'right';
   h.addEventListener('click',()=>{if(typeof tipDiv!=='undefined'&&tipDiv)tipDiv.style.display='none';drillSort.dir=drillSort.col===col&&drillSort.dir==='desc'?'asc':'desc';drillSort.col=col;renderDrill(drillFilter);});
+  return h;
+}
+
+function addColumnTip(container, label){
+  const tip=COLUMN_TIPS[label]||COLUMN_TIPS[label.replace('WMA','MA')];
+  if(!tip) return;
+  const icon=document.createElement('span');
+  icon.textContent=' ⓘ';
+  icon.style.cssText='font-size:9px;opacity:0.5;cursor:help;vertical-align:middle';
+  container.appendChild(icon);
+  const tipDiv=document.createElement('div');
+  tipDiv.style.cssText='display:none;position:fixed;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:8px 10px;font-size:11px;font-family:var(--sans);line-height:1.5;width:220px;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.5);font-weight:400;text-align:left;white-space:normal;pointer-events:none';
+  tipDiv.textContent=tip;
+  setTimeout(()=>{if(!tipDiv.parentElement)document.body.appendChild(tipDiv);},0);
+  icon.addEventListener('click',(e)=>{
+    e.stopPropagation();
+    if(tipDiv.style.display==='block'){tipDiv.style.display='none';return;}
+    document.querySelectorAll('.__pulse_tip').forEach(t=>t.style.display='none');
+    tipDiv.classList.add('__pulse_tip');
+    const r=icon.getBoundingClientRect();
+    tipDiv.style.display='block';
+    const pr=tipDiv.getBoundingClientRect();
+    let top=r.top-pr.height-6;
+    if(top<8) top=r.bottom+6;
+    let left=r.left+(r.width-pr.width)/2;
+    if(left<8) left=8;
+    if(left+pr.width>window.innerWidth-8) left=window.innerWidth-pr.width-8;
+    tipDiv.style.top=top+'px';
+    tipDiv.style.left=left+'px';
+  });
+  document.addEventListener('click',()=>tipDiv.style.display='none');
+}
+
+function mkHStatic(label, align){
+  const h=document.createElement('th');
+  const tip=COLUMN_TIPS[label];
+  h.style.textAlign=align||'right';
+  if(tip){
+    const inner=document.createElement('span');inner.textContent=label;
+    const icon=document.createElement('span');icon.textContent=' ⓘ';
+    icon.style.cssText='font-size:9px;opacity:0.5;cursor:help;vertical-align:middle';
+    const tipDiv=document.createElement('div');
+    tipDiv.style.cssText='display:none;position:fixed;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:8px 10px;font-size:11px;font-family:var(--sans);line-height:1.5;width:220px;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.5);font-weight:400;text-align:left;white-space:normal;pointer-events:none';
+    tipDiv.textContent=tip;
+    h.append(inner,icon);
+    setTimeout(()=>{if(!tipDiv.parentElement)document.body.appendChild(tipDiv);},0);
+    icon.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      if(tipDiv.style.display==='block'){tipDiv.style.display='none';return;}
+      document.querySelectorAll('.__pulse_tip').forEach(t=>t.style.display='none');
+      tipDiv.classList.add('__pulse_tip');
+      const r=icon.getBoundingClientRect();
+      tipDiv.style.display='block';
+      const pr=tipDiv.getBoundingClientRect();
+      let top=r.top-pr.height-6;
+      if(top<8) top=r.bottom+6;
+      let left=r.left+(r.width-pr.width)/2;
+      if(left<8) left=8;
+      if(left+pr.width>window.innerWidth-8) left=window.innerWidth-pr.width-8;
+      tipDiv.style.top=top+'px';
+      tipDiv.style.left=left+'px';
+    });
+    document.addEventListener('click',()=>tipDiv.style.display='none');
+  } else {
+    h.textContent=label;
+  }
   return h;
 }
 
@@ -3796,7 +3865,7 @@ function build20MAScan(thresh,minAtrPct,minDVol,direction,scanTF,body){
   };
 
   const hdr=document.createElement('div');hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
-  const h20s=(t,w)=>{const d=document.createElement('div');d.style.cssText='width:'+w+';text-align:right;flex-shrink:0';d.textContent=t;return d;};
+  const h20s=(t,w)=>{const d=document.createElement('div');d.style.cssText='width:'+w+';text-align:right;flex-shrink:0';d.textContent=t;addColumnTip(d,t);return d;};
   hdr.append(
     (()=>{const d=document.createElement('div');d.style.cssText='width:60px;flex-shrink:0';d.textContent='Ticker';return d;})(),
     (()=>{const d=document.createElement('div');d.style.cssText='flex:1';d.textContent='Theme';return d;})(),
@@ -3905,8 +3974,7 @@ function renderTickerSearch(q){
   const tbl=document.createElement('table');
   const thead=document.createElement('thead');const hrow=document.createElement('tr');
   ['Ticker','Theme','Price','Vol ×','ATR','Vol %','ATR/50MA',...TFS.map(t=>t==='today'?'Today':t)].forEach((lbl,i)=>{
-    const th=document.createElement('th');th.textContent=lbl;
-    th.style.textAlign=i<2?'left':'right';hrow.appendChild(th);
+    hrow.appendChild(mkHStatic(lbl,i<2?'left':'right'));
   });
   thead.appendChild(hrow);tbl.appendChild(thead);
 
