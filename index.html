@@ -135,6 +135,7 @@ tr:hover td{background:var(--bg3)}
   <div class="tab" id="tab-scan" onclick="setTab('scan')">50MA Scan</div>
   <div class="tab" id="tab-gaps" onclick="setTab('gaps')">Morning Gaps</div>
   <div class="tab" id="tab-ext" onclick="setTab('ext')">Extension</div>
+  <div class="tab" id="tab-softs" onclick="setTab('softs')">Softs Weather</div>
   <div class="tab" id="tab-positions" onclick="setTab('positions')">Positions</div>
   <div class="right">
     <input class="si" id="gsearch" placeholder="Search or AAPL/QQQ..." oninput="onSearch(this.value)">
@@ -222,10 +223,10 @@ const THEMES=[
   {id:'cloud',name:'Cloud Infrastructure',etf:'SKYY',tickers:['AMZN','MSFT','GOOGL','CRM','SNOW','NET','DDOG','MDB','ESTC','GTLB','ORCL','CFLT','HUBS','ZS','ANET','CDNS','IBM']},
   {id:'cyber',name:'Cybersecurity',etf:'CIBR',tickers:['CRWD','PANW','ZS','S','FTNT','TENB','CYBR','OKTA','RPD','VRNS','SAIL','QLYS','DDOG','RBRK','BB','RDWR']},
   {id:'comp_hw',name:'Computer Hardware',etf:'IGPT',tickers:['AAPL','DELL','HPQ','HPE','STX','WDC','NTAP','PSTG','SMCI','VRT','POWL','CRSR','CLS']},
-  {id:'fintech',name:'Fintech',etf:'FINX',tickers:['XYZ','PYPL','AFRM','UPST','SOFI','HOOD','COIN','LC','MSTR','CRCL','IPAY','SEZL','FOUR']},
+  {id:'fintech',name:'Fintech',etf:'FINX',tickers:['XYZ','PYPL','AFRM','UPST','SOFI','HOOD','COIN','LC','MSTR','CRCL','IPAY','SEZL','FOUR','CHYM']},
   {id:'btc_miners',name:'Bitcoin Miners / HPC',etf:'WGMI',tickers:['MARA','RIOT','CLSK','WULF','CORZ','HUT','IREN','BTBT','HIVE','CIFR','APLD','BTDR','NBTC','KEEL','GLXY','FWDI']},
   {id:'fin_data',name:'Financial Data & Exchanges',etf:'IAI',tickers:['MSCI','ICE','CME','NDAQ','SPGI','MCO','FDS','MKTX','TW','CBOE']},
-  {id:'space',name:'Space',etf:'UFO',tickers:['RKLB','LUNR','ASTS','PL','SPIR','BKSY','RDW','SATL','IRDM','MNTS','ACHR','JOBY']},
+  {id:'space',name:'Space',etf:'UFO',tickers:['RKLB','LUNR','ASTS','PL','SPIR','BKSY','RDW','SATL','IRDM','MNTS','ACHR','JOBY','SPCX']},
   {id:'ev',name:'Electric Vehicles',etf:'DRIV',tickers:['TSLA','RIVN','LCID','NIO','LI','XPEV','MVST','F']},
   {id:'reit_office',name:'REIT - Office',etf:'',tickers:['BXP','SLG','HIW','PDM','DEA','PGRE','ESRT','VNO','SPG','WELL']},
   {id:'re_dev',name:'Real Estate Development',etf:'ITB',tickers:['CBRE','JLL','FPH','HHH','JBGS','Z']},
@@ -236,7 +237,7 @@ const THEMES=[
   {id:'cons_cyc',name:'Consumer Cyclical',etf:'XLY',tickers:['HD','MCD','LOW','NKE','BKNG','TJX','SBUX','CMG','YUM','ABNB','RCL','CCL','MGM','WYNN','LVS','ORLY','AZO','DKS','EBAY','ETSY','LYFT','UBER','DASH','PDD','CAR','PTON','SE','PTRN']},
   {id:'cons_disc',name:'Retail / Apparel',etf:'XRT',tickers:['WMT','TGT','COST','DLTR','DG','ROST','ANF','AEO','LULU','URBN','GAP','VSXY']},
   {id:'cons_staples',name:'Consumer Staples',etf:'XLP',tickers:['PG','KO','PEP','PM','MO','CL','KMB','GIS','K','HSY','CAG','MKC','CELH','ELF','MDLZ','KHC','CALM','BYND']},
-  {id:'restaurants',name:'Restaurants / Leisure',etf:'EATZ',tickers:['MCD','SBUX','CMG','YUM','QSR','DPZ','SHAK','JACK','CAKE','CAVA','EAT']},
+  {id:'restaurants',name:'Restaurants / Leisure',etf:'EATZ',tickers:['MCD','SBUX','CMG','YUM','QSR','DPZ','SHAK','JACK','CAKE','CAVA','EAT','CBRL']},
   {id:'med_devices',name:'Medical Devices',etf:'IHI',tickers:['MDT','ABT','ISRG','SYK','BSX','EW','ZBH','DXCM','PODD','INMD','TNDM','GMED','ALGN','NTRA','ATEC','IRTC','NVRO','RVTY','TMDX','GRAL','WGS','HNGE','BFLY','BLLN']},
   {id:'pharma',name:'Pharmaceuticals',etf:'PPH',tickers:['JNJ','PFE','MRK','ABBV','BMY','AMGN','GILD','BIIB','REGN','VRTX','GSK','AZN','TEVA','GMAB','JAZZ','LNTH']},
   {id:'hospitals',name:'Healthcare / Hospitals',etf:'XLV',tickers:['UNH','CVS','CI','HUM','CNC','MOH','ELV','HCA','THC','UHS','TEM','OMCL','GDRX','OSCR']},
@@ -918,6 +919,7 @@ function renderMain(){
   if(tab==='positions'){renderPositions();return;}
   if(tab==='gaps'){renderGaps();return;}
   if(tab==='ext'){renderExtension();return;}
+  if(tab==='softs'){renderSofts();return;}
   if(tab==='20ma'){render20MAScan();return;}
   if(drillId){renderDrill();return;}
   view==='heat'?renderHeat():renderList();
@@ -2272,6 +2274,183 @@ function renderPositions(){
   main.innerHTML='';main.appendChild(wrap);
 }
 
+
+// ── SOFTS WEATHER (ENSO + Rainfall) ────────────────────────────────────────
+const WEATHER_URL='https://pulse-export.vercel.app/api/weather';
+let softsData=null,softsLoading=false;
+
+function loadSoftsCache(){
+  try{
+    const d=localStorage.getItem('tt_weather');
+    if(d) softsData=JSON.parse(d);
+  }catch(e){}
+}
+function saveSoftsCache(){
+  try{localStorage.setItem('tt_weather',JSON.stringify(softsData));localStorage.setItem('tt_weather_time',new Date().toISOString());}catch(e){}
+}
+
+async function fetchSoftsData(body){
+  softsLoading=true;renderSoftsBody(body);
+  try{
+    const r=await fetch(WEATHER_URL);
+    if(!r.ok) throw new Error('Server error '+r.status);
+    softsData=await r.json();
+    saveSoftsCache();
+  }catch(err){
+    softsData={error:err.message};
+  }
+  softsLoading=false;renderSoftsBody(body);
+}
+
+function ensoTrendChart(trend){
+  const w=230,h=54,pad=4;
+  const vals=trend.map(t=>t.anom);
+  const mx=Math.max(1.5,...vals.map(Math.abs));
+  const bw=(w-pad*2)/trend.length;
+  let bars='';
+  trend.forEach((t,i)=>{
+    const x=pad+i*bw;
+    const bh=Math.abs(t.anom)/mx*(h/2-6);
+    const y=t.anom>=0?(h/2-bh):(h/2);
+    const col=t.anom>=0.5?'#f5a623':t.anom<=-0.5?'#2d8cff':'#3a4455';
+    bars+='<rect x="'+(x+1)+'" y="'+y+'" width="'+(bw-2)+'" height="'+Math.max(bh,1)+'" fill="'+col+'" rx="1"/>';
+  });
+  return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg">'+
+    '<line x1="0" y1="'+(h/2)+'" x2="'+w+'" y2="'+(h/2)+'" stroke="#3a4455" stroke-width="1"/>'+bars+'</svg>';
+}
+
+function rainMiniChart(monthly){
+  const w=240,h=76,padB=14,padT=4;
+  const allVals=monthly.flatMap(m=>[m.actual,m.normal||0]);
+  const mx=Math.max(1,...allVals)*1.15;
+  const bw=(w)/monthly.length;
+  let bars='';
+  monthly.forEach((m,i)=>{
+    const x=i*bw;
+    const bh=(h-padB-padT)*(m.actual/mx);
+    const y=h-padB-bh;
+    const wet=m.normal!=null?m.actual>=m.normal:true;
+    const col=m.isCurrent?'#6b7a90':(wet?'#00c97a':'#ff3d55');
+    bars+='<rect x="'+(x+3)+'" y="'+y+'" width="'+(bw-6)+'" height="'+Math.max(bh,1)+'" fill="'+col+'" opacity="'+(m.isCurrent?'0.55':'0.9')+'" rx="1"/>';
+    if(m.normal!=null){
+      const ny=h-padB-(h-padB-padT)*(m.normal/mx);
+      bars+='<line x1="'+(x+2)+'" y1="'+ny+'" x2="'+(x+bw-2)+'" y2="'+ny+'" stroke="#cdd6e8" stroke-width="1.5" stroke-dasharray="2,1.5"/>';
+    }
+    bars+='<text x="'+(x+bw/2)+'" y="'+(h-2)+'" font-size="7" fill="#6b7a90" text-anchor="middle" font-family="IBM Plex Mono,monospace">'+m.label+'</text>';
+  });
+  return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg">'+bars+'</svg>';
+}
+
+function renderSofts(){
+  const main=document.getElementById('main');
+  const wrap=document.createElement('div');
+  wrap.style.cssText='display:flex;flex-direction:column;height:100%;overflow:hidden';
+
+  const ctrl=document.createElement('div');
+  ctrl.style.cssText='display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--border2);background:var(--bg2);flex-shrink:0;flex-wrap:wrap';
+  const lbl=document.createElement('span');lbl.style.cssText='font-size:12px;color:#fff;font-family:var(--mono)';lbl.textContent='Softs / Weather — ENSO + Cocoa & Coffee Belt Rainfall';
+  const refreshBtn=document.createElement('button');
+  refreshBtn.className='sbtn';refreshBtn.textContent='⟳ Refresh';
+  const sep=document.createElement('span');sep.style.cssText='color:var(--border2)';sep.textContent='|';
+  const chartsLbl=document.createElement('span');chartsLbl.style.cssText='font-size:11px;color:var(--text2);font-family:var(--mono)';chartsLbl.textContent='Charts:';
+  const mkChartLink=(sym,label)=>{
+    const a=document.createElement('button');
+    a.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--blue);font-family:var(--mono);font-size:11px;padding:3px 8px;cursor:pointer';
+    a.textContent=label;
+    a.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+sym,'_blank'));
+    return a;
+  };
+  const updEl=document.createElement('span');updEl.id='softs-updated';updEl.style.cssText='font-size:10px;color:var(--text3);font-family:var(--mono);margin-left:auto';
+  ctrl.append(lbl,refreshBtn,sep,chartsLbl,mkChartLink('CC1!','Cocoa'),mkChartLink('KC1!','Coffee'),mkChartLink('SB1!','Sugar'),updEl);
+
+  const body=document.createElement('div');
+  body.id='softs-body';body.style.cssText='flex:1;overflow-y:auto;padding:14px';
+
+  refreshBtn.addEventListener('click',()=>fetchSoftsData(body));
+
+  wrap.append(ctrl,body);
+  main.innerHTML='';main.appendChild(wrap);
+
+  if(!softsData) loadSoftsCache();
+  const t=localStorage.getItem('tt_weather_time');
+  updEl.textContent=t?('Updated '+new Date(t).toLocaleString()):'';
+  if(!softsData){ fetchSoftsData(body); }
+  else renderSoftsBody(body);
+}
+
+function renderSoftsBody(body){
+  const updEl=document.getElementById('softs-updated');
+  const t=localStorage.getItem('tt_weather_time');
+  if(updEl) updEl.textContent=t?('Updated '+new Date(t).toLocaleString()):'';
+
+  if(softsLoading){body.innerHTML='<div class="state"><span class="spin"></span>Fetching ENSO + rainfall data...</div>';return;}
+  if(!softsData||softsData.error){
+    body.innerHTML='<div class="state" style="color:var(--amber)">'+
+      (softsData&&softsData.error?'Weather fetch failed: '+softsData.error:'No data yet')+
+      '<br><span style="font-size:10px;color:var(--text3)">Make sure the weather endpoint is deployed at:<br>'+WEATHER_URL+'</span></div>';
+    return;
+  }
+
+  body.innerHTML='';
+  const grid=document.createElement('div');
+  grid.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px';
+
+  // ── ENSO card ──
+  if(softsData.enso&&!softsData.enso.error){
+    const e=softsData.enso;
+    const phCol=e.phase==='El Niño'?'var(--amber)':e.phase==='La Niña'?'var(--blue)':'var(--text2)';
+    const phBg=e.phase==='El Niño'?'var(--ad)':e.phase==='La Niña'?'var(--bd)':'var(--bg3)';
+    const card=document.createElement('div');
+    card.style.cssText='background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:14px';
+    card.innerHTML=
+      '<div style="font-size:10px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin-bottom:8px">NOAA CPC ENSO Status</div>'+
+      '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px">'+
+        '<span style="font-size:20px;font-weight:500;color:'+phCol+';background:'+phBg+';padding:2px 10px;border-radius:4px">'+e.phase+'</span>'+
+        '<span style="font-family:var(--mono);font-size:13px;color:var(--text)">RONI '+(e.value>0?'+':'')+e.value.toFixed(2)+'°C</span>'+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--text2);margin-bottom:10px">'+e.seas+' '+e.yr+' — Relative Oceanic Niño Index (replaced ONI, Feb 2026)</div>'+
+      '<div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:4px;text-transform:uppercase">Last 8 Seasons</div>';
+    const chartDiv=document.createElement('div');chartDiv.innerHTML=ensoTrendChart(e.trend);
+    card.appendChild(chartDiv);
+    const note=document.createElement('div');
+    note.style.cssText='font-size:10px;color:var(--text3);margin-top:8px;line-height:1.5';
+    note.textContent='El Niño (amber) tends toward drier West Africa / wetter Brazil; La Niña (blue) the reverse — but relationships are probabilistic, not deterministic.';
+    card.appendChild(note);
+    grid.appendChild(card);
+  } else {
+    const err=document.createElement('div');err.style.cssText='color:var(--red);font-size:11px';err.textContent='ENSO data unavailable'+(softsData.enso&&softsData.enso.error?': '+softsData.enso.error:'');
+    grid.appendChild(err);
+  }
+
+  // ── Rainfall cards ──
+  (softsData.rainfall||[]).forEach(r=>{
+    const card=document.createElement('div');
+    card.style.cssText='background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:14px';
+    if(r.error){
+      card.innerHTML='<div style="font-size:11px;color:var(--text)">'+r.label+'</div><div style="color:var(--red);font-size:11px;margin-top:6px">'+r.error+'</div>';
+      grid.appendChild(card);return;
+    }
+    const anomCol=r.anomalyPct==null?'var(--text2)':r.anomalyPct>=10?'var(--green)':r.anomalyPct<=-10?'var(--red)':'var(--text2)';
+    card.innerHTML=
+      '<div style="font-size:10px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin-bottom:8px">'+r.label+'</div>'+
+      '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px">'+
+        '<span style="font-family:var(--mono);font-size:18px;color:var(--text)">'+r.last30Actual+'mm</span>'+
+        '<span style="font-size:11px;color:var(--text2)">last 30d</span>'+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--text2);margin-bottom:10px">Normal: '+(r.normal!=null?r.normal+'mm':'—')+
+        ' &nbsp;·&nbsp; <span style="color:'+anomCol+';font-weight:500">'+(r.anomalyPct!=null?((r.anomalyPct>0?'+':'')+r.anomalyPct+'% vs normal'):'—')+'</span></div>';
+    const chartDiv=document.createElement('div');chartDiv.innerHTML=rainMiniChart(r.monthly);
+    card.appendChild(chartDiv);
+    grid.appendChild(card);
+  });
+
+  body.appendChild(grid);
+
+  const foot=document.createElement('div');
+  foot.style.cssText='font-size:10px;color:var(--text3);margin-top:14px;line-height:1.6';
+  foot.innerHTML='Sources: NOAA CPC RONI (<a href="https://www.cpc.ncep.noaa.gov/data/indices/RONI.ascii.txt" target="_blank" style="color:var(--text2)">cpc.ncep.noaa.gov</a>) · Rainfall: Open-Meteo / ERA5 reanalysis at fixed reference coordinates per region — actual station siting will vary within each belt, treat as a directional signal, not local ground truth. Dashed line = 10-yr calendar-month normal. Grey bar = current month-to-date (partial).';
+  body.appendChild(foot);
+}
 
 // ── MORNING GAPS ──────────────────────────────────────────────────────────────
 function renderGaps(){
