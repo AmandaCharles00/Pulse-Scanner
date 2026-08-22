@@ -130,6 +130,8 @@ tr:hover td{background:var(--bg3)}
   <div class="tab on" id="tab-sectors" onclick="setTab('sectors')">Sectors</div>
   <div class="tab" id="tab-themes" onclick="setTab('themes')">Themes</div>
   <div class="tab" id="tab-movers" onclick="setTab('movers')">Top Movers</div>
+  <div class="tab" id="tab-hilo" onclick="setTab('hilo')">Highs / Lows</div>
+  <div class="tab" id="tab-news" onclick="setTab('news')">Ticker News</div>
   <div class="tab" id="tab-alerts" onclick="setTab('alerts')">Alerts</div>
   <div class="tab" id="tab-20ma" onclick="setTab('20ma')">20MA Scan</div>
   <div class="tab" id="tab-scan" onclick="setTab('scan')">50MA Scan</div>
@@ -893,6 +895,7 @@ document.getElementById('apiKey').addEventListener('input',function(){localStora
 
 // ── NAVIGATION ────────────────────────────────────────────────────────────────
 function setTab(t){
+  if(tab==='news'&&t!=='news')pauseNewsCycle();
   tab=t;drillId=null;
   document.querySelectorAll('.tab').forEach(el=>el.classList.remove('on'));
   document.getElementById('tab-'+t).classList.add('on');
@@ -914,6 +917,8 @@ function renderMain(){
   if(ob) ob.style.display='none';
   if(tab==='sectors'){renderSectors();return;}
   if(tab==='movers'){renderMovers();return;}
+  if(tab==='hilo'){renderHighsLows();return;}
+  if(tab==='news'){renderTickerNews();return;}
   if(tab==='alerts'){renderAlertSettings();return;}
   if(tab==='scan'){renderScan();return;}
   if(tab==='positions'){renderPositions();return;}
@@ -1132,6 +1137,345 @@ function renderMovers(){
   };
   cols.append(mkSec(gainers,true),mkSec(losers,false));pv.appendChild(cols);
   main.innerHTML='';main.appendChild(pv);
+}
+
+// ── HIGHS / LOWS ──────────────────────────────────────────────────────────────
+// Uses the daily closes already fetched during Sync (cache[tk].closes, chronological
+// asc, ~450 calendar days / ~300 trading sessions — a workable proxy for 52-week).
+// "Hits" = how many times, within that lookback window, the ticker closed at a
+// fresh record high (or low) — i.e. how often it's been "making new ground."
+// Note: closes/bars are session-only (not persisted to localStorage — see saveCache),
+// so this tab needs a fresh Sync each session to populate.
+let hiloSelected=null;
+
+function computeHighsLows(){
+  const rows=[];
+  const seen=new Set();
+  getThemesWithWatchlist().forEach(th=>{
+    th.tickers.forEach(tk=>{
+      if(seen.has(tk))return;
+      const d=cache[tk];
+      if(!d||d.stale||isOTC(tk))return;
+      const closes=d.closes;
+      if(!closes||closes.length<20)return;
+      seen.add(tk);
+      let hi=-Infinity,lo=Infinity,hiHits=0,loHits=0;
+      closes.forEach(c=>{if(c>hi){hi=c;hiHits++;}if(c<lo){lo=c;loHits++;}});
+      const last=closes[closes.length-1];
+      const isNewHigh=last>=hi-1e-6;
+      const isNewLow=last<=lo+1e-6;
+      if(isNewHigh||isNewLow){
+        rows.push({ticker:tk,theme:th.name,isNewHigh,isNewLow,hits:isNewHigh?hiHits:loHits,hi52:+hi.toFixed(2),lo52:+lo.toFixed(2),price:d.price,today:d.today});
+      }
+    });
+  });
+  return rows;
+}
+
+function renderHighsLows(){
+  const main=document.getElementById('main');
+  const rows=computeHighsLows();
+
+  if(!rows.length){
+    const anyBars=Object.keys(cache).some(tk=>cache[tk]&&cache[tk].closes&&cache[tk].closes.length);
+    main.innerHTML='<div class="state">'+
+      (anyBars?'No new highs or lows in the current data.':'No bar history in memory — hit Sync first.<br><span style="font-size:10px;color:var(--text3)">Highs/Lows uses per-day closes, which aren\'t cached across page reloads — a fresh Sync each session repopulates them.</span>')+
+      '</div>';
+    return;
+  }
+
+  const highs=rows.filter(r=>r.isNewHigh).sort((a,b)=>b.hits-a.hits);
+  const lows=rows.filter(r=>r.isNewLow).sort((a,b)=>b.hits-a.hits);
+  const total=highs.length+lows.length;
+  const hiPct=total?Math.round(highs.length/total*100):0;
+  const loPct=100-hiPct;
+
+  const wrap=document.createElement('div');
+  wrap.style.cssText='display:flex;flex-direction:column;height:100%;overflow:hidden';
+
+  const hdr=document.createElement('div');
+  hdr.style.cssText='padding:12px 16px;border-bottom:1px solid var(--border2);background:var(--bg2);flex-shrink:0';
+  const title=document.createElement('div');
+  title.style.cssText='font-size:12px;color:#fff;font-family:var(--mono);margin-bottom:8px';
+  title.innerHTML='⚡ Highs / Lows <span style="color:var(--text3);font-weight:400">— new closing highs/lows across your tracked universe (~18mo lookback)</span>';
+  hdr.appendChild(title);
+
+  const breadthRow=document.createElement('div');
+  breadthRow.style.cssText='display:flex;align-items:center;justify-content:space-between;font-size:11px;font-family:var(--mono);margin-bottom:4px';
+  breadthRow.innerHTML='<span style="color:var(--green)">New Highs '+hiPct+'% ('+highs.length+')</span><span style="color:var(--red)">New Lows '+loPct+'% ('+lows.length+')</span>';
+  hdr.appendChild(breadthRow);
+
+  const barWrap=document.createElement('div');
+  barWrap.style.cssText='height:6px;border-radius:3px;overflow:hidden;display:flex;background:var(--bg4)';
+  const barG=document.createElement('div');barG.style.cssText='width:'+hiPct+'%;background:var(--green)';
+  const barR=document.createElement('div');barR.style.cssText='width:'+loPct+'%;background:var(--red)';
+  barWrap.append(barG,barR);hdr.appendChild(barWrap);
+
+  const body=document.createElement('div');
+  body.id='hilo-body';
+  body.style.cssText='flex:1;overflow-y:auto;padding:14px';
+
+  const mkChip=(r)=>{
+    const isG=r.isNewHigh;
+    const chip=document.createElement('button');
+    chip.style.cssText='display:flex;align-items:center;gap:5px;background:'+(isG?'var(--gd)':'var(--rd)')+';border:1px solid '+(isG?'var(--green)':'var(--red)')+';border-radius:4px;color:'+(isG?'var(--green)':'var(--red)')+';font-family:var(--mono);font-size:12px;font-weight:500;padding:8px 10px;cursor:pointer;text-align:left';
+    chip.innerHTML=(isG?'↑ ':'↓ ')+r.ticker+' <span style="opacity:.6;font-weight:400;margin-left:2px">| '+r.hits+'</span>';
+    chip.addEventListener('click',()=>{hiloSelected=r;renderHiloDetail(r);});
+    return chip;
+  };
+
+  const secH=document.createElement('div');
+  secH.style.cssText='font-size:9px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin:2px 0 6px';
+  secH.textContent='New Highs ('+highs.length+')';
+  const gridH=document.createElement('div');
+  gridH.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px;margin-bottom:16px';
+  highs.forEach(r=>gridH.appendChild(mkChip(r)));
+
+  const secL=document.createElement('div');
+  secL.style.cssText='font-size:9px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin:2px 0 6px';
+  secL.textContent='New Lows ('+lows.length+')';
+  const gridL=document.createElement('div');
+  gridL.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px';
+  lows.forEach(r=>gridL.appendChild(mkChip(r)));
+
+  const detailHolder=document.createElement('div');
+  detailHolder.id='hilo-detail';detailHolder.style.cssText='margin-top:18px';
+
+  body.append(secH,gridH,secL,gridL,detailHolder);
+  wrap.append(hdr,body);
+  main.innerHTML='';main.appendChild(wrap);
+
+  const preselect=(hiloSelected&&rows.find(r=>r.ticker===hiloSelected.ticker))||highs[0]||lows[0];
+  if(preselect){hiloSelected=preselect;renderHiloDetail(preselect);}
+}
+
+function renderHiloDetail(r){
+  const holder=document.getElementById('hilo-detail');
+  if(!holder)return;
+  const isG=r.isNewHigh;
+  holder.innerHTML='';
+  const card=document.createElement('div');
+  card.style.cssText='background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:14px 16px;display:flex;align-items:center;gap:22px;flex-wrap:wrap';
+  card.innerHTML=
+    '<span class="tk" style="font-size:16px">'+r.ticker+'</span>'+
+    '<span style="font-family:var(--mono);font-size:16px;color:var(--text)">'+(r.price!=null?'$'+r.price.toFixed(2):'—')+'</span>'+
+    '<span style="font-family:var(--mono);font-size:13px" class="'+pc(r.today)+'">'+f2(r.today)+'</span>'+
+    '<span style="font-size:11px;color:'+(isG?'var(--green)':'var(--red)')+';font-family:var(--mono)">'+r.hits+' new-'+(isG?'high':'low')+' closes</span>'+
+    '<span style="font-size:11px;color:var(--text2)">'+r.theme+'</span>'+
+    '<span style="font-size:10px;color:var(--text3);font-family:var(--mono)">Range: $'+r.lo52.toFixed(2)+' – $'+r.hi52.toFixed(2)+'</span>';
+  const btn=document.createElement('button');
+  btn.className='dback';btn.style.cssText+='margin-left:auto';btn.textContent='Open Chart →';
+  btn.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
+  card.appendChild(btn);
+  holder.appendChild(card);
+}
+
+// ── TICKER NEWS (auto-cycling) ──────────────────────────────────────────────
+let newsUniverse=[],newsIdx=0,newsPlaying=false,newsCycleSec=20,newsElapsed=0;
+let newsAdvanceTimer=null,newsProgTimer=null;
+const newsCache={}; // ticker -> {articles,fetchedAt}
+const NEWS_TTL=10*60*1000;
+
+function getNewsUniverse(){
+  const seen=new Set();const list=[];
+  getThemesWithWatchlist().forEach(th=>th.tickers.forEach(tk=>{
+    if(!seen.has(tk)&&!isOTC(tk)){seen.add(tk);list.push(tk);}
+  }));
+  return list;
+}
+
+async function fetchNewsFor(ticker){
+  const cached=newsCache[ticker];
+  if(cached&&(Date.now()-cached.fetchedAt)<NEWS_TTL) return cached.articles;
+  const key=document.getElementById('apiKey').value.trim();
+  if(!key) return null; // signal "no key" distinctly from "no articles"
+  try{
+    const r=await fetch('https://api.polygon.io/v2/reference/news?ticker='+encodeURIComponent(ticker)+'&limit=8&order=desc&sort=published_utc&apiKey='+key);
+    const d=await r.json();
+    const articles=(d.results||[]).map(a=>({
+      title:a.title,
+      publisher:(a.publisher&&a.publisher.name)||'',
+      logo:(a.publisher&&a.publisher.logo_url)||'',
+      url:a.article_url,
+      published:a.published_utc,
+      desc:a.description||''
+    }));
+    newsCache[ticker]={articles,fetchedAt:Date.now()};
+    return articles;
+  }catch(e){return [];}
+}
+
+function timeAgo(iso){
+  if(!iso)return'';
+  const mins=Math.round((Date.now()-new Date(iso).getTime())/60000);
+  if(mins<1)return'just now';
+  if(mins<60)return mins+'m ago';
+  const hrs=Math.round(mins/60);
+  if(hrs<24)return hrs+'h ago';
+  return Math.round(hrs/24)+'d ago';
+}
+
+function renderTickerNews(){
+  const main=document.getElementById('main');
+  newsUniverse=getNewsUniverse();
+  if(!newsUniverse.length){main.innerHTML='<div class="state">No tickers tracked yet.</div>';return;}
+  if(newsIdx>=newsUniverse.length)newsIdx=0;
+
+  const wrap=document.createElement('div');
+  wrap.style.cssText='display:flex;flex-direction:column;height:100%;overflow:hidden';
+
+  const ctrl=document.createElement('div');
+  ctrl.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border2);background:var(--bg2);flex-shrink:0;flex-wrap:wrap';
+
+  const prevBtn=document.createElement('button');prevBtn.className='xbtn';prevBtn.textContent='← Prev';
+  const nextBtn=document.createElement('button');nextBtn.className='xbtn';nextBtn.textContent='Next →';
+  const posEl=document.createElement('span');posEl.id='news-pos';posEl.style.cssText='font-family:var(--mono);font-size:11px;color:var(--text2);width:90px;text-align:center;flex-shrink:0';
+  const playBtn=document.createElement('button');playBtn.className='sbtn';playBtn.id='news-play';playBtn.textContent='▶ Play';
+  const jumpIn=document.createElement('input');jumpIn.className='si';jumpIn.placeholder='Jump to ticker...';jumpIn.style.width='120px';
+
+  prevBtn.addEventListener('click',()=>{stepNews(-1);});
+  nextBtn.addEventListener('click',()=>{stepNews(1);});
+  playBtn.addEventListener('click',()=>{newsPlaying?pauseNewsCycle():playNewsCycle();});
+  jumpIn.addEventListener('keydown',e=>{
+    if(e.key!=='Enter')return;
+    const q=jumpIn.value.trim().toUpperCase();
+    const i=newsUniverse.indexOf(q);
+    if(i>=0){newsIdx=i;jumpIn.value='';resetNewsProgress();loadCurrentNews();startNewsTickIfPlaying();}
+  });
+
+  const progWrap=document.createElement('div');
+  progWrap.style.cssText='flex:1;min-width:80px;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin:0 4px';
+  const progBar=document.createElement('div');progBar.id='news-prog';progBar.style.cssText='height:100%;width:0%;background:var(--blue);transition:width .2s linear';
+  progWrap.appendChild(progBar);
+
+  ctrl.append(prevBtn,posEl,nextBtn,playBtn,progWrap,jumpIn);
+
+  const body=document.createElement('div');
+  body.id='news-body';body.style.cssText='flex:1;overflow-y:auto;padding:14px';
+
+  wrap.append(ctrl,body);
+  main.innerHTML='';main.appendChild(wrap);
+
+  loadCurrentNews();
+}
+
+function stepNews(delta){
+  newsIdx=(newsIdx+delta+newsUniverse.length)%newsUniverse.length;
+  resetNewsProgress();
+  loadCurrentNews();
+  startNewsTickIfPlaying();
+}
+
+async function loadCurrentNews(){
+  const ticker=newsUniverse[newsIdx];
+  const body=document.getElementById('news-body');
+  const posEl=document.getElementById('news-pos');
+  if(!body||!posEl)return; // tab navigated away mid-fetch
+  posEl.textContent=ticker+' ('+(newsIdx+1)+'/'+newsUniverse.length+')';
+
+  const d=cache[ticker]||{};
+  const bars=d.bars;
+  const lastBar=bars&&bars.length?bars[bars.length-1]:null;
+  const prevBar=bars&&bars.length>1?bars[bars.length-2]:null;
+  const theme=(getThemesWithWatchlist().find(th=>th.tickers.includes(ticker))||{}).name||'';
+
+  body.innerHTML='';
+  const quote=document.createElement('div');
+  quote.style.cssText='background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:14px 16px;margin-bottom:14px';
+  quote.innerHTML=
+    '<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px">'+
+      '<span class="tk" style="font-size:18px">'+ticker+'</span>'+
+      '<span style="font-size:11px;color:var(--text2)">'+theme+'</span>'+
+      '<span style="font-family:var(--mono);font-size:18px;color:var(--text);margin-left:auto">'+(d.price!=null?'$'+d.price.toFixed(2):'—')+'</span>'+
+      '<span style="font-family:var(--mono);font-size:14px" class="'+pc(d.today)+'">'+f2(d.today)+'</span>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;font-family:var(--mono);font-size:11px">'+
+      '<div><div style="color:var(--text3);font-size:9px;text-transform:uppercase;margin-bottom:2px">Open</div>'+(lastBar&&lastBar.o!=null?'$'+lastBar.o.toFixed(2):'—')+'</div>'+
+      '<div><div style="color:var(--text3);font-size:9px;text-transform:uppercase;margin-bottom:2px">High</div>'+(lastBar&&lastBar.h!=null?'$'+lastBar.h.toFixed(2):'—')+'</div>'+
+      '<div><div style="color:var(--text3);font-size:9px;text-transform:uppercase;margin-bottom:2px">Low</div>'+(lastBar&&lastBar.l!=null?'$'+lastBar.l.toFixed(2):'—')+'</div>'+
+      '<div><div style="color:var(--text3);font-size:9px;text-transform:uppercase;margin-bottom:2px">Prev Close</div>'+(prevBar&&prevBar.c!=null?'$'+prevBar.c.toFixed(2):'—')+'</div>'+
+      '<div><div style="color:var(--text3);font-size:9px;text-transform:uppercase;margin-bottom:2px">Volume</div>'+(d.volume?(d.volume/1e6).toFixed(2)+'M':'—')+'</div>'+
+    '</div>';
+  const chartBtn=document.createElement('button');
+  chartBtn.className='xbtn';chartBtn.style.cssText='margin-top:10px';chartBtn.textContent='Open Chart →';
+  chartBtn.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+ticker,'_blank'));
+  quote.appendChild(chartBtn);
+  body.appendChild(quote);
+
+  const newsHdr=document.createElement('div');
+  newsHdr.style.cssText='font-size:9px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin-bottom:8px';
+  newsHdr.textContent='Latest News';
+  body.appendChild(newsHdr);
+
+  const listHolder=document.createElement('div');listHolder.id='news-list';
+  listHolder.innerHTML='<div class="state" style="padding:20px;color:var(--text2)"><span class="spin"></span>Loading news...</div>';
+  body.appendChild(listHolder);
+
+  const articles=await fetchNewsFor(ticker);
+  // Bail if the user has since moved to a different ticker or left the tab
+  if(newsUniverse[newsIdx]!==ticker||!document.getElementById('news-list'))return;
+  const freshHolder=document.getElementById('news-list');
+  freshHolder.innerHTML='';
+
+  if(articles===null){
+    freshHolder.innerHTML='<div style="color:var(--amber);font-size:11px">Enter your Polygon API key at top right to load news.</div>';
+    return;
+  }
+  if(!articles.length){
+    freshHolder.innerHTML='<div style="color:var(--text3);font-size:11px">No recent news found for '+ticker+'.</div>';
+    return;
+  }
+  articles.forEach(a=>{
+    const card=document.createElement('div');
+    card.style.cssText='display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer';
+    card.addEventListener('click',()=>window.open(a.url,'_blank'));
+    const logo=document.createElement('div');
+    logo.style.cssText='width:32px;height:32px;border-radius:4px;background:var(--bg3);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text3)';
+    if(a.logo){
+      const img=document.createElement('img');img.src=a.logo;img.style.cssText='width:100%;height:100%;object-fit:contain';img.onerror=()=>{logo.textContent='📰';};
+      logo.appendChild(img);
+    } else logo.textContent='📰';
+    const info=document.createElement('div');info.style.cssText='flex:1;min-width:0';
+    info.innerHTML=
+      '<div style="font-size:12px;color:var(--text);line-height:1.4;margin-bottom:3px">'+a.title+'</div>'+
+      '<div style="font-size:10px;color:var(--text3);font-family:var(--mono)">'+(a.publisher||'')+(a.publisher?' · ':'')+timeAgo(a.published)+'</div>';
+    card.append(logo,info);
+    freshHolder.appendChild(card);
+  });
+}
+
+function playNewsCycle(){
+  newsPlaying=true;
+  const btn=document.getElementById('news-play');if(btn)btn.textContent='⏸ Pause';
+  resetNewsProgress();
+  tickNewsProgress();
+}
+function pauseNewsCycle(){
+  newsPlaying=false;
+  const btn=document.getElementById('news-play');if(btn)btn.textContent='▶ Play';
+  if(newsAdvanceTimer){clearTimeout(newsAdvanceTimer);newsAdvanceTimer=null;}
+  if(newsProgTimer){clearInterval(newsProgTimer);newsProgTimer=null;}
+}
+function resetNewsProgress(){
+  newsElapsed=0;
+  const bar=document.getElementById('news-prog');if(bar)bar.style.width='0%';
+  if(newsAdvanceTimer){clearTimeout(newsAdvanceTimer);newsAdvanceTimer=null;}
+  if(newsProgTimer){clearInterval(newsProgTimer);newsProgTimer=null;}
+}
+function startNewsTickIfPlaying(){
+  if(newsPlaying)tickNewsProgress();
+}
+function tickNewsProgress(){
+  newsProgTimer=setInterval(()=>{
+    newsElapsed+=0.25;
+    const bar=document.getElementById('news-prog');
+    if(!bar){pauseNewsCycle();return;} // tab navigated away
+    bar.style.width=Math.min(100,(newsElapsed/newsCycleSec*100))+'%';
+    if(newsElapsed>=newsCycleSec){
+      clearInterval(newsProgTimer);newsProgTimer=null;
+      stepNews(1); // stepNews restarts the tick itself if still playing
+    }
+  },250);
 }
 
 // ── SHARED NOTES BOARD ────────────────────────────────────────────────────────
