@@ -748,7 +748,7 @@ async function doSync(){
   const workers=Array.from({length:12},async()=>{while(idx2<tasks.length)await tasks[idx2++]();});
   await Promise.all(workers);
 
-  buildStats();buildSectorStats();checkAlerts();checkAndPlayAlert();saveCache();saveExtensionHistory();backfillExtensionHistory();
+  buildStats();buildSectorStats();checkAlerts();checkAndPlayAlert();saveCache();saveExtensionHistory();backfillExtensionHistory();saveHighsLowsHistory();backfillHighsLowsHistory();
   window._extHistCache=null;
   syncing=false;btn.textContent='⟳ Sync';btn.classList.remove('busy');
   renderMain();scheduleAutoRefresh();
@@ -1140,13 +1140,109 @@ function renderMovers(){
 }
 
 // ── HIGHS / LOWS ──────────────────────────────────────────────────────────────
-// Uses the daily closes already fetched during Sync (cache[tk].closes, chronological
-// asc, ~450 calendar days / ~300 trading sessions — a workable proxy for 52-week).
-// "Hits" = how many times, within that lookback window, the ticker closed at a
-// fresh record high (or low) — i.e. how often it's been "making new ground."
-// Note: closes/bars are session-only (not persisted to localStorage — see saveCache),
-// so this tab needs a fresh Sync each session to populate.
+// "New high/new low today" is determined live each Sync from cache[tk].closes
+// (chronological asc, ~450 calendar days / ~300 trading sessions — a workable
+// proxy for 52-week highs/lows). That part is always session-fresh.
+//
+// "Hits" (how many times a ticker has made new ground) is now PERSISTENT:
+// each Sync logs today's new-high/new-low tickers to the Supabase table
+// `highs_lows_history` (mirrors how Extension History works), and the tab
+// reads back a distinct-day count per ticker from there. First Sync after
+// this update backfills history from whatever bars are currently cached,
+// same pattern as backfillExtensionHistory(). If the Supabase table doesn't
+// exist yet, or the read fails, the tab falls back to a session-only count.
 let hiloSelected=null;
+
+async function saveHighsLowsHistory(){
+  const rows=computeHighsLows();
+  if(!rows.length) return;
+  const now=new Date().toISOString();
+  const records=rows.map(r=>({
+    ticker:r.ticker, theme:r.theme,
+    direction:r.isNewHigh?'high':'low',
+    price:r.price,
+    captured_at:now
+  }));
+  try{
+    await supaFetch('POST','/rest/v1/highs_lows_history?on_conflict=ticker,captured_at',records,{
+      'Prefer':'resolution=merge-duplicates,return=minimal'
+    });
+    console.log('Highs/Lows history saved:',records.length,'entries');
+  }catch(e){console.warn('Highs/Lows history save failed:',e);}
+}
+
+async function backfillHighsLowsHistory(force=false){
+  if(window._hiloBackfilled&&!force) return;
+  window._hiloBackfilled=true;
+
+  if(!force){
+    // Only auto-backfill if the table has no records older than 60 days
+    const cutoff=new Date(Date.now()-60*864e5).toISOString();
+    const existing=await supaFetch('GET','/rest/v1/highs_lows_history?select=captured_at&captured_at=lt.'+cutoff+'&limit=1');
+    if(existing&&Array.isArray(existing)&&existing.length>0){
+      console.log('Highs/Lows history has historical data, skipping backfill');
+      return;
+    }
+  }
+
+  console.log('Backfilling highs/lows history from historical bar data...');
+  const records=[];
+  const themeMap={};
+  getThemesWithWatchlist().forEach(th=>th.tickers.forEach(tk=>{if(!themeMap[tk])themeMap[tk]=th.name;}));
+
+  Object.keys(cache).forEach(ticker=>{
+    const d=cache[ticker];
+    if(!d||!d.bars||d.bars.length<20) return;
+    if(isOTC(ticker)) return;
+    const theme=themeMap[ticker];
+    if(!theme) return;
+    const bars=d.bars;
+    let hi=-Infinity,lo=Infinity;
+    for(let i=0;i<bars.length;i++){
+      const b=bars[i];
+      if(b.c==null) continue;
+      if(i<19){ if(b.c>hi)hi=b.c; if(b.c<lo)lo=b.c; continue; } // ~1mo warmup before logging records
+      if(b.c>hi){ hi=b.c; records.push({ticker,theme,direction:'high',price:+b.c.toFixed(2),captured_at:new Date(b.t).toISOString()}); }
+      else if(b.c<lo){ lo=b.c; records.push({ticker,theme,direction:'low',price:+b.c.toFixed(2),captured_at:new Date(b.t).toISOString()}); }
+    }
+  });
+
+  if(!records.length){console.log('No historical highs/lows events found');return;}
+
+  // One record per ticker+direction+day
+  const seen=new Set();
+  const deduped=records.filter(r=>{
+    const key=r.ticker+'|'+r.direction+'|'+r.captured_at.slice(0,10);
+    if(seen.has(key)) return false;
+    seen.add(key); return true;
+  });
+
+  console.log('Upserting',deduped.length,'historical highs/lows records...');
+  for(let i=0;i<deduped.length;i+=500)
+    await supaFetch('POST','/rest/v1/highs_lows_history?on_conflict=ticker,captured_at',deduped.slice(i,i+500),{
+      'Prefer':'resolution=merge-duplicates,return=minimal'
+    });
+  console.log('Highs/Lows backfill complete!');
+}
+
+async function loadHighsLowsHits(){
+  const cutoff=new Date(Date.now()-370*864e5).toISOString();
+  try{
+    const data=await supaFetch('GET','/rest/v1/highs_lows_history?select=ticker,direction,captured_at&captured_at=gte.'+encodeURIComponent(cutoff)+'&order=captured_at.desc&limit=20000');
+    if(!data||!Array.isArray(data)) return null;
+    const seenDay=new Set();
+    const hits={}; // ticker -> {high:N, low:N}
+    data.forEach(r=>{
+      const day=r.captured_at.slice(0,10);
+      const key=r.ticker+'|'+r.direction+'|'+day;
+      if(seenDay.has(key)) return;
+      seenDay.add(key);
+      if(!hits[r.ticker]) hits[r.ticker]={high:0,low:0};
+      hits[r.ticker][r.direction]=(hits[r.ticker][r.direction]||0)+1;
+    });
+    return hits;
+  }catch(e){console.warn('loadHighsLowsHits failed:',e);return null;}
+}
 
 function computeHighsLows(){
   const rows=[];
@@ -1172,7 +1268,7 @@ function computeHighsLows(){
   return rows;
 }
 
-function renderHighsLows(){
+async function renderHighsLows(){
   const main=document.getElementById('main');
   const rows=computeHighsLows();
 
@@ -1182,6 +1278,20 @@ function renderHighsLows(){
       (anyBars?'No new highs or lows in the current data.':'No bar history in memory — hit Sync first.<br><span style="font-size:10px;color:var(--text3)">Highs/Lows uses per-day closes, which aren\'t cached across page reloads — a fresh Sync each session repopulates them.</span>')+
       '</div>';
     return;
+  }
+
+  main.innerHTML='<div class="state"><span class="spin"></span>Loading hit history...</div>';
+  const persistentHits=await loadHighsLowsHits();
+  if(tab!=='hilo') return; // user navigated away while this was in flight
+
+  let hitsSource='session';
+  if(persistentHits){
+    hitsSource='persistent';
+    rows.forEach(r=>{
+      const p=persistentHits[r.ticker];
+      const val=p?p[r.isNewHigh?'high':'low']:null;
+      if(val!=null) r.hits=val;
+    });
   }
 
   const highs=rows.filter(r=>r.isNewHigh).sort((a,b)=>b.hits-a.hits);
@@ -1196,8 +1306,11 @@ function renderHighsLows(){
   const hdr=document.createElement('div');
   hdr.style.cssText='padding:12px 16px;border-bottom:1px solid var(--border2);background:var(--bg2);flex-shrink:0';
   const title=document.createElement('div');
-  title.style.cssText='font-size:12px;color:#fff;font-family:var(--mono);margin-bottom:8px';
-  title.innerHTML='⚡ Highs / Lows <span style="color:var(--text3);font-weight:400">— new closing highs/lows across your tracked universe (~18mo lookback)</span>';
+  title.style.cssText='font-size:12px;color:#fff;font-family:var(--mono);margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap';
+  title.innerHTML='⚡ Highs / Lows <span style="color:var(--text3);font-weight:400">— new closing highs/lows across your tracked universe</span>'+
+    (hitsSource==='persistent'
+      ? '<span style="font-size:9px;color:var(--green);border:1px solid var(--green);border-radius:3px;padding:1px 6px;font-weight:500">✓ hits: 12mo history</span>'
+      : '<span style="font-size:9px;color:var(--amber);border:1px solid var(--amber);border-radius:3px;padding:1px 6px;font-weight:500" title="Create a highs_lows_history table in Supabase for persistent hit counts across sessions">⚠ hits: session-only</span>');
   hdr.appendChild(title);
 
   const breadthRow=document.createElement('div');
