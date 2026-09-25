@@ -2441,8 +2441,6 @@ function renderPositions(){
     const hdrs=[
       {label:'L/S',col:null},{label:'Ticker',col:'ticker'},{label:'Theme',col:'theme'},
       {label:'Entry Date',col:'entry_date'},{label:'Notes',col:null},{label:'Price',col:'price'},{label:'Entry $',col:'entry'},
-      {label:'Shares',col:'shares'},{label:'Mkt Value',col:'mktVal'},
-      {label:'P&L $',col:'pnlDollar'},{label:'P&L %',col:'pnlPct'},
       {label:'% from Entry',col:'pctFromEntry'},{label:'ATR/50MA',col:'atrMA'},
       {label:'Vol ×',col:'volX'},...TFS.map(t=>({label:t==='today'?'Today':t,col:t})),
       {label:'',col:null}
@@ -2559,31 +2557,6 @@ function renderPositions(){
       // Entry
       const tdE=document.createElement('td');tdE.style.cssText='text-align:right;color:#cdd6e8;font-family:var(--mono);font-size:11px';
       tdE.textContent=p.entry?'$'+p.entry.toFixed(2):'—';tr.appendChild(tdE);
-
-      // Shares
-      const tdSh=document.createElement('td');tdSh.style.cssText='text-align:right;color:#cdd6e8;font-family:var(--mono);font-size:11px';
-      tdSh.textContent=p.shares?p.shares.toLocaleString():'—';tr.appendChild(tdSh);
-
-      // Market Value
-      const tdMv=document.createElement('td');tdMv.style.cssText='text-align:right;font-weight:500;font-family:var(--mono);font-size:11px;color:#fff';
-      tdMv.textContent=mktVal!=null?'$'+mktVal.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}):'—';
-      tr.appendChild(tdMv);
-
-      // P&L $
-      const tdPnl=document.createElement('td');tdPnl.style.cssText='text-align:right;font-weight:500;font-family:var(--mono)';
-      if(pnlDollar!=null){
-        tdPnl.style.color=pnlDollar>=0?'var(--green)':'var(--red)';
-        tdPnl.textContent=(pnlDollar>=0?'+':'')+pnlDollar.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
-      } else tdPnl.textContent='—';
-      tr.appendChild(tdPnl);
-
-      // P&L %
-      const tdPnlP=document.createElement('td');tdPnlP.style.cssText='text-align:right;font-family:var(--mono)';
-      if(pnlPct!=null){
-        tdPnlP.style.color=pnlPct>=0?'var(--green)':'var(--red)';
-        tdPnlP.textContent=(pnlPct>=0?'+':'')+pnlPct.toFixed(2)+'%';
-      } else tdPnlP.textContent='—';
-      tr.appendChild(tdPnlP);
 
       // % from Entry (pre-computed)
       const tdMoveFrom=document.createElement('td');tdMoveFrom.style.cssText='text-align:right;font-family:var(--mono);font-size:11px;font-weight:500';
@@ -2708,17 +2681,6 @@ function renderPositions(){
         const td=document.createElement('td');
         td.style.cssText='padding:8px 10px;font-family:var(--mono);font-size:11px';
         if(i===0){td.textContent='TOTAL';td.style.fontWeight='600';td.style.color='var(--text)';}
-        else if(i===5){td.style.textAlign='right';td.style.fontWeight='600';td.textContent=totalValue?'$'+totalValue.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}):'—';}
-        else if(i===6){
-          td.style.textAlign='right';td.style.fontWeight='600';
-          td.style.color=totalPnl>=0?'var(--green)':'var(--red)';
-          td.textContent=totalValue?(totalPnl>=0?'+':'')+totalPnl.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}):'—';
-        }
-        else if(i===7){
-          const totalPct=totalValue&&totalPnl?((totalPnl/(totalValue-totalPnl))*100):null;
-          td.style.textAlign='right';td.style.fontWeight='600';
-          if(totalPct!=null){td.style.color=totalPct>=0?'var(--green)':'var(--red)';td.textContent=(totalPct>=0?'+':'')+totalPct.toFixed(2)+'%';}
-        }
         trow.appendChild(td);
       }
       tfoot.appendChild(trow);tbl.appendChild(tfoot);
