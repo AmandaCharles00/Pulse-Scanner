@@ -1188,6 +1188,22 @@ function renderSpreads(){
   hdr.innerHTML='<div><div style="font-size:14px;font-weight:600;color:#fff">Where groups are separating</div>'+
     '<div style="font-size:10px;color:var(--text2);margin-top:3px">Tracked ETF pairs · return difference in percentage points · biggest gaps first</div></div>'+
     '<div style="font-size:10px;color:var(--text2);font-family:var(--mono);white-space:nowrap">'+rows.length+' tracked comparisons · '+tfLabel+'</div>';
+  // In-panel timeframe toggle (kept in sync with the toolbar buttons)
+  const tfBar=document.createElement('div');
+  tfBar.style.cssText='display:flex;gap:4px;align-items:center;margin-top:10px';
+  [['today','1D'],['1W','1W'],['1M','1M'],['3M','3M'],['6M','6M'],['YTD','YTD']].forEach(([k,lbl])=>{
+    const b=document.createElement('button');
+    const on=tf===k;
+    b.style.cssText='background:'+(on?'var(--blue)':'var(--bg4)')+';border:1px solid '+(on?'var(--blue)':'var(--border2)')+';border-radius:3px;color:#fff;font-family:var(--mono);font-size:10px;padding:3px 9px;cursor:pointer';
+    b.textContent=lbl;
+    b.addEventListener('click',()=>{
+      tf=k;
+      document.querySelectorAll('.tf').forEach(x=>x.classList.toggle('on',x.textContent===(k==='today'?'Today':k)));
+      renderSpreads();
+    });
+    tfBar.appendChild(b);
+  });
+  hdr.firstChild.appendChild(tfBar);
   panel.appendChild(hdr);
 
   const grid=document.createElement('div');
