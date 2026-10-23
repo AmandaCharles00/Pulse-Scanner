@@ -131,11 +131,10 @@ tr:hover td{background:var(--bg3)}
   <div class="tab" id="tab-themes" onclick="setTab('themes')">Themes</div>
   <div class="tab" id="tab-movers" onclick="setTab('movers')">Top Movers</div>
   <div class="tab" id="tab-hilo" onclick="setTab('hilo')">Highs / Lows</div>
-  <div class="tab" id="tab-spreads" onclick="setTab('spreads')">Spreads</div>
+  <div class="tab" id="tab-spreads" onclick="setTab('spreads')">Macro</div>
   <div class="tab" id="tab-news" onclick="setTab('news')">Ticker News</div>
   <div class="tab" id="tab-alerts" onclick="setTab('alerts')">Alerts</div>
-  <div class="tab" id="tab-20ma" onclick="setTab('20ma')">20MA Scan</div>
-  <div class="tab" id="tab-scan" onclick="setTab('scan')">50MA Scan</div>
+  <div class="tab" id="tab-scan" onclick="setTab('scan')">MA Scan</div>
   <div class="tab" id="tab-gaps" onclick="setTab('gaps')">Morning Gaps</div>
   <div class="tab" id="tab-ext" onclick="setTab('ext')">Extension</div>
   <div class="tab" id="tab-softs" onclick="setTab('softs')">Softs Weather</div>
@@ -633,7 +632,7 @@ async function doSync(){
   // Also include any position tracker tickers
   const posTickers=positions.map(p=>p.ticker).filter(Boolean);
   // Always include major benchmark ETFs for correlation lookups
-  const benchmarks=['SPY','QQQ','IWM','DIA','GLD','SLV','TLT','HYG','XLK','XLF','XLV','XLE','XLI','XLB','XLP','XLY','XLRE','XLU','XLC','IGV','RSP'];
+  const benchmarks=['SPY','QQQ','IWM','DIA','GLD','SLV','TLT','HYG','XLK','XLF','XLV','XLE','XLI','XLB','XLP','XLY','XLRE','XLU','XLC','IGV','RSP','UUP','USO'];
   // Include watchlist tickers from Supabase
   const all=[...new Set([...etfs,...allTickers,...posTickers,...benchmarks,...watchlistTickers])];
   const fromDate=new Date(now);fromDate.setDate(fromDate.getDate()-450);
@@ -922,12 +921,11 @@ function renderMain(){
   if(tab==='spreads'){renderSpreads();return;}
   if(tab==='news'){renderTickerNews();return;}
   if(tab==='alerts'){renderAlertSettings();return;}
-  if(tab==='scan'){renderScan();return;}
+  if(tab==='scan'||tab==='20ma'){renderMAScan();return;}
   if(tab==='positions'){renderPositions();return;}
   if(tab==='gaps'){renderGaps();return;}
   if(tab==='ext'){renderExtension();return;}
   if(tab==='softs'){renderSofts();return;}
-  if(tab==='20ma'){render20MAScan();return;}
   if(drillId){renderDrill();return;}
   view==='heat'?renderHeat():renderList();
 }
@@ -1166,6 +1164,98 @@ const SPREAD_PAIRS=[
   ['GLD','SPY','Gold / market'],
   ['TLT','SPY','Long bonds / market']
 ];
+// ── MACRO PILLARS ──────────────────────────────────────────────────────────
+// Rule-based risk-on/off scorecard computed from already-synced price history.
+// "1w ago" re-runs the same rules on history truncated by 5 trading sessions.
+function _ema(a,n){if(a.length<n)return null;const k=2/(n+1);let e=a.slice(0,n).reduce((s,v)=>s+v,0)/n;for(let i=n;i<a.length;i++)e=a[i]*k+e*(1-k);return e;}
+function _sma(a,n){if(a.length<n)return null;return a.slice(-n).reduce((s,v)=>s+v,0)/n;}
+function _cl(tk,off){const c=cache[tk]&&cache[tk].closes;if(!c||c.length<60)return null;return off?c.slice(0,c.length-off):c;}
+function _ret(c,n){if(!c||c.length<=n)return null;const a=c[c.length-1-n];return a?(c[c.length-1]/a-1)*100:null;}
+function _arrow(b){return b?'▲':'▼';}
+function pillarScores(off){
+  const out=[];
+  // 1) Technical Analysis — SPY & QQQ vs 50 EMA and 200 SMA
+  {let pts=0,n=0,det=[];
+   ['SPY','QQQ'].forEach(tk=>{const c=_cl(tk,off);if(!c||c.length<200)return;const p=c[c.length-1],e=_ema(c,50),s=_sma(c,200);
+     const a=p>e,b=p>s;pts+=(a?1:0)+(b?1:0);n+=2;det.push(tk+' '+_arrow(a)+'50 '+_arrow(b)+'200');});
+   out.push(n?{v:pts>=3?1:pts>=2?0:-1,d:det.join(' · ')}:null);}
+  // 2) Market Structure — breadth (% of tickers above 50 EMA) + equal-weight vs cap-weight (20d)
+  {let up=0,tot=0;const seen=new Set();
+   THEMES.forEach(t=>t.tickers.forEach(tk=>{if(seen.has(tk))return;seen.add(tk);const c=_cl(tk,off);if(!c||c.length<60)return;tot++;if(c[c.length-1]>_ema(c,50))up++;}));
+   const rs=_cl('RSP',off),sp=_cl('SPY',off);
+   if(tot>20){const b=up/tot*100;let pts=b>=60?1:b<40?-1:0;let det=b.toFixed(0)+'% above 50EMA';
+     if(rs&&sp){const d=_ret(rs,20)-_ret(sp,20);pts+=d>0.5?1:d<-0.5?-1:0;det+=' · RSP vs SPY '+(d>=0?'+':'')+d.toFixed(1)+'pp (20d)';}
+     out.push({v:pts>=1?1:pts<=-1?-1:0,d:det});}
+   else out.push(null);}
+  // 3) Monetary & Fiscal — TLT trend + HYG credit (proxy)
+  {const t=_cl('TLT',off),h=_cl('HYG',off);
+   if(t&&h){let pts=0;const a=t[t.length-1]>_ema(t,50),b=_ret(t,60)>0,c=h[h.length-1]>_ema(h,50);
+     pts=(a?1:-1)+(b?1:-1)+(c?1:-1);
+     out.push({v:pts>=2?1:pts<=-2?-1:0,d:'TLT '+_arrow(a)+'50EMA · TLT 3M '+_arrow(b)+' · HYG '+_arrow(c)+'50EMA'});}
+   else out.push(null);}
+  // 4) Global Liquidity — Fed net liquidity (WALCL - TGA - RRP) when the feed is loaded, else US dollar proxy
+  {const L=window._liq&&window._liq.series;const u=_cl('UUP',off);
+   if(L&&L.length>=15){const e=L.length-1-(off?1:0);
+     const cur=L[e].net,c4=(cur/L[e-4].net-1)*100,c13=(cur/L[e-13].net-1)*100;
+     const pts=(c4>0.3?1:c4<-0.3?-1:0)+(c13>0.5?1:c13<-0.5?-1:0);
+     out.push({v:pts>=1?1:pts<=-1?-1:0,d:'Fed net liquidity $'+(cur/1000).toFixed(2)+'T · 4w '+(c4>=0?'+':'')+c4.toFixed(1)+'% · 13w '+(c13>=0?'+':'')+c13.toFixed(1)+'%'});}
+   else if(u){const weakA=u[u.length-1]<_ema(u,50),weakB=_ret(u,60)<0;const pts=(weakA?1:-1)+(weakB?1:-1);
+     out.push({v:pts>=2?1:pts<=-2?-1:0,d:'USD (UUP) '+(weakA?'below':'above')+' 50EMA · 3M '+(weakB?'down':'up')});}
+   else out.push(null);}
+  // 5) Gov't & Geopolitics — gold vs SPY, oil spike, SPY drawdown (proxy)
+  {const g=_cl('GLD',off),sp=_cl('SPY',off),o=_cl('USO',off);
+   if(g&&sp){let pts=0;const d=_ret(g,20)-_ret(sp,20);pts+=d>2?-1:d<-2?1:0;
+     const hi=Math.max(...sp.slice(-20)),dd=(sp[sp.length-1]/hi-1)*100;pts+=dd<-5?-1:dd>-2?1:0;
+     let det='Gold vs SPY '+(d>=0?'+':'')+d.toFixed(1)+'pp · SPY '+dd.toFixed(1)+'% off 20d high';
+     if(o){const r=_ret(o,20);if(r>8)pts-=1;det+=' · Oil '+(r>=0?'+':'')+r.toFixed(0)+'%';}
+     out.push({v:pts>=1?1:pts<=-1?-1:0,d:det});}
+   else out.push(null);}
+  return out;
+}
+const MACRO_PILLARS=[
+  ['Technical Analysis','SPY & QQQ vs 50 EMA and 200 SMA. 3-4 of 4 above = Risk On, 2 = Neutral, 0-1 = Risk Off.'],
+  ['Market Structure','% of your tracked tickers above their 50 EMA (60%+ On, under 40% Off) plus equal-weight (RSP) vs cap-weight (SPY) 20-day return.'],
+  ['Monetary & Fiscal Policy','Proxy: TLT trend (falling bonds = rising yields = tighter), TLT 3M direction, and HYG credit trend.'],
+  ['Global Liquidity','Fed net liquidity = balance sheet (WALCL) minus Treasury General Account minus reverse repo, from FRED. Rising over 4w and 13w = On, falling = Off. Falls back to the US dollar (UUP) trend if the feed is unreachable.'],
+  ['Gov’t & Geopolitics','Proxy: gold outperforming SPY, oil spikes (+8% in 20d) and SPY drawdown from its 20-day high all point to stress.']
+];
+const LIQUIDITY_URL='https://pulse-export.vercel.app/api/liquidity';
+function loadLiquidity(){
+  if(window._liqTried) return; window._liqTried=true;
+  fetch(LIQUIDITY_URL).then(r=>r.json()).then(j=>{
+    if(j&&j.series&&j.series.length>=15){window._liq=j;if(tab==='spreads')renderSpreads();}
+  }).catch(e=>console.warn('Liquidity feed unavailable, using dollar proxy:',e));
+}
+function buildMacroPillars(){
+  loadLiquidity();
+  const now=pillarScores(0),prev=pillarScores(5);
+  const chip=s=>{
+    if(!s) return '<span style="display:inline-block;min-width:78px;text-align:center;padding:4px 8px;border-radius:5px;font-size:10px;font-weight:700;font-family:var(--mono);background:var(--bg3);color:var(--text3)">N/A</span>';
+    const m=s.v===1?['RISK ON','var(--gd)','var(--green)']:s.v===-1?['RISK OFF','var(--rd)','var(--red)']:['NEUTRAL','var(--bg4)','var(--text2)'];
+    return '<span style="display:inline-block;min-width:78px;text-align:center;padding:4px 8px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:.03em;font-family:var(--mono);background:'+m[1]+';color:'+m[2]+'">'+m[0]+'</span>';
+  };
+  const valid=now.filter(Boolean);
+  const on=valid.filter(s=>s.v===1).length,off=valid.filter(s=>s.v===-1).length;
+  const regime=!valid.length?'':off>=4?'Broad Risk Off':on>=4?'Broad Risk On':off>on?'Leaning Risk Off':on>off?'Leaning Risk On':'Mixed';
+  const panel=document.createElement('div');
+  panel.style.cssText='background:var(--bg2);border:1px solid var(--border2);border-radius:8px;overflow:hidden;margin-bottom:14px';
+  let h='<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border2)">'+
+    '<div><div style="font-size:14px;font-weight:600;color:#fff">Macro pillars</div>'+
+    '<div style="font-size:10px;color:var(--text2);margin-top:3px">Rule-based risk read from your synced price data · hover a pillar for its rules</div></div>'+
+    '<div style="font-size:11px;color:#fff;font-family:var(--mono);white-space:nowrap">'+(regime?regime+' <span style="color:var(--text3)">· '+on+' on / '+off+' off</span>':'')+'</div></div>';
+  h+='<div style="display:grid;grid-template-columns:minmax(150px,1.1fr) 96px 96px minmax(180px,3fr);align-items:center;padding:8px 16px;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);font-family:var(--mono);background:var(--bg3)">'+
+    '<div>Pillar</div><div>Score</div><div>1w ago</div><div>What drove it</div></div>';
+  MACRO_PILLARS.forEach(([name,rule],i)=>{
+    const n=now[i],p=prev[i],chg=n&&p&&n.v!==p.v;
+    h+='<div title="'+rule.replace(/"/g,'&quot;')+'" style="display:grid;grid-template-columns:minmax(150px,1.1fr) 96px 96px minmax(180px,3fr);align-items:center;padding:10px 16px;border-top:1px solid var(--border2);gap:4px">'+
+      '<div style="font-size:12px;color:var(--text)">'+name+(chg?' <span style="color:var(--blue);font-size:9px;font-family:var(--mono)">CHANGED</span>':'')+'</div>'+
+      '<div>'+chip(n)+'</div><div>'+chip(p)+'</div>'+
+      '<div style="font-size:10px;color:var(--text2);font-family:var(--mono)">'+(n?n.d:'Not enough data — sync again')+'</div></div>';
+  });
+  panel.innerHTML=h;
+  return panel;
+}
+
 function renderSpreads(){
   const main=document.getElementById('main');
   const tfLabel=tf==='today'?'1D':tf;
@@ -1234,6 +1324,7 @@ function renderSpreads(){
     grid.appendChild(card);
   });
   panel.appendChild(grid);
+  wrap.appendChild(buildMacroPillars());
   wrap.appendChild(panel);
   main.innerHTML='';main.appendChild(wrap);
 }
@@ -2101,6 +2192,23 @@ function renderAlertSettings(){
 
 
 // ── 50MA SCAN ─────────────────────────────────────────────────────────────────
+let maScanWhich='50';
+function renderMAScan(){
+  if(maScanWhich==='20') render20MAScan(); else renderScan();
+  const main=document.getElementById('main');
+  const wrap=main.firstElementChild; if(!wrap) return;
+  const bar=document.createElement('div');
+  bar.style.cssText='display:flex;align-items:center;gap:6px;padding:8px 14px;border-bottom:1px solid var(--border2);background:var(--bg);flex-shrink:0';
+  const lab=document.createElement('span');lab.textContent='Moving average';lab.style.cssText='font-size:11px;color:var(--text2);font-family:var(--mono);margin-right:4px';
+  bar.appendChild(lab);
+  [['20','20 EMA'],['50','50 EMA']].forEach(([k,t])=>{
+    const on=maScanWhich===k,b=document.createElement('button');b.textContent=t;
+    b.style.cssText='background:'+(on?'var(--blue)':'var(--bg4)')+';border:1px solid '+(on?'var(--blue)':'var(--border2)')+';border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:4px 12px;cursor:pointer';
+    b.addEventListener('click',()=>{maScanWhich=k;renderMAScan();});
+    bar.appendChild(b);
+  });
+  wrap.insertBefore(bar,wrap.firstChild);
+}
 function renderScan(){
   const main=document.getElementById('main');
   const noData=Object.keys(cache).length===0;
