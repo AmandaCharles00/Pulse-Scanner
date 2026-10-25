@@ -1299,7 +1299,7 @@ function buildMacroPillars(){
      [['auto','Auto (proxy)'],['1','Override: Risk On'],['0','Override: Neutral'],['-1','Override: Risk Off']].forEach(([k,t2])=>{const o=document.createElement('option');o.value=k;o.textContent=t2;sel.appendChild(o);});
      sel.value=ov?String(ov.v):'auto';
      const note=document.createElement('input');note.type='text';note.placeholder='note (e.g. midterms)';note.value=ov&&ov.note||'';
-     note.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:11.5px;padding:2px 6px;width:170px';
+     note.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:11.5px;padding:2px 6px;width:340px;max-width:60vw';
      const save=()=>{try{if(sel.value==='auto')localStorage.removeItem('macro_geo');else localStorage.setItem('macro_geo',JSON.stringify({v:+sel.value,note:note.value.trim()}));}catch(e){}renderSpreads();};
      sel.addEventListener('change',save);note.addEventListener('change',save);
      box.append(sel,note);gr.lastElementChild.appendChild(box);}}
