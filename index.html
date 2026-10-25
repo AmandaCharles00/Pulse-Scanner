@@ -8,7 +8,7 @@
 :root{
   --bg:#0d0f14;--bg2:#12151c;--bg3:#181c26;--bg4:#1e2330;
   --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);
-  --text:#cdd6e8;--text2:#a0aec0;--text3:#8899b0;
+  --text:#eef2fa;--text2:#cfd9ea;--text3:#b3c0d6;
   --green:#00c97a;--gd:rgba(0,201,122,0.13);
   --red:#ff3d55;--rd:rgba(255,61,85,0.13);
   --blue:#2d8cff;--bd:rgba(45,140,255,0.15);
@@ -16,49 +16,49 @@
   --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:12px;overflow:hidden}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;overflow:hidden}
 body{display:flex;flex-direction:column}
 .bar{height:42px;background:var(--bg2);border-bottom:1px solid var(--border2);display:flex;align-items:center;padding:0 12px;gap:5px;flex-shrink:0}
 .logo{font-family:var(--mono);font-size:13px;font-weight:500;margin-right:6px}
 .sep{width:1px;height:18px;background:var(--border2);margin:0 2px;flex-shrink:0}
-.tab{padding:0 11px;height:42px;display:flex;align-items:center;font-size:12px;color:#fff;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;user-select:none}
+.tab{padding:0 11px;height:42px;display:flex;align-items:center;font-size:13px;color:#fff;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;user-select:none}
 .tab:hover{color:var(--text)}.tab.on{color:var(--blue);border-bottom-color:var(--blue)}
 .right{margin-left:auto;display:flex;align-items:center;gap:5px}
-.si{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-size:12px;padding:3px 8px;width:130px;outline:none}
+.si{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-size:13px;padding:3px 8px;width:130px;outline:none}
 .si:focus{border-color:var(--blue);color:var(--text)}.si::placeholder{color:var(--text2)}
 .vtg{display:flex;border:1px solid var(--border2);border-radius:3px;overflow:hidden}
-.vb{background:var(--bg3);border:none;color:#fff;padding:4px 9px;cursor:pointer;font-size:12px;font-family:var(--mono)}
+.vb{background:var(--bg3);border:none;color:#fff;padding:4px 9px;cursor:pointer;font-size:13px;font-family:var(--mono)}
 .vb:hover{background:var(--bg4)}.vb.on{background:var(--bd);color:var(--blue)}
-.ki{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:10px;padding:3px 7px;width:190px;outline:none}
+.ki{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:11.5px;padding:3px 7px;width:190px;outline:none}
 .ki:focus{border-color:var(--blue)}.ki::placeholder{color:var(--text2)}
-.sbtn{background:var(--gd);border:1px solid var(--green);border-radius:3px;color:var(--green);font-family:var(--mono);font-size:11px;padding:3px 10px;cursor:pointer;white-space:nowrap}
+.sbtn{background:var(--gd);border:1px solid var(--green);border-radius:3px;color:var(--green);font-family:var(--mono);font-size:12.5px;padding:3px 10px;cursor:pointer;white-space:nowrap}
 .sbtn:hover{background:rgba(0,201,122,0.22)}.sbtn.busy{opacity:0.5;cursor:default}
-.xbtn{background:transparent;border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 8px;cursor:pointer}
+.xbtn{background:transparent;border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 8px;cursor:pointer}
 .xbtn:hover{color:var(--text)}
 .tfg{display:flex;gap:2px}
-.tf{background:transparent;border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 7px;cursor:pointer}
+.tf{background:transparent;border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 7px;cursor:pointer}
 .tf.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .sbar{display:none;align-items:center;gap:8px;padding:5px 14px;background:var(--bg3);border-bottom:1px solid var(--border2);flex-shrink:0}
 .sbar.show{display:flex}
-.stks{font-size:9px;color:var(--text2);flex:1;line-height:1.8;overflow:hidden;max-height:36px}
+.stks{font-size:11px;color:var(--text2);flex:1;line-height:1.8;overflow:hidden;max-height:36px}
 .sacts{display:flex;gap:5px;flex-shrink:0}
-.sab{background:var(--bg2);border:1px solid var(--border2);border-radius:3px;color:#fff;font-size:11px;padding:3px 9px;cursor:pointer;font-family:var(--mono)}
+.sab{background:var(--bg2);border:1px solid var(--border2);border-radius:3px;color:#fff;font-size:12.5px;padding:3px 9px;cursor:pointer;font-family:var(--mono)}
 .sab:hover{color:var(--text)}.sab.red{color:var(--red)}
 .abar{display:none;flex-direction:column;gap:3px;padding:6px 14px;background:rgba(245,166,35,0.08);border-bottom:1px solid rgba(245,166,35,0.3);flex-shrink:0;max-height:110px;overflow-y:auto}
 .abar.show{display:flex}
-.alert-item{display:flex;align-items:center;gap:8px;font-size:11px;font-family:var(--mono)}
+.alert-item{display:flex;align-items:center;gap:8px;font-size:12.5px;font-family:var(--mono)}
 .atk{color:var(--blue);cursor:pointer;width:50px;flex-shrink:0}
 .atk:hover{text-decoration:underline}
 .amsg{color:var(--amber);flex:1}
 .main{flex:1;overflow:hidden;display:flex;flex-direction:column}
 .lv{flex:1;overflow-y:auto}
 .lhdr{display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5}
-.lhdr-name{flex:1;font-size:9px;color:#d0d8e8;letter-spacing:.07em;text-transform:uppercase}
+.lhdr-name{flex:1;font-size:11px;color:#eef2fa;letter-spacing:.07em;text-transform:uppercase}
 .lhdr-bar{width:110px;flex-shrink:0}
-.lhdr-tf{width:70px;text-align:right;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);flex-shrink:0;cursor:pointer}
+.lhdr-tf{width:70px;text-align:right;font-size:11px;color:#eef2fa;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);flex-shrink:0;cursor:pointer}
 .lhdr-tf:hover,.lhdr-tf.on{color:var(--blue)}
-.lhdr-rs{width:32px;text-align:right;font-size:9px;color:#d0d8e8;font-family:var(--mono);flex-shrink:0}
-.lhdr-cnt{width:26px;text-align:right;font-size:9px;color:#d0d8e8;flex-shrink:0}
+.lhdr-rs{width:32px;text-align:right;font-size:11px;color:#eef2fa;font-family:var(--mono);flex-shrink:0}
+.lhdr-cnt{width:26px;text-align:right;font-size:11px;color:#eef2fa;flex-shrink:0}
 .lrow{display:flex;align-items:center;padding:0 14px;height:38px;border-bottom:1px solid var(--border);transition:background .08s}
 .lrow:hover{background:var(--bg3)}.lrow.sel{background:rgba(45,140,255,.06);border-left:2px solid var(--blue)}
 .lchk{margin-right:9px;flex-shrink:0;accent-color:var(--blue);width:12px;height:12px;cursor:pointer}
@@ -66,56 +66,56 @@ body{display:flex;flex-direction:column}
 .lname:hover{color:var(--blue)}
 .lbar-w{width:110px;height:3px;background:var(--bg4);border-radius:2px;flex-shrink:0;overflow:hidden;margin-right:2px;cursor:pointer}
 .lbar{height:100%;border-radius:2px}
-.ltf{width:70px;text-align:right;font-family:var(--mono);font-size:12px;flex-shrink:0;cursor:pointer}
+.ltf{width:70px;text-align:right;font-family:var(--mono);font-size:13px;flex-shrink:0;cursor:pointer}
 .ltf:hover{opacity:.7}
-.lrs{width:32px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0}
-.lcnt{width:26px;text-align:right;font-size:11px;color:#c0cce0;flex-shrink:0}
-.pos{color:var(--green)}.neg{color:var(--red)}.neu{color:#a0aec0}
+.lrs{width:32px;text-align:right;font-family:var(--mono);font-size:12.5px;flex-shrink:0}
+.lcnt{width:26px;text-align:right;font-size:12.5px;color:#eef2fa;flex-shrink:0}
+.pos{color:var(--green)}.neg{color:var(--red)}.neu{color:#eef2fa}
 .hv{flex:1;overflow-y:auto;padding:8px}
 .hgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:4px}
 .hcell{padding:10px 12px 8px;border-radius:4px;cursor:pointer}
 .hcell:hover{opacity:.82}
-.hcell-name{font-size:11px;font-weight:500;color:rgba(255,255,255,.9);margin-bottom:4px;line-height:1.3}
+.hcell-name{font-size:12.5px;font-weight:500;color:rgba(255,255,255,.9);margin-bottom:4px;line-height:1.3}
 .hcell-pct{font-family:var(--mono);font-size:15px;font-weight:500;color:#fff}
-.hcell-cnt{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px}
+.hcell-cnt{font-size:11.5px;color:rgba(255,255,255,.45);margin-top:2px}
 .dv{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .dhdr{padding:8px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px;flex-shrink:0;background:var(--bg2)}
-.dback{background:transparent;border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 8px;cursor:pointer}
+.dback{background:transparent;border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 8px;cursor:pointer}
 .dback:hover{color:var(--text)}
-.dtitle{font-size:14px;font-weight:500}.dsub{font-size:10px;color:#c0cce0}
-.dsi{margin-left:auto;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-size:12px;padding:3px 8px;width:130px;outline:none}
+.dtitle{font-size:14px;font-weight:500}.dsub{font-size:11.5px;color:#eef2fa}
+.dsi{margin-left:auto;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-size:13px;padding:3px 8px;width:130px;outline:none}
 .dsi:focus{border-color:var(--blue);color:var(--text)}.dsi::placeholder{color:var(--text2)}
 .tw{flex:1;overflow-y:auto}
 table{width:100%;border-collapse:collapse}
 thead{position:sticky;top:0;background:var(--bg2);z-index:4}
-th{padding:8px 10px;font-size:10px;color:#fff;text-align:right;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--border2);font-family:var(--mono);white-space:nowrap;cursor:pointer}
+th{padding:8px 10px;font-size:11.5px;color:#fff;text-align:right;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--border2);font-family:var(--mono);white-space:nowrap;cursor:pointer}
 th:first-child{text-align:left}th:hover{color:var(--blue)}
-th.asc::after{content:' ▲';font-size:7px}th.desc::after{content:' ▼';font-size:7px}
-td{padding:8px 10px;border-bottom:1px solid var(--border);font-size:12px;text-align:right;font-family:var(--mono);white-space:nowrap}
+th.asc::after{content:' ▲';font-size:9px}th.desc::after{content:' ▼';font-size:9px}
+td{padding:8px 10px;border-bottom:1px solid var(--border);font-size:13px;text-align:right;font-family:var(--mono);white-space:nowrap}
 td:first-child{text-align:left;font-family:var(--sans)}
 tr:hover td{background:var(--bg3)}
 .tk{color:var(--blue);cursor:pointer;font-weight:500;font-family:var(--mono)}.tk:hover{text-decoration:underline}
 .bc{display:inline-flex;align-items:center;gap:5px}
 .bbg{width:38px;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden;flex-shrink:0}
 .bfg{height:100%;border-radius:2px}
-.vc{display:inline-block;padding:1px 5px;border-radius:2px;font-size:10px}
+.vc{display:inline-block;padding:1px 5px;border-radius:2px;font-size:11.5px}
 .pv{flex:1;overflow-y:auto;padding:10px 16px}
 .asv{flex:1;overflow-y:auto;padding:12px 16px}
 .as-section{margin-bottom:20px}
-.as-title{font-size:11px;color:#fff;margin-bottom:8px;letter-spacing:.05em;text-transform:uppercase;font-family:var(--mono);padding-bottom:4px;border-bottom:1px solid var(--border)}
+.as-title{font-size:12.5px;color:#fff;margin-bottom:8px;letter-spacing:.05em;text-transform:uppercase;font-family:var(--mono);padding-bottom:4px;border-bottom:1px solid var(--border)}
 .as-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
-.as-label{flex:1;font-size:12px}
-.as-sub{font-size:11px;color:#c0cce0;margin-top:2px}
-.as-in{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12px;padding:3px 8px;width:70px;outline:none;text-align:right}
+.as-label{flex:1;font-size:13px}
+.as-sub{font-size:12.5px;color:#eef2fa;margin-top:2px}
+.as-in{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:13px;padding:3px 8px;width:70px;outline:none;text-align:right}
 .as-in:focus{border-color:var(--blue)}
 .as-toggle{display:flex;gap:4px}
-.as-tog{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 8px;cursor:pointer}
+.as-tog{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 8px;cursor:pointer}
 .as-tog.on{background:var(--gd);border-color:var(--green);color:var(--green)}
-.state{padding:60px 20px;text-align:center;color:#c0cce0;font-size:12px;line-height:2.4}
+.state{padding:60px 20px;text-align:center;color:#eef2fa;font-size:13px;line-height:2.4}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
 .tooltip-wrap{position:relative;display:inline-block;cursor:help}
-.tooltip-wrap .tooltip{visibility:hidden;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:8px 10px;font-size:11px;font-family:var(--sans);line-height:1.5;width:220px;position:absolute;z-index:100;bottom:125%;left:50%;transform:translateX(-50%);opacity:0;transition:opacity .15s;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.4)}
+.tooltip-wrap .tooltip{visibility:hidden;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:8px 10px;font-size:12.5px;font-family:var(--sans);line-height:1.5;width:220px;position:absolute;z-index:100;bottom:125%;left:50%;transform:translateX(-50%);opacity:0;transition:opacity .15s;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.4)}
 .tooltip-wrap .tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--border2)}
 .tooltip-wrap .tooltip.show{visibility:visible;opacity:1}
 ::-webkit-scrollbar{width:6px;height:10px}::-webkit-scrollbar-track{background:var(--bg3);border-radius:4px}
@@ -171,32 +171,32 @@ tr:hover td{background:var(--bg3)}
 <div class="main" id="main">
   <div id="onboard" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:0;padding:40px 20px;text-align:center">
     <div style="font-family:var(--mono);font-size:22px;font-weight:500;color:var(--text);margin-bottom:8px">Pulse Scanner</div>
-    <div style="font-size:13px;color:#c0cce0;margin-bottom:36px">Real-time theme & sector performance powered by Polygon.io</div>
+    <div style="font-size:13px;color:#eef2fa;margin-bottom:36px">Real-time theme & sector performance powered by Polygon.io</div>
 
     <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:28px 32px;max-width:420px;width:100%;text-align:left">
       <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px">Get Started</div>
-      <div style="font-size:12px;color:#d0d8e8;margin-bottom:20px;line-height:1.7">
+      <div style="font-size:13px;color:#eef2fa;margin-bottom:20px;line-height:1.7">
         You need a <a href="https://polygon.io/dashboard/signup" target="_blank" style="color:var(--blue)">Polygon.io Starter</a> API key (~$29/mo) to sync live market data.
         Your key is stored locally in your browser and never shared.
       </div>
 
-      <div style="font-size:10px;color:var(--text2);font-family:var(--mono);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Step 1 — Enter your API key above and hit Sync</div>
-      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:10px 12px;font-size:12px;color:#d0d8e8;margin-bottom:16px;font-family:var(--mono)">
+      <div style="font-size:11.5px;color:var(--text2);font-family:var(--mono);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Step 1 — Enter your API key above and hit Sync</div>
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:10px 12px;font-size:13px;color:#eef2fa;margin-bottom:16px;font-family:var(--mono)">
         ↑ Paste key in the field at top right, then click <span style="color:var(--green)">⟳ Sync</span>
       </div>
 
-      <div style="font-size:10px;color:var(--text2);font-family:var(--mono);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Step 2 — Explore your themes</div>
-      <div style="font-size:12px;color:#d0d8e8;line-height:1.7;margin-bottom:16px">
+      <div style="font-size:11.5px;color:var(--text2);font-family:var(--mono);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Step 2 — Explore your themes</div>
+      <div style="font-size:13px;color:#eef2fa;line-height:1.7;margin-bottom:16px">
         After syncing, browse 48 themes ranked by performance. Click any theme to see individual tickers with ATR, volume, and % change across all timeframes.
       </div>
 
-      <div style="font-size:10px;color:var(--text2);font-family:var(--mono);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Step 3 — Set up TradingView (optional)</div>
-      <div style="font-size:11px;color:var(--text2);line-height:1.7">
+      <div style="font-size:11.5px;color:var(--text2);font-family:var(--mono);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Step 3 — Set up TradingView (optional)</div>
+      <div style="font-size:12.5px;color:var(--text2);line-height:1.7">
         In TradingView, save your indicators as a <strong style="color:var(--text2)">Default Chart Layout</strong> so they load automatically when you click any ticker link.
       </div>
     </div>
 
-    <div style="display:flex;gap:24px;margin-top:24px;font-size:11px;color:#c0cce0">
+    <div style="display:flex;gap:24px;margin-top:24px;font-size:12.5px;color:#eef2fa">
       <div>⚡ 48 themes</div>
       <div>📊 ATR / 50MA scan</div>
       <div>🔔 Custom alerts</div>
@@ -394,7 +394,7 @@ function renderSectorHeat(){
   buildSectorStats();const main=document.getElementById('main');
   const tfBar=document.createElement('div');tfBar.style.cssText='display:flex;gap:4px;padding:8px 14px;background:var(--bg2);border-bottom:2px solid var(--blue);flex-shrink:0';
   ['today','1W','1M','3M','YTD'].forEach(t=>{
-    const btn=document.createElement('button');btn.style.cssText='background:'+(tf===t?'var(--blue)':'var(--bg3)')+';border:1px solid '+(tf===t?'var(--blue)':'var(--border2)')+';border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 10px;cursor:pointer';
+    const btn=document.createElement('button');btn.style.cssText='background:'+(tf===t?'var(--blue)':'var(--bg3)')+';border:1px solid '+(tf===t?'var(--blue)':'var(--border2)')+';border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 10px;cursor:pointer';
     btn.textContent=t==='today'?'Today':t;btn.addEventListener('click',()=>{tf=t;renderSectorHeat();});tfBar.appendChild(btn);
   });
   const grid=document.createElement('div');grid.className='hgrid';
@@ -429,7 +429,7 @@ function renderSectors(){
     h.addEventListener('click',()=>{tf=t;document.querySelectorAll('.tf').forEach(b=>b.classList.toggle('on',b.textContent===(t==='today'?'Today':t)));renderSectors();});
     hdr.appendChild(h);
   });
-  const hvol2=document.createElement('div');hvol2.className='lhdr-tf';hvol2.style.cssText='width:52px;text-align:right;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);flex-shrink:0';hvol2.textContent='ATR%';
+  const hvol2=document.createElement('div');hvol2.className='lhdr-tf';hvol2.style.cssText='width:52px;text-align:right;font-size:11px;color:#eef2fa;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);flex-shrink:0';hvol2.textContent='ATR%';
   const hrs=document.createElement('div');hrs.className='lhdr-rs';hrs.textContent='RS';
   hrs.style.cursor='help';
   const hcnt=document.createElement('div');hcnt.className='lhdr-cnt';hcnt.textContent='#';
@@ -455,7 +455,7 @@ function renderSectors(){
 
     // ETF badge — clickable link to TradingView
     const etfBadge=document.createElement('div');
-    etfBadge.style.cssText='width:32px;font-family:var(--mono);font-size:10px;color:var(--blue);flex-shrink:0;margin-right:4px;cursor:pointer;text-decoration:none';
+    etfBadge.style.cssText='width:32px;font-family:var(--mono);font-size:11.5px;color:var(--blue);flex-shrink:0;margin-right:4px;cursor:pointer;text-decoration:none';
     etfBadge.textContent=s.etf;
     etfBadge.title='Open '+s.etf+' on TradingView';
     if(s.etf)etfBadge.addEventListener('click',e=>{e.stopPropagation();window.open('https://www.tradingview.com/chart/?symbol='+s.etf,'_blank');});
@@ -496,7 +496,7 @@ function renderSectors(){
     const atrPcts2=s.tickers.map(tk=>{const d=cache[tk];return d?.dailyVol??null;}).filter(v=>v!=null);
     const avgAtr2=atrPcts2.length?+(atrPcts2.reduce((a,b)=>a+b,0)/atrPcts2.length).toFixed(2):null;
     const atrEl2=document.createElement('div');
-    atrEl2.style.cssText='width:52px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';
+    atrEl2.style.cssText='width:52px;text-align:right;font-family:var(--mono);font-size:12.5px;flex-shrink:0';
     atrEl2.style.color=avgAtr2>=8?'var(--green)':avgAtr2>=4?'var(--text)':'var(--text2)';
     atrEl2.textContent=avgAtr2!=null?avgAtr2.toFixed(1)+'%':'—';
 
@@ -514,7 +514,7 @@ function renderSectors(){
         const th2=THEMES.find(t=>t.id===tid);if(!th2)return;
         const tv2=stats[tid]?.[tf]??null;
         const chip=document.createElement('span');
-        chip.style.cssText='font-size:9px;font-family:var(--mono);padding:1px 6px;border-radius:2px;border:1px solid '+(tv2==null?'var(--border2)':tv2>=0?'rgba(0,201,122,0.5)':'rgba(255,61,85,0.5)')+';color:'+(tv2==null?'var(--text2)':tv2>=0?'var(--green)':'var(--red)')+';background:'+(tv2==null?'transparent':tv2>=0?'var(--gd)':'var(--rd)')+';cursor:pointer;white-space:nowrap';
+        chip.style.cssText='font-size:11px;font-family:var(--mono);padding:1px 6px;border-radius:2px;border:1px solid '+(tv2==null?'var(--border2)':tv2>=0?'rgba(0,201,122,0.5)':'rgba(255,61,85,0.5)')+';color:'+(tv2==null?'var(--text2)':tv2>=0?'var(--green)':'var(--red)')+';background:'+(tv2==null?'transparent':tv2>=0?'var(--gd)':'var(--rd)')+';cursor:pointer;white-space:nowrap';
         chip.textContent=th2.name+(tv2!=null?(tv2>=0?' +':' ')+tv2.toFixed(1)+'%':'');
         chip.addEventListener('click',()=>openDrill(tid));
         subRow.appendChild(chip);
@@ -834,12 +834,12 @@ function renderAlertBar(){
     const item=document.createElement('div');item.className='alert-item';
     const tk=document.createElement('span');tk.className='atk';tk.textContent=a.ticker;
     tk.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+a.ticker,'_blank'));
-    const th=document.createElement('span');th.style.cssText='color:#c0cce0;width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0';th.textContent=a.theme;
+    const th=document.createElement('span');th.style.cssText='color:#eef2fa;width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0';th.textContent=a.theme;
     const msg=document.createElement('span');msg.className='amsg';msg.textContent='⚡ '+a.msg;
-    const ts=document.createElement('span');ts.style.cssText='color:#fff;font-size:10px;font-family:var(--mono);flex-shrink:0;margin-left:8px;opacity:0.7';ts.textContent=a.time||'';
+    const ts=document.createElement('span');ts.style.cssText='color:#fff;font-size:11.5px;font-family:var(--mono);flex-shrink:0;margin-left:8px;opacity:0.7';ts.textContent=a.time||'';
     item.append(tk,th,msg,ts);bar.appendChild(item);
   });
-  if(triggeredAlerts.length>8){const m=document.createElement('div');m.style.cssText='font-size:10px;color:var(--text2);font-family:var(--mono)';m.textContent='+'+(triggeredAlerts.length-8)+' more — see Alerts tab';bar.appendChild(m);}
+  if(triggeredAlerts.length>8){const m=document.createElement('div');m.style.cssText='font-size:11.5px;color:var(--text2);font-family:var(--mono)';m.textContent='+'+(triggeredAlerts.length-8)+' more — see Alerts tab';bar.appendChild(m);}
 }
 
 // ── AUTO REFRESH ──────────────────────────────────────────────────────────────
@@ -952,7 +952,7 @@ function renderList(filter=''){
     h.addEventListener('click',()=>{tf=t;document.querySelectorAll('.tf').forEach(b=>b.classList.toggle('on',b.textContent===(t==='today'?'Today':t)));renderList();});
     hdr.appendChild(h);
   });
-  const hvol=document.createElement('div');hvol.className='lhdr-tf';hvol.style.cssText='width:52px;text-align:right;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);flex-shrink:0';hvol.textContent='Vol %';
+  const hvol=document.createElement('div');hvol.className='lhdr-tf';hvol.style.cssText='width:52px;text-align:right;font-size:11px;color:#eef2fa;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);flex-shrink:0';hvol.textContent='Vol %';
   const hrs=document.createElement('div');hrs.className='lhdr-rs';hrs.textContent='RS';
   hrs.style.cursor='help';
   const hcnt=document.createElement('div');hcnt.className='lhdr-cnt';hcnt.textContent='#';
@@ -977,7 +977,7 @@ function renderList(filter=''){
     nameWrap.appendChild(name);
     if(th.etf){
       const etfTag=document.createElement('span');
-      etfTag.style.cssText='font-size:9px;font-family:var(--mono);padding:1px 5px;border-radius:2px;border:1px solid rgba(45,140,255,0.4);color:var(--blue);background:var(--bd);cursor:pointer;white-space:nowrap;flex-shrink:0;opacity:0.85';
+      etfTag.style.cssText='font-size:11px;font-family:var(--mono);padding:1px 5px;border-radius:2px;border:1px solid rgba(45,140,255,0.4);color:var(--blue);background:var(--bd);cursor:pointer;white-space:nowrap;flex-shrink:0;opacity:0.85';
       etfTag.textContent=th.etf;etfTag.title='Open '+th.etf+' on TradingView';
       etfTag.addEventListener('click',e=>{e.stopPropagation();window.open('https://www.tradingview.com/chart/?symbol='+th.etf,'_blank');});
       nameWrap.appendChild(etfTag);
@@ -990,7 +990,7 @@ function renderList(filter=''){
     const atrPcts=th.tickers.map(tk=>{const d=cache[tk];return d?.dailyVol??null;}).filter(v=>v!=null);
     const avgAtrPct=atrPcts.length?+(atrPcts.reduce((a,b)=>a+b,0)/atrPcts.length).toFixed(2):null;
     const atrPctEl=document.createElement('div');
-    atrPctEl.style.cssText='width:52px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';
+    atrPctEl.style.cssText='width:52px;text-align:right;font-family:var(--mono);font-size:12.5px;flex-shrink:0';
     atrPctEl.style.color=avgAtrPct>=2.5?'var(--green)':avgAtrPct>=1.5?'var(--text)':'var(--text2)';
     atrPctEl.textContent=avgAtrPct!=null?avgAtrPct.toFixed(2)+'%':'—';
 
@@ -1006,7 +1006,7 @@ function renderHeat(){
   const main=document.getElementById('main');
   const tfBar=document.createElement('div');tfBar.style.cssText='display:flex;gap:4px;padding:8px 14px;background:var(--bg2);border-bottom:2px solid var(--blue);flex-shrink:0';
   ['today','1W','1M','3M','YTD'].forEach(t=>{
-    const btn=document.createElement('button');btn.style.cssText='background:'+(tf===t?'var(--blue)':'var(--bg3)')+';border:1px solid '+(tf===t?'var(--blue)':'var(--border2)')+';border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 10px;cursor:pointer';
+    const btn=document.createElement('button');btn.style.cssText='background:'+(tf===t?'var(--blue)':'var(--bg3)')+';border:1px solid '+(tf===t?'var(--blue)':'var(--border2)')+';border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 10px;cursor:pointer';
     btn.textContent=t==='today'?'Today':t;btn.addEventListener('click',()=>{tf=t;renderHeat();});tfBar.appendChild(btn);
   });
   const hv2=document.createElement('div');hv2.style.cssText='display:flex;flex-direction:column;width:100%;height:100%;overflow:hidden';
@@ -1047,7 +1047,7 @@ function renderDrill(filter=''){drillFilter=filter;
   const back=document.createElement('button');back.className='dback';back.textContent='← Back';back.addEventListener('click',closeDrill);
   const title=document.createElement('div');title.className='dtitle';title.textContent=th.name;
   const sub=document.createElement('div');sub.className='dsub';sub.textContent='('+th.tickers.length+')';
-  const status=document.createElement('span');status.style.cssText='font-size:10px;margin-left:4px;color:'+(cSz>0?'var(--green)':'var(--amber)');
+  const status=document.createElement('span');status.style.cssText='font-size:11.5px;margin-left:4px;color:'+(cSz>0?'var(--green)':'var(--amber)');
   status.textContent=cSz>0?'✓ '+cSz+' cached':'⚠ Sync first';
   const dsi=document.createElement('input');dsi.className='dsi';dsi.placeholder='Filter...';dsi.style.marginLeft='auto';
   dsi.addEventListener('input',()=>renderDrill(dsi.value));
@@ -1102,17 +1102,17 @@ function renderMovers(){
 
   const pv=document.createElement('div');pv.className='pv';
   const phdr=document.createElement('div');phdr.style.cssText='display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:10px';
-  const lbl=document.createElement('span');lbl.textContent='Timeframe:';lbl.style.cssText='font-size:12px;color:#fff;margin-right:4px';phdr.appendChild(lbl);
+  const lbl=document.createElement('span');lbl.textContent='Timeframe:';lbl.style.cssText='font-size:13px;color:#fff;margin-right:4px';phdr.appendChild(lbl);
   TFS.forEach(t=>{
     const btn=document.createElement('button');
-    btn.style.cssText='background:'+(tf===t?'var(--blue)':'var(--bg4)')+';border:1px solid '+(tf===t?'var(--blue)':'var(--border2)')+';border-radius:3px;color:#fff'+';font-family:var(--mono);font-size:10px;padding:3px 8px;cursor:pointer';
+    btn.style.cssText='background:'+(tf===t?'var(--blue)':'var(--bg4)')+';border:1px solid '+(tf===t?'var(--blue)':'var(--border2)')+';border-radius:3px;color:#fff'+';font-family:var(--mono);font-size:11.5px;padding:3px 8px;cursor:pointer';
     btn.textContent=t==='today'?'Today':t;
     btn.addEventListener('click',()=>{tf=t;document.querySelectorAll('.tf').forEach(b=>b.classList.toggle('on',b.textContent===(t==='today'?'Today':t)));renderMovers();});
     phdr.appendChild(btn);
   });
-  const sep=document.createElement('span');sep.style.cssText='margin:0 6px;color:#fff;font-size:12px';sep.textContent='|';
+  const sep=document.createElement('span');sep.style.cssText='margin:0 6px;color:#fff;font-size:13px';sep.textContent='|';
   const vfBtn=document.createElement('button');
-  vfBtn.style.cssText='background:'+(alertSettings.volFilter?'var(--ad)':'var(--bg4)')+';border:1px solid '+(alertSettings.volFilter?'var(--amber)':'var(--border2)')+';border-radius:3px;color:'+(alertSettings.volFilter?'var(--amber)':'var(--text2)')+';font-family:var(--mono);font-size:10px;padding:3px 8px;cursor:pointer';
+  vfBtn.style.cssText='background:'+(alertSettings.volFilter?'var(--ad)':'var(--bg4)')+';border:1px solid '+(alertSettings.volFilter?'var(--amber)':'var(--border2)')+';border-radius:3px;color:'+(alertSettings.volFilter?'var(--amber)':'var(--text2)')+';font-family:var(--mono);font-size:11.5px;padding:3px 8px;cursor:pointer';
   vfBtn.textContent='Vol >1.5x only';
   vfBtn.addEventListener('click',()=>{alertSettings.volFilter=!alertSettings.volFilter;renderMovers();});
   phdr.append(sep,vfBtn);pv.appendChild(phdr);
@@ -1120,16 +1120,16 @@ function renderMovers(){
   const cols=document.createElement('div');cols.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:16px';
   const mkSec=(rows,isG)=>{
     const sec=document.createElement('div');
-    const h=document.createElement('div');h.style.cssText='font-size:10px;color:'+(isG?'var(--green)':'var(--red)')+';letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);padding-bottom:6px;border-bottom:1px solid var(--border2);margin-bottom:4px;font-weight:500';
+    const h=document.createElement('div');h.style.cssText='font-size:11.5px;color:'+(isG?'var(--green)':'var(--red)')+';letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);padding-bottom:6px;border-bottom:1px solid var(--border2);margin-bottom:4px;font-weight:500';
     h.textContent=(isG?'▲ Top Gainers':'▼ Top Losers')+' — '+(tf==='today'?'Today':tf);sec.appendChild(h);
     rows.forEach(r=>{
       const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);gap:8px;cursor:pointer';
       row.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
-      const tk=document.createElement('span');tk.style.cssText='width:52px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:11px;flex-shrink:0';tk.textContent=r.ticker;
-      const th2=document.createElement('span');th2.style.cssText='flex:1;font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';th2.textContent=r.theme;
-      const pct=document.createElement('span');pct.style.cssText='font-family:var(--mono);font-size:11px;font-weight:500;color:'+(isG?'var(--green)':'var(--red)')+';flex-shrink:0';pct.textContent=f2(r[tf]);
+      const tk=document.createElement('span');tk.style.cssText='width:52px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:12.5px;flex-shrink:0';tk.textContent=r.ticker;
+      const th2=document.createElement('span');th2.style.cssText='flex:1;font-size:12.5px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';th2.textContent=r.theme;
+      const pct=document.createElement('span');pct.style.cssText='font-family:var(--mono);font-size:12.5px;font-weight:500;color:'+(isG?'var(--green)':'var(--red)')+';flex-shrink:0';pct.textContent=f2(r[tf]);
       const vol=r.volume&&r.avgVolume?r.volume/r.avgVolume:null;
-      const volEl=document.createElement('span');volEl.style.cssText='font-family:var(--mono);font-size:10px;flex-shrink:0;width:36px;text-align:right';
+      const volEl=document.createElement('span');volEl.style.cssText='font-family:var(--mono);font-size:11.5px;flex-shrink:0;width:36px;text-align:right';
       volEl.style.color=vol>=2?'var(--green)':vol>=1.3?'var(--amber)':'#c0cce0';volEl.textContent=vol?vol.toFixed(1)+'x':'';
       row.append(tk,th2,pct,volEl);sec.appendChild(row);
     });
@@ -1262,9 +1262,9 @@ function buildMacroPillars(){
   const cmpLbl=macroCmp===1?'1d ago':'1w ago';
   const now=pillarScores(0),prev=pillarScores(macroCmp);
   const chip=s=>{
-    if(!s) return '<span style="display:inline-block;min-width:78px;text-align:center;padding:4px 8px;border-radius:5px;font-size:10px;font-weight:700;font-family:var(--mono);background:var(--bg3);color:var(--text3)">N/A</span>';
+    if(!s) return '<span style="display:inline-block;min-width:78px;text-align:center;padding:4px 8px;border-radius:5px;font-size:11.5px;font-weight:700;font-family:var(--mono);background:var(--bg3);color:var(--text3)">N/A</span>';
     const m=s.v===1?['RISK ON','var(--gd)','var(--green)']:s.v===-1?['RISK OFF','var(--rd)','var(--red)']:['NEUTRAL','var(--bg4)','var(--text2)'];
-    return '<span style="display:inline-block;min-width:78px;text-align:center;padding:4px 8px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:.03em;font-family:var(--mono);background:'+m[1]+';color:'+m[2]+'">'+m[0]+'</span>';
+    return '<span style="display:inline-block;min-width:78px;text-align:center;padding:4px 8px;border-radius:5px;font-size:11.5px;font-weight:700;letter-spacing:.03em;font-family:var(--mono);background:'+m[1]+';color:'+m[2]+'">'+m[0]+'</span>';
   };
   const valid=now.filter(Boolean);
   const on=valid.filter(s=>s.v===1).length,off=valid.filter(s=>s.v===-1).length;
@@ -1273,36 +1273,36 @@ function buildMacroPillars(){
   panel.style.cssText='background:var(--bg2);border:1px solid var(--border2);border-radius:8px;overflow:hidden;margin-bottom:14px';
   let h='<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border2)">'+
     '<div><div style="font-size:14px;font-weight:600;color:#fff">Macro pillars</div>'+
-    '<div style="font-size:10px;color:var(--text2);margin-top:3px">Rule-based risk read from your synced price data · hover a pillar for its rules</div>'+
-    '<div id="macro-cmp" style="margin-top:10px;display:flex;gap:4px;align-items:center"><span style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-right:4px">COMPARE TO</span></div></div>'+
-    '<div style="text-align:right"><div style="font-size:11px;color:#fff;font-family:var(--mono);white-space:nowrap">'+(regime?regime+' <span style="color:var(--text3)">· '+on+' on / '+off+' off</span>':'')+'</div>'+
+    '<div style="font-size:11.5px;color:var(--text2);margin-top:3px">Rule-based risk read from your synced price data · hover a pillar for its rules</div>'+
+    '<div id="macro-cmp" style="margin-top:10px;display:flex;gap:4px;align-items:center"><span style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-right:4px">COMPARE TO</span></div></div>'+
+    '<div style="text-align:right"><div style="font-size:12.5px;color:#fff;font-family:var(--mono);white-space:nowrap">'+(regime?regime+' <span style="color:var(--text3)">· '+on+' on / '+off+' off</span>':'')+'</div>'+
     '</div></div>';
-  h+='<div style="display:grid;grid-template-columns:minmax(150px,1.1fr) 96px 96px minmax(180px,3fr);align-items:center;padding:8px 16px;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);font-family:var(--mono);background:var(--bg3)">'+
+  h+='<div style="display:grid;grid-template-columns:minmax(150px,1.1fr) 96px 96px minmax(180px,3fr);align-items:center;padding:8px 16px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);font-family:var(--mono);background:var(--bg3)">'+
     '<div>Pillar</div><div>Score</div><div>'+cmpLbl+'</div><div>What drove it</div></div>';
   MACRO_PILLARS.forEach(([name,rule],i)=>{
     const n=now[i],p=prev[i],chg=n&&p&&n.v!==p.v;
     h+='<div title="'+rule.replace(/"/g,'&quot;')+'" style="display:grid;grid-template-columns:minmax(150px,1.1fr) 96px 96px minmax(180px,3fr);align-items:center;padding:10px 16px;border-top:1px solid var(--border2);gap:4px">'+
-      '<div style="font-size:12px;color:var(--text)">'+name+(chg?' <span style="color:var(--blue);font-size:9px;font-family:var(--mono)">CHANGED</span>':'')+'</div>'+
+      '<div style="font-size:13px;color:var(--text)">'+name+(chg?' <span style="color:var(--blue);font-size:11px;font-family:var(--mono)">CHANGED</span>':'')+'</div>'+
       '<div>'+chip(n)+'</div><div>'+chip(p)+'</div>'+
-      '<div style="font-size:10px;color:var(--text2);font-family:var(--mono)">'+(n?n.d:'Not enough data — sync again')+'</div></div>';
+      '<div style="font-size:11.5px;color:var(--text2);font-family:var(--mono)">'+(n?n.d:'Not enough data — sync again')+'</div></div>';
   });
   panel.innerHTML=h;
   {const gr=panel.querySelectorAll('div[title]')[4];
    if(gr&&gr.lastElementChild){
      const ov=_geoOvr();const box=document.createElement('div');box.style.cssText='margin-top:6px;display:flex;gap:6px;align-items:center;flex-wrap:wrap';
      const sel=document.createElement('select');
-     sel.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:10px;padding:2px 4px';
+     sel.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:11.5px;padding:2px 4px';
      [['auto','Auto (proxy)'],['1','Override: Risk On'],['0','Override: Neutral'],['-1','Override: Risk Off']].forEach(([k,t2])=>{const o=document.createElement('option');o.value=k;o.textContent=t2;sel.appendChild(o);});
      sel.value=ov?String(ov.v):'auto';
      const note=document.createElement('input');note.type='text';note.placeholder='note (e.g. midterms)';note.value=ov&&ov.note||'';
-     note.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:10px;padding:2px 6px;width:170px';
+     note.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:11.5px;padding:2px 6px;width:170px';
      const save=()=>{try{if(sel.value==='auto')localStorage.removeItem('macro_geo');else localStorage.setItem('macro_geo',JSON.stringify({v:+sel.value,note:note.value.trim()}));}catch(e){}renderSpreads();};
      sel.addEventListener('change',save);note.addEventListener('change',save);
      box.append(sel,note);gr.lastElementChild.appendChild(box);}}
   const cb=panel.querySelector('#macro-cmp');
   [[1,'1D'],[5,'1W']].forEach(([k,t])=>{
     const on=macroCmp===k,b=document.createElement('button');b.textContent=t;
-    b.style.cssText='background:'+(on?'var(--blue)':'var(--bg4)')+';border:1px solid '+(on?'var(--blue)':'var(--border2)')+';border-radius:3px;color:#fff;font-family:var(--mono);font-size:10px;padding:3px 9px;cursor:pointer';
+    b.style.cssText='background:'+(on?'var(--blue)':'var(--bg4)')+';border:1px solid '+(on?'var(--blue)':'var(--border2)')+';border-radius:3px;color:#fff;font-family:var(--mono);font-size:11.5px;padding:3px 9px;cursor:pointer';
     b.addEventListener('click',()=>{macroCmp=k;renderSpreads();});
     cb.appendChild(b);
   });
@@ -1329,15 +1329,15 @@ function renderSpreads(){
   const hdr=document.createElement('div');
   hdr.style.cssText='display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border2)';
   hdr.innerHTML='<div><div style="font-size:14px;font-weight:600;color:#fff">Where groups are separating</div>'+
-    '<div style="font-size:10px;color:var(--text2);margin-top:3px">Tracked ETF pairs · return difference in percentage points · biggest gaps first</div></div>'+
-    '<div style="font-size:10px;color:var(--text2);font-family:var(--mono);white-space:nowrap">'+rows.length+' tracked comparisons · '+tfLabel+'</div>';
+    '<div style="font-size:11.5px;color:var(--text2);margin-top:3px">Tracked ETF pairs · return difference in percentage points · biggest gaps first</div></div>'+
+    '<div style="font-size:11.5px;color:var(--text2);font-family:var(--mono);white-space:nowrap">'+rows.length+' tracked comparisons · '+tfLabel+'</div>';
   // In-panel timeframe toggle (kept in sync with the toolbar buttons)
   const tfBar=document.createElement('div');
   tfBar.style.cssText='display:flex;gap:4px;align-items:center;margin-top:10px';
   [['today','1D'],['1W','1W'],['1M','1M'],['3M','3M'],['6M','6M'],['YTD','YTD']].forEach(([k,lbl])=>{
     const b=document.createElement('button');
     const on=tf===k;
-    b.style.cssText='background:'+(on?'var(--blue)':'var(--bg4)')+';border:1px solid '+(on?'var(--blue)':'var(--border2)')+';border-radius:3px;color:#fff;font-family:var(--mono);font-size:10px;padding:3px 9px;cursor:pointer';
+    b.style.cssText='background:'+(on?'var(--blue)':'var(--bg4)')+';border:1px solid '+(on?'var(--blue)':'var(--border2)')+';border-radius:3px;color:#fff;font-family:var(--mono);font-size:11.5px;padding:3px 9px;cursor:pointer';
     b.textContent=lbl;
     b.addEventListener('click',()=>{
       tf=k;
@@ -1354,7 +1354,7 @@ function renderSpreads(){
 
   const chip=(tk,v)=>{
     const c=v>=0?'var(--green)':'var(--red)';
-    return '<span style="display:inline-flex;gap:6px;align-items:center;border:1px solid var(--border2);background:var(--bg3);border-radius:4px;padding:3px 7px;font-family:var(--mono);font-size:10px;color:var(--text)">'+tk+
+    return '<span style="display:inline-flex;gap:6px;align-items:center;border:1px solid var(--border2);background:var(--bg3);border-radius:4px;padding:3px 7px;font-family:var(--mono);font-size:11.5px;color:var(--text)">'+tk+
       ' <span style="color:'+c+'">'+(v>=0?'+':'')+v.toFixed(2)+'%</span></span>';
   };
   const t=localStorage.getItem('tt_time');
@@ -1368,12 +1368,12 @@ function renderSpreads(){
     card.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.a+'%2F'+r.b,'_blank'));
     card.innerHTML=
       '<div style="display:flex;justify-content:space-between;align-items:baseline">'+
-        '<div style="font-size:11px;font-weight:600;color:#fff;font-family:var(--mono)">'+r.a+' <span style="color:var(--text3);font-weight:400">vs</span> '+r.b+'</div>'+
+        '<div style="font-size:12.5px;font-weight:600;color:#fff;font-family:var(--mono)">'+r.a+' <span style="color:var(--text3);font-weight:400">vs</span> '+r.b+'</div>'+
         '<div style="font-size:15px;font-weight:600;color:'+sc+';font-family:var(--mono)">'+(r.spread>=0?'+':'')+r.spread.toFixed(2)+' pp</div>'+
       '</div>'+
-      '<div style="font-size:11px;color:var(--text2);margin:6px 0 10px">'+r.desc+'</div>'+
+      '<div style="font-size:12.5px;color:var(--text2);margin:6px 0 10px">'+r.desc+'</div>'+
       '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">'+chip(r.a,r.ra)+chip(r.b,r.rb)+'</div>'+
-      '<div style="font-size:9px;color:var(--text3);font-family:var(--mono)">'+tfLabel+' return spread'+(stamp?' · synced '+stamp:'')+'</div>';
+      '<div style="font-size:11px;color:var(--text3);font-family:var(--mono)">'+tfLabel+' return spread'+(stamp?' · synced '+stamp:'')+'</div>';
     grid.appendChild(card);
   });
   panel.appendChild(grid);
@@ -1518,7 +1518,7 @@ async function renderHighsLows(){
   if(!rows.length){
     const anyBars=Object.keys(cache).some(tk=>cache[tk]&&cache[tk].closes&&cache[tk].closes.length);
     main.innerHTML='<div class="state">'+
-      (anyBars?'No new highs or lows in the current data.':'No bar history in memory — hit Sync first.<br><span style="font-size:10px;color:var(--text3)">Highs/Lows uses per-day closes, which aren\'t cached across page reloads — a fresh Sync each session repopulates them.</span>')+
+      (anyBars?'No new highs or lows in the current data.':'No bar history in memory — hit Sync first.<br><span style="font-size:11.5px;color:var(--text3)">Highs/Lows uses per-day closes, which aren\'t cached across page reloads — a fresh Sync each session repopulates them.</span>')+
       '</div>';
     return;
   }
@@ -1549,15 +1549,15 @@ async function renderHighsLows(){
   const hdr=document.createElement('div');
   hdr.style.cssText='padding:12px 16px;border-bottom:1px solid var(--border2);background:var(--bg2);flex-shrink:0';
   const title=document.createElement('div');
-  title.style.cssText='font-size:12px;color:#fff;font-family:var(--mono);margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap';
+  title.style.cssText='font-size:13px;color:#fff;font-family:var(--mono);margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap';
   title.innerHTML='⚡ Highs / Lows <span style="color:var(--text3);font-weight:400">— new closing highs/lows across your tracked universe</span>'+
     (hitsSource==='persistent'
-      ? '<span style="font-size:9px;color:var(--green);border:1px solid var(--green);border-radius:3px;padding:1px 6px;font-weight:500">✓ hits: 12mo history</span>'
-      : '<span style="font-size:9px;color:var(--amber);border:1px solid var(--amber);border-radius:3px;padding:1px 6px;font-weight:500" title="Create a highs_lows_history table in Supabase for persistent hit counts across sessions">⚠ hits: session-only</span>');
+      ? '<span style="font-size:11px;color:var(--green);border:1px solid var(--green);border-radius:3px;padding:1px 6px;font-weight:500">✓ hits: 12mo history</span>'
+      : '<span style="font-size:11px;color:var(--amber);border:1px solid var(--amber);border-radius:3px;padding:1px 6px;font-weight:500" title="Create a highs_lows_history table in Supabase for persistent hit counts across sessions">⚠ hits: session-only</span>');
   hdr.appendChild(title);
 
   const breadthRow=document.createElement('div');
-  breadthRow.style.cssText='display:flex;align-items:center;justify-content:space-between;font-size:11px;font-family:var(--mono);margin-bottom:4px';
+  breadthRow.style.cssText='display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-family:var(--mono);margin-bottom:4px';
   breadthRow.innerHTML='<span style="color:var(--green)">New Highs '+hiPct+'% ('+highs.length+')</span><span style="color:var(--red)">New Lows '+loPct+'% ('+lows.length+')</span>';
   hdr.appendChild(breadthRow);
 
@@ -1574,21 +1574,21 @@ async function renderHighsLows(){
   const mkChip=(r)=>{
     const isG=r.isNewHigh;
     const chip=document.createElement('button');
-    chip.style.cssText='display:flex;align-items:center;gap:5px;background:'+(isG?'var(--gd)':'var(--rd)')+';border:1px solid '+(isG?'var(--green)':'var(--red)')+';border-radius:4px;color:'+(isG?'var(--green)':'var(--red)')+';font-family:var(--mono);font-size:12px;font-weight:500;padding:8px 10px;cursor:pointer;text-align:left';
+    chip.style.cssText='display:flex;align-items:center;gap:5px;background:'+(isG?'var(--gd)':'var(--rd)')+';border:1px solid '+(isG?'var(--green)':'var(--red)')+';border-radius:4px;color:'+(isG?'var(--green)':'var(--red)')+';font-family:var(--mono);font-size:13px;font-weight:500;padding:8px 10px;cursor:pointer;text-align:left';
     chip.innerHTML=(isG?'↑ ':'↓ ')+r.ticker+' <span style="opacity:.6;font-weight:400;margin-left:2px">| '+r.hits+'</span>';
     chip.addEventListener('click',()=>{hiloSelected=r;renderHiloDetail(r);});
     return chip;
   };
 
   const secH=document.createElement('div');
-  secH.style.cssText='font-size:9px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin:2px 0 6px';
+  secH.style.cssText='font-size:11px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin:2px 0 6px';
   secH.textContent='New Highs ('+highs.length+')';
   const gridH=document.createElement('div');
   gridH.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px;margin-bottom:16px';
   highs.forEach(r=>gridH.appendChild(mkChip(r)));
 
   const secL=document.createElement('div');
-  secL.style.cssText='font-size:9px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin:2px 0 6px';
+  secL.style.cssText='font-size:11px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin:2px 0 6px';
   secL.textContent='New Lows ('+lows.length+')';
   const gridL=document.createElement('div');
   gridL.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px';
@@ -1616,9 +1616,9 @@ function renderHiloDetail(r){
     '<span class="tk" style="font-size:16px">'+r.ticker+'</span>'+
     '<span style="font-family:var(--mono);font-size:16px;color:var(--text)">'+(r.price!=null?'$'+r.price.toFixed(2):'—')+'</span>'+
     '<span style="font-family:var(--mono);font-size:13px" class="'+pc(r.today)+'">'+f2(r.today)+'</span>'+
-    '<span style="font-size:11px;color:'+(isG?'var(--green)':'var(--red)')+';font-family:var(--mono)">'+r.hits+' new-'+(isG?'high':'low')+' closes</span>'+
-    '<span style="font-size:11px;color:var(--text2)">'+r.theme+'</span>'+
-    '<span style="font-size:10px;color:var(--text3);font-family:var(--mono)">Range: $'+r.lo52.toFixed(2)+' – $'+r.hi52.toFixed(2)+'</span>';
+    '<span style="font-size:12.5px;color:'+(isG?'var(--green)':'var(--red)')+';font-family:var(--mono)">'+r.hits+' new-'+(isG?'high':'low')+' closes</span>'+
+    '<span style="font-size:12.5px;color:var(--text2)">'+r.theme+'</span>'+
+    '<span style="font-size:11.5px;color:var(--text3);font-family:var(--mono)">Range: $'+r.lo52.toFixed(2)+' – $'+r.hi52.toFixed(2)+'</span>';
   const btn=document.createElement('button');
   btn.className='dback';btn.style.cssText+='margin-left:auto';btn.textContent='Open Chart →';
   btn.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
@@ -1685,7 +1685,7 @@ function renderTickerNews(){
 
   const prevBtn=document.createElement('button');prevBtn.className='xbtn';prevBtn.textContent='← Prev';
   const nextBtn=document.createElement('button');nextBtn.className='xbtn';nextBtn.textContent='Next →';
-  const posEl=document.createElement('span');posEl.id='news-pos';posEl.style.cssText='font-family:var(--mono);font-size:11px;color:var(--text2);width:90px;text-align:center;flex-shrink:0';
+  const posEl=document.createElement('span');posEl.id='news-pos';posEl.style.cssText='font-family:var(--mono);font-size:12.5px;color:var(--text2);width:90px;text-align:center;flex-shrink:0';
   const playBtn=document.createElement('button');playBtn.className='sbtn';playBtn.id='news-play';playBtn.textContent='▶ Play';
   const jumpIn=document.createElement('input');jumpIn.className='si';jumpIn.placeholder='Jump to ticker...';jumpIn.style.width='120px';
 
@@ -1741,16 +1741,16 @@ async function loadCurrentNews(){
   quote.innerHTML=
     '<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px">'+
       '<span class="tk" style="font-size:18px">'+ticker+'</span>'+
-      '<span style="font-size:11px;color:var(--text2)">'+theme+'</span>'+
+      '<span style="font-size:12.5px;color:var(--text2)">'+theme+'</span>'+
       '<span style="font-family:var(--mono);font-size:18px;color:var(--text);margin-left:auto">'+(d.price!=null?'$'+d.price.toFixed(2):'—')+'</span>'+
       '<span style="font-family:var(--mono);font-size:14px" class="'+pc(d.today)+'">'+f2(d.today)+'</span>'+
     '</div>'+
-    '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;font-family:var(--mono);font-size:11px">'+
-      '<div><div style="color:var(--text3);font-size:9px;text-transform:uppercase;margin-bottom:2px">Open</div>'+(lastBar&&lastBar.o!=null?'$'+lastBar.o.toFixed(2):'—')+'</div>'+
-      '<div><div style="color:var(--text3);font-size:9px;text-transform:uppercase;margin-bottom:2px">High</div>'+(lastBar&&lastBar.h!=null?'$'+lastBar.h.toFixed(2):'—')+'</div>'+
-      '<div><div style="color:var(--text3);font-size:9px;text-transform:uppercase;margin-bottom:2px">Low</div>'+(lastBar&&lastBar.l!=null?'$'+lastBar.l.toFixed(2):'—')+'</div>'+
-      '<div><div style="color:var(--text3);font-size:9px;text-transform:uppercase;margin-bottom:2px">Prev Close</div>'+(prevBar&&prevBar.c!=null?'$'+prevBar.c.toFixed(2):'—')+'</div>'+
-      '<div><div style="color:var(--text3);font-size:9px;text-transform:uppercase;margin-bottom:2px">Volume</div>'+(d.volume?(d.volume/1e6).toFixed(2)+'M':'—')+'</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;font-family:var(--mono);font-size:12.5px">'+
+      '<div><div style="color:var(--text3);font-size:11px;text-transform:uppercase;margin-bottom:2px">Open</div>'+(lastBar&&lastBar.o!=null?'$'+lastBar.o.toFixed(2):'—')+'</div>'+
+      '<div><div style="color:var(--text3);font-size:11px;text-transform:uppercase;margin-bottom:2px">High</div>'+(lastBar&&lastBar.h!=null?'$'+lastBar.h.toFixed(2):'—')+'</div>'+
+      '<div><div style="color:var(--text3);font-size:11px;text-transform:uppercase;margin-bottom:2px">Low</div>'+(lastBar&&lastBar.l!=null?'$'+lastBar.l.toFixed(2):'—')+'</div>'+
+      '<div><div style="color:var(--text3);font-size:11px;text-transform:uppercase;margin-bottom:2px">Prev Close</div>'+(prevBar&&prevBar.c!=null?'$'+prevBar.c.toFixed(2):'—')+'</div>'+
+      '<div><div style="color:var(--text3);font-size:11px;text-transform:uppercase;margin-bottom:2px">Volume</div>'+(d.volume?(d.volume/1e6).toFixed(2)+'M':'—')+'</div>'+
     '</div>';
   const chartBtn=document.createElement('button');
   chartBtn.className='xbtn';chartBtn.style.cssText='margin-top:10px';chartBtn.textContent='Open Chart →';
@@ -1759,7 +1759,7 @@ async function loadCurrentNews(){
   body.appendChild(quote);
 
   const newsHdr=document.createElement('div');
-  newsHdr.style.cssText='font-size:9px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin-bottom:8px';
+  newsHdr.style.cssText='font-size:11px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin-bottom:8px';
   newsHdr.textContent='Latest News';
   body.appendChild(newsHdr);
 
@@ -1774,11 +1774,11 @@ async function loadCurrentNews(){
   freshHolder.innerHTML='';
 
   if(articles===null){
-    freshHolder.innerHTML='<div style="color:var(--amber);font-size:11px">Enter your Polygon API key at top right to load news.</div>';
+    freshHolder.innerHTML='<div style="color:var(--amber);font-size:12.5px">Enter your Polygon API key at top right to load news.</div>';
     return;
   }
   if(!articles.length){
-    freshHolder.innerHTML='<div style="color:var(--text3);font-size:11px">No recent news found for '+ticker+'.</div>';
+    freshHolder.innerHTML='<div style="color:var(--text3);font-size:12.5px">No recent news found for '+ticker+'.</div>';
     return;
   }
   articles.forEach(a=>{
@@ -1786,15 +1786,15 @@ async function loadCurrentNews(){
     card.style.cssText='display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer';
     card.addEventListener('click',()=>window.open(a.url,'_blank'));
     const logo=document.createElement('div');
-    logo.style.cssText='width:32px;height:32px;border-radius:4px;background:var(--bg3);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text3)';
+    logo.style.cssText='width:32px;height:32px;border-radius:4px;background:var(--bg3);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3)';
     if(a.logo){
       const img=document.createElement('img');img.src=a.logo;img.style.cssText='width:100%;height:100%;object-fit:contain';img.onerror=()=>{logo.textContent='📰';};
       logo.appendChild(img);
     } else logo.textContent='📰';
     const info=document.createElement('div');info.style.cssText='flex:1;min-width:0';
     info.innerHTML=
-      '<div style="font-size:12px;color:var(--text);line-height:1.4;margin-bottom:3px">'+a.title+'</div>'+
-      '<div style="font-size:10px;color:var(--text3);font-family:var(--mono)">'+(a.publisher||'')+(a.publisher?' · ':'')+timeAgo(a.published)+'</div>';
+      '<div style="font-size:13px;color:var(--text);line-height:1.4;margin-bottom:3px">'+a.title+'</div>'+
+      '<div style="font-size:11.5px;color:var(--text3);font-family:var(--mono)">'+(a.publisher||'')+(a.publisher?' · ':'')+timeAgo(a.published)+'</div>';
     card.append(logo,info);
     freshHolder.appendChild(card);
   });
@@ -1841,7 +1841,7 @@ const NOTE_BORDERS=['rgba(139,92,246,0.4)','rgba(45,140,255,0.4)','rgba(0,201,12
 async function loadNotes(container){
   const data=await supaFetch('GET','/rest/v1/pulse_notes?select=*&order=created_at.desc&limit=100');
   if(!data||!Array.isArray(data)){
-    container.innerHTML='<div style="font-size:11px;color:var(--red);font-family:var(--mono)">Could not load notes — check Supabase table "pulse_notes" exists.</div>';
+    container.innerHTML='<div style="font-size:12.5px;color:var(--red);font-family:var(--mono)">Could not load notes — check Supabase table "pulse_notes" exists.</div>';
     return;
   }
   container.innerHTML='';
@@ -1863,7 +1863,7 @@ async function loadNotes(container){
     const hdr=document.createElement('div');
     hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:'+cat.bg;
     const hlbl=document.createElement('span');
-    hlbl.style.cssText='font-size:11px;font-family:var(--mono);font-weight:600;color:#fff;letter-spacing:.05em;text-transform:uppercase';
+    hlbl.style.cssText='font-size:12.5px;font-family:var(--mono);font-weight:600;color:#fff;letter-spacing:.05em;text-transform:uppercase';
     hlbl.textContent=cat.label+' ('+catNotes.length+')';
     hdr.appendChild(hlbl);
     section.appendChild(hdr);
@@ -1874,7 +1874,7 @@ async function loadNotes(container){
 
     if(!catNotes.length){
       const empty=document.createElement('div');
-      empty.style.cssText='font-size:11px;color:var(--text2);font-family:var(--mono);padding:4px 0';
+      empty.style.cssText='font-size:12.5px;color:var(--text2);font-family:var(--mono);padding:4px 0';
       empty.textContent='No '+cat.label.toLowerCase()+' yet.';
       grid.appendChild(empty);
     } else {
@@ -1894,7 +1894,7 @@ function renderNote(note,i,container){
   const topRow=document.createElement('div');
   topRow.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:6px';
   const author=document.createElement('span');
-  author.style.cssText='font-size:11px;font-family:var(--mono);color:'+NOTE_BORDERS[idx].replace('0.4','0.9')+';font-weight:500';
+  author.style.cssText='font-size:12.5px;font-family:var(--mono);color:'+NOTE_BORDERS[idx].replace('0.4','0.9')+';font-weight:500';
   author.textContent=note.author||'Anonymous';
   topRow.appendChild(author);
   const del=document.createElement('button');
@@ -1922,14 +1922,14 @@ function renderNote(note,i,container){
 
   // Note text
   const txt=document.createElement('div');
-  txt.style.cssText='font-size:12px;color:var(--text);line-height:1.55;word-break:break-word;font-family:var(--sans);white-space:pre-wrap';
+  txt.style.cssText='font-size:13px;color:var(--text);line-height:1.55;word-break:break-word;font-family:var(--sans);white-space:pre-wrap';
   txt.textContent=note.text;
   card.appendChild(txt);
 
   // Timestamp — readable, own line at bottom
   const d=new Date(note.created_at);
   const ts=document.createElement('div');
-  ts.style.cssText='font-size:11px;color:#ffffff;font-family:var(--mono);border-top:1px solid rgba(255,255,255,0.15);padding-top:6px;margin-top:2px;font-weight:500';
+  ts.style.cssText='font-size:12.5px;color:#ffffff;font-family:var(--mono);border-top:1px solid rgba(255,255,255,0.15);padding-top:6px;margin-top:2px;font-weight:500';
   ts.textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
   card.appendChild(ts);
 
@@ -2125,7 +2125,7 @@ function renderAlertSettings(){
   const tkIn=document.createElement('input');tkIn.className='as-in';tkIn.style.width='70px';tkIn.placeholder='TICKER';tkIn.style.textTransform='uppercase';
   const aboveIn=document.createElement('input');aboveIn.className='as-in';aboveIn.type='number';aboveIn.placeholder='Above $';aboveIn.style.width='80px';aboveIn.step='0.01';aboveIn.min='0';
   const belowIn=document.createElement('input');belowIn.className='as-in';belowIn.type='number';belowIn.placeholder='Below $';belowIn.style.width='80px';belowIn.step='0.01';belowIn.min='0';
-  const noteIn=document.createElement('input');noteIn.className='as-in';noteIn.placeholder='Note (optional)';noteIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12px;padding:3px 8px;width:140px;outline:none';
+  const noteIn=document.createElement('input');noteIn.className='as-in';noteIn.placeholder='Note (optional)';noteIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:13px;padding:3px 8px;width:140px;outline:none';
   const addBtn=document.createElement('button');addBtn.className='sbtn';addBtn.textContent='+ Add';
   addBtn.addEventListener('click',()=>{
     const tk=tkIn.value.trim().toUpperCase();if(!tk)return;
@@ -2138,9 +2138,9 @@ function renderAlertSettings(){
     saveCache();tkIn.value='';aboveIn.value='';belowIn.value='';noteIn.value='';
     renderAlertSettings();checkAlerts();
   });
-  const lbl_tk=document.createElement('span');lbl_tk.style.cssText='font-size:11px;color:var(--text2);font-family:var(--mono)';lbl_tk.textContent='Ticker';
-  const lbl_ab=document.createElement('span');lbl_ab.style.cssText='font-size:11px;color:var(--text2);font-family:var(--mono)';lbl_ab.textContent='Alert above';
-  const lbl_bl=document.createElement('span');lbl_bl.style.cssText='font-size:11px;color:var(--text2);font-family:var(--mono)';lbl_bl.textContent='or below';
+  const lbl_tk=document.createElement('span');lbl_tk.style.cssText='font-size:12.5px;color:var(--text2);font-family:var(--mono)';lbl_tk.textContent='Ticker';
+  const lbl_ab=document.createElement('span');lbl_ab.style.cssText='font-size:12.5px;color:var(--text2);font-family:var(--mono)';lbl_ab.textContent='Alert above';
+  const lbl_bl=document.createElement('span');lbl_bl.style.cssText='font-size:12.5px;color:var(--text2);font-family:var(--mono)';lbl_bl.textContent='or below';
   addRow.append(lbl_tk,tkIn,lbl_ab,aboveIn,lbl_bl,belowIn,noteIn,addBtn);
   s3.appendChild(addRow);
 
@@ -2151,19 +2151,19 @@ function renderAlertSettings(){
       const d=cache[ca.ticker];const curPrice=d?.price!=null?'$'+d.price.toFixed(2):'—';
       const tk2=document.createElement('span');tk2.style.cssText='width:60px;color:var(--blue);font-family:var(--mono);font-weight:500;cursor:pointer;flex-shrink:0';tk2.textContent=ca.ticker;
       tk2.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+ca.ticker,'_blank'));
-      const cur=document.createElement('span');cur.style.cssText='width:65px;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';cur.textContent='Now: '+curPrice;
-      const targets=document.createElement('span');targets.style.cssText='flex:1;font-size:11px;color:var(--text);font-family:var(--mono)';
+      const cur=document.createElement('span');cur.style.cssText='width:65px;font-family:var(--mono);font-size:12.5px;color:var(--text2);flex-shrink:0';cur.textContent='Now: '+curPrice;
+      const targets=document.createElement('span');targets.style.cssText='flex:1;font-size:12.5px;color:var(--text);font-family:var(--mono)';
       const parts=[];
       if(ca.priceAbove!=null)parts.push('▲ Above $'+ca.priceAbove.toFixed(2));
       if(ca.priceBelow!=null)parts.push('▼ Below $'+ca.priceBelow.toFixed(2));
       if(ca.note)parts.push('· '+ca.note);
       targets.textContent=parts.join('  ');
-      const delBtn=document.createElement('button');delBtn.style.cssText='background:transparent;border:1px solid var(--border2);border-radius:3px;color:var(--red);font-family:var(--mono);font-size:10px;padding:2px 7px;cursor:pointer';delBtn.textContent='✕';
+      const delBtn=document.createElement('button');delBtn.style.cssText='background:transparent;border:1px solid var(--border2);border-radius:3px;color:var(--red);font-family:var(--mono);font-size:11.5px;padding:2px 7px;cursor:pointer';delBtn.textContent='✕';
       delBtn.addEventListener('click',()=>{customTickerAlerts.splice(i,1);saveCache();renderAlertSettings();checkAlerts();});
       row.append(tk2,cur,targets,delBtn);s3.appendChild(row);
     });
   } else {
-    const none=document.createElement('div');none.style.cssText='color:var(--text2);font-size:11px;padding:10px 0';
+    const none=document.createElement('div');none.style.cssText='color:var(--text2);font-size:12.5px;padding:10px 0';
     none.textContent='No custom ticker alerts set.';s3.appendChild(none);
   }
   asv.appendChild(s3);
@@ -2176,27 +2176,27 @@ function renderAlertSettings(){
   const notesGrid=document.createElement('div');
   notesGrid.id='notes-grid';
   notesGrid.style.cssText='display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;min-height:40px';
-  notesGrid.innerHTML='<div style="font-size:11px;color:var(--text2);font-family:var(--mono);padding:8px 0">Loading notes...</div>';
+  notesGrid.innerHTML='<div style="font-size:12.5px;color:var(--text2);font-family:var(--mono);padding:8px 0">Loading notes...</div>';
   s4.appendChild(notesGrid);
 
   // Add note form
   const addNoteRow=document.createElement('div');
   addNoteRow.style.cssText='display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap';
   const authorIn=document.createElement('input');
-  authorIn.className='as-in';authorIn.placeholder='Your name';authorIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 8px;width:90px;outline:none';
+  authorIn.className='as-in';authorIn.placeholder='Your name';authorIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 8px;width:90px;outline:none';
   const savedAuthor=localStorage.getItem('pulse_author')||'';
   authorIn.value=savedAuthor;
   authorIn.addEventListener('input',()=>localStorage.setItem('pulse_author',authorIn.value.trim()));
   const tickerNoteIn=document.createElement('input');
-  tickerNoteIn.className='as-in';tickerNoteIn.placeholder='TICKER (opt)';tickerNoteIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 8px;width:90px;outline:none;text-transform:uppercase';
+  tickerNoteIn.className='as-in';tickerNoteIn.placeholder='TICKER (opt)';tickerNoteIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 8px;width:90px;outline:none;text-transform:uppercase';
   const noteTextIn=document.createElement('textarea');
   noteTextIn.placeholder='Write a note...';
-  noteTextIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--sans);font-size:12px;padding:6px 8px;width:260px;height:60px;outline:none;resize:vertical;line-height:1.5';
+  noteTextIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--sans);font-size:13px;padding:6px 8px;width:260px;height:60px;outline:none;resize:vertical;line-height:1.5';
   noteTextIn.addEventListener('focus',()=>noteTextIn.style.borderColor='var(--blue)');
   noteTextIn.addEventListener('blur',()=>noteTextIn.style.borderColor='var(--border2)');
   // Category selector
   const catSel=document.createElement('select');
-  catSel.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;outline:none;cursor:pointer';
+  catSel.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 6px;outline:none;cursor:pointer';
   [['long','📈 Long Idea'],['short','📉 Short Idea'],['general','💬 General']].forEach(([val,lbl])=>{
     const opt=document.createElement('option');
     opt.value=val;opt.textContent=lbl;catSel.appendChild(opt);
@@ -2230,14 +2230,14 @@ function renderAlertSettings(){
       const row=document.createElement('div');row.className='as-row';
       const tk=document.createElement('span');tk.style.cssText='width:60px;color:var(--blue);font-family:var(--mono);font-weight:500;cursor:pointer;flex-shrink:0';tk.textContent=a.ticker;
       tk.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+a.ticker,'_blank'));
-      const th2=document.createElement('span');th2.style.cssText='width:130px;font-size:11px;color:#c0cce0;flex-shrink:0';th2.textContent=a.theme;
+      const th2=document.createElement('span');th2.style.cssText='width:130px;font-size:12.5px;color:#eef2fa;flex-shrink:0';th2.textContent=a.theme;
       const msg=document.createElement('span');msg.style.color='var(--amber)';msg.textContent=a.msg;
-      const ts2=document.createElement('span');ts2.style.cssText='color:#fff;font-size:10px;font-family:var(--mono);flex-shrink:0;margin-left:auto;opacity:0.7';ts2.textContent=a.time||'';
+      const ts2=document.createElement('span');ts2.style.cssText='color:#fff;font-size:11.5px;font-family:var(--mono);flex-shrink:0;margin-left:auto;opacity:0.7';ts2.textContent=a.time||'';
       row.append(tk,th2,msg,ts2);s2.appendChild(row);
     });
     asv.appendChild(s2);
   } else {
-    const none=document.createElement('div');none.style.cssText='color:var(--text2);font-size:11px;margin-top:12px';
+    const none=document.createElement('div');none.style.cssText='color:var(--text2);font-size:12.5px;margin-top:12px';
     none.textContent=Object.keys(cache).length>0?'No alerts at current thresholds.':'Sync data first.';asv.appendChild(none);
   }
   main.innerHTML='';main.appendChild(asv);
@@ -2252,11 +2252,11 @@ function renderMAScan(){
   const wrap=main.firstElementChild; if(!wrap) return;
   const bar=document.createElement('div');
   bar.style.cssText='display:flex;align-items:center;gap:6px;padding:8px 14px;border-bottom:1px solid var(--border2);background:var(--bg);flex-shrink:0';
-  const lab=document.createElement('span');lab.textContent='Moving average';lab.style.cssText='font-size:11px;color:var(--text2);font-family:var(--mono);margin-right:4px';
+  const lab=document.createElement('span');lab.textContent='Moving average';lab.style.cssText='font-size:12.5px;color:var(--text2);font-family:var(--mono);margin-right:4px';
   bar.appendChild(lab);
   [['20','20 EMA'],['50','50 EMA']].forEach(([k,t])=>{
     const on=maScanWhich===k,b=document.createElement('button');b.textContent=t;
-    b.style.cssText='background:'+(on?'var(--blue)':'var(--bg4)')+';border:1px solid '+(on?'var(--blue)':'var(--border2)')+';border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:4px 12px;cursor:pointer';
+    b.style.cssText='background:'+(on?'var(--blue)':'var(--bg4)')+';border:1px solid '+(on?'var(--blue)':'var(--border2)')+';border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:4px 12px;cursor:pointer';
     b.addEventListener('click',()=>{maScanWhich=k;renderMAScan();});
     bar.appendChild(b);
   });
@@ -2274,48 +2274,48 @@ function renderScan(){
   ctrl.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border2);background:var(--bg2);flex-shrink:0;flex-wrap:wrap';
 
   const lbl=document.createElement('span');
-  lbl.style.cssText='font-size:12px;color:#fff;font-family:var(--mono)';
+  lbl.style.cssText='font-size:13px;color:#fff;font-family:var(--mono)';
   lbl.textContent='Within';
 
   // Threshold input
   const threshIn=document.createElement('input');
   threshIn.type='number';threshIn.value='1';threshIn.min='0.1';threshIn.max='10';threshIn.step='0.1';
-  threshIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:55px;outline:none;text-align:right';
+  threshIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 6px;width:55px;outline:none;text-align:right';
   const lbl2=document.createElement('span');
-  lbl2.style.cssText='font-size:12px;color:#fff;font-family:var(--mono)';
+  lbl2.style.cssText='font-size:13px;color:#fff;font-family:var(--mono)';
   lbl2.textContent='% of 50MA';
 
   const sep=document.createElement('span');sep.style.cssText='color:var(--border2);margin:0 4px';sep.textContent='|';
 
   // ATR% minimum filter
   const lbl3=document.createElement('span');
-  lbl3.style.cssText='font-size:12px;color:#fff;font-family:var(--mono)';
+  lbl3.style.cssText='font-size:13px;color:#fff;font-family:var(--mono)';
   lbl3.textContent='Min ATR%';
   const atrPctIn=document.createElement('input');
   atrPctIn.type='number';atrPctIn.value='4';atrPctIn.min='0';atrPctIn.max='50';atrPctIn.step='0.5';
-  atrPctIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:55px;outline:none;text-align:right';
+  atrPctIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 6px;width:55px;outline:none;text-align:right';
 
   const lbl4=document.createElement('span');
-  lbl4.style.cssText='font-size:12px;color:#fff;font-family:var(--mono)';
+  lbl4.style.cssText='font-size:13px;color:#fff;font-family:var(--mono)';
   lbl4.textContent='%';
   const sep2b=document.createElement('span');sep2b.style.cssText='color:var(--border2);margin:0 4px';sep2b.textContent='|';
 
   // Min avg dollar volume filter
   const lbl5=document.createElement('span');
-  lbl5.style.cssText='font-size:12px;color:#fff;font-family:var(--mono)';
+  lbl5.style.cssText='font-size:13px;color:#fff;font-family:var(--mono)';
   lbl5.textContent='Min AvgVol $';
   const dvolIn=document.createElement('input');
   dvolIn.type='number';dvolIn.value='80';dvolIn.min='0';dvolIn.step='10';
-  dvolIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:65px;outline:none;text-align:right';
+  dvolIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 6px;width:65px;outline:none;text-align:right';
   const lbl6=document.createElement('span');
-  lbl6.style.cssText='font-size:12px;color:#fff;font-family:var(--mono)';
+  lbl6.style.cssText='font-size:13px;color:#fff;font-family:var(--mono)';
   lbl6.textContent='M/day';
   const sep3=document.createElement('span');sep3.style.cssText='color:var(--border2);margin:0 4px';sep3.textContent='|';
 
   // Volume filter toggle
   const volToggle=document.createElement('button');
   volToggle.dataset.on='0';
-  volToggle.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 8px;cursor:pointer';
+  volToggle.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 8px;cursor:pointer';
   volToggle.textContent='Vol >1.5x only';
   volToggle.addEventListener('click',()=>{
     const on=volToggle.dataset.on==='1';
@@ -2328,19 +2328,19 @@ function renderScan(){
 
   const countEl=document.createElement('span');
   countEl.id='scan-count';
-  countEl.style.cssText='font-size:12px;color:#fff;font-family:var(--mono);margin-left:auto';
+  countEl.style.cssText='font-size:13px;color:#fff;font-family:var(--mono);margin-left:auto';
 
   // Wire all change handlers here after all elements are declared
   // Direction filter controls
   const sep4=document.createElement('span');sep4.style.cssText='color:var(--border2);margin:0 4px';sep4.textContent='|';
-  const dirLbl=document.createElement('span');dirLbl.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';dirLbl.textContent='Direction:';
+  const dirLbl=document.createElement('span');dirLbl.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono)';dirLbl.textContent='Direction:';
   const dirToggle=document.createElement('div');dirToggle.style.cssText='display:flex;gap:2px';
   dirToggle.dataset.dir='all';
   const dirBtns=[];
   const mkDirBtn=(lbl,val,activeCol,activeBg)=>{
     const btn=document.createElement('button');
     btn.dataset.val=val;
-    btn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 9px;cursor:pointer';
+    btn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:12.5px;padding:3px 9px;cursor:pointer';
     btn.textContent=lbl;
     btn.addEventListener('click',()=>{
       dirBtns.forEach(b=>{b.style.background='var(--bg3)';b.style.borderColor='var(--border2)';b.style.color='var(--text)';});
@@ -2364,13 +2364,13 @@ function renderScan(){
 
   // Daily / Weekly toggle for 50MA scan
   const sep5=document.createElement('span');sep5.style.cssText='color:var(--border2);margin:0 4px';sep5.textContent='|';
-  const tfLbl50=document.createElement('span');tfLbl50.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';tfLbl50.textContent='Timeframe:';
+  const tfLbl50=document.createElement('span');tfLbl50.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono)';tfLbl50.textContent='Timeframe:';
   const tfToggle50=document.createElement('div');tfToggle50.style.cssText='display:flex;gap:2px';tfToggle50.dataset.tf='daily';
   const tf50Btns=[];
   const mkTF50=(label,val)=>{
     const btn=document.createElement('button');
     const isOn=val==='daily';
-    btn.style.cssText='background:'+(isOn?'var(--bd)':'var(--bg3)')+';border:1px solid '+(isOn?'var(--blue)':'var(--border2)')+';border-radius:3px;color:'+(isOn?'var(--blue)':'var(--text)')+';font-family:var(--mono);font-size:11px;padding:3px 9px;cursor:pointer';
+    btn.style.cssText='background:'+(isOn?'var(--bd)':'var(--bg3)')+';border:1px solid '+(isOn?'var(--blue)':'var(--border2)')+';border-radius:3px;color:'+(isOn?'var(--blue)':'var(--text)')+';font-family:var(--mono);font-size:12.5px;padding:3px 9px;cursor:pointer';
     btn.textContent=label;
     btn.addEventListener('click',()=>{
       tf50Btns.forEach(b=>{b.style.background='var(--bg3)';b.style.borderColor='var(--border2)';b.style.color='var(--text)';});
@@ -2454,7 +2454,7 @@ function buildScanResults(thresh, volOnly, minAtrPct, minDVol, direction, scanTF
   body.innerHTML='';
 
   if(!results.length){
-    body.innerHTML='<div class="state" style="padding:30px;color:#c0cce0">No tickers within '+thresh+'% of '+maLabel+(volOnly?' with vol >1.5x':'')+'</div>';
+    body.innerHTML='<div class="state" style="padding:30px;color:#eef2fa">No tickers within '+thresh+'% of '+maLabel+(volOnly?' with vol >1.5x':'')+'</div>';
     return;
   }
 
@@ -2483,7 +2483,7 @@ function buildScanResults(thresh, volOnly, minAtrPct, minDVol, direction, scanTF
 
   // Header
   const hdr=document.createElement('div');
-  hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
+  hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:11px;color:#eef2fa;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
   const h50Static=(t,w,extra='')=>{const d=document.createElement('div');d.style.cssText='width:'+w+';text-align:right;flex-shrink:0;'+extra;d.textContent=t;addColumnTip(d,t);return d;};
   const h50Left=(t,w)=>{const d=document.createElement('div');d.style.cssText='width:'+w+';flex-shrink:0';d.textContent=t;return d;};
   hdr.append(
@@ -2514,32 +2514,32 @@ function buildScanResults(thresh, volOnly, minAtrPct, minDVol, direction, scanTF
     const pctCol=isAbove?'var(--green)':'var(--red)';
 
     const tk=document.createElement('div');
-    tk.style.cssText='width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:11px;flex-shrink:0';
+    tk.style.cssText='width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:12.5px;flex-shrink:0';
     tk.textContent=r.ticker;
 
     const th=document.createElement('div');
-    th.style.cssText='flex:1;font-size:11px;color:#cdd6e8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+    th.style.cssText='flex:1;font-size:12.5px;color:#eef2fa;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
     th.textContent=r.theme;
 
     const price=document.createElement('div');
-    price.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:#fff;flex-shrink:0';
+    price.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:12.5px;color:#fff;flex-shrink:0';
     price.textContent='$'+r.price.toFixed(2);
 
     const ma=document.createElement('div');
-    ma.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';
+    ma.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--text2);flex-shrink:0';
     ma.textContent='$'+r.ma50.toFixed(2);
 
     const pct=document.createElement('div');
-    pct.style.cssText='width:90px;text-align:right;font-family:var(--mono);font-size:11px;font-weight:500;flex-shrink:0;color:'+pctCol;
+    pct.style.cssText='width:90px;text-align:right;font-family:var(--mono);font-size:12.5px;font-weight:500;flex-shrink:0;color:'+pctCol;
     pct.textContent=(isAbove?'+':'')+r.pctFromMA.toFixed(3)+'%';
 
     const atr=document.createElement('div');
-    atr.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';
+    atr.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--text2);flex-shrink:0';
     atr.textContent=r.atr?'$'+r.atr.toFixed(2):'—';
 
     // Vol % — true daily volatility (20-day stddev of daily % changes)
     const atrPctEl=document.createElement('div');
-    atrPctEl.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:12px;flex-shrink:0';
+    atrPctEl.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:13px;flex-shrink:0';
     const atrPctVal = r.dailyVol??null;
     atrPctEl.style.color = atrPctVal>=2.5?'var(--green)':atrPctVal>=1.5?'#fff':'#c0cce0';
     atrPctEl.textContent = atrPctVal!=null ? atrPctVal.toFixed(2)+'%' : '—';
@@ -2553,12 +2553,12 @@ function buildScanResults(thresh, volOnly, minAtrPct, minDVol, direction, scanTF
     vol.appendChild(volChip(r.volume,r.avgVolume));
 
     const today=document.createElement('div');
-    today.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';
+    today.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:12.5px;flex-shrink:0';
     today.className=pc(r.today);today.textContent=f2(r.today);
 
     // Avg dollar volume cell
     const dvolEl=document.createElement('div');
-    dvolEl.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:12px;color:#c0cce0;flex-shrink:0';
+    dvolEl.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:13px;color:#eef2fa;flex-shrink:0';
     dvolEl.textContent=r.avgDVol!=null?'$'+r.avgDVol.toFixed(0)+'M':'—';
     row.append(tk,th,price,ma,pct,atr,atrPctEl,atrMA,vol,dvolEl,today);
     body.appendChild(row);
@@ -2657,13 +2657,13 @@ function renderPositions(){
     el.addEventListener('keydown',e=>{if(e.key==='Enter')addBtn.click();});
   });
 
-  const lbl=document.createElement('span');lbl.style.cssText='font-size:10px;color:var(--text2);font-family:var(--mono);margin-right:4px';
+  const lbl=document.createElement('span');lbl.style.cssText='font-size:11.5px;color:var(--text2);font-family:var(--mono);margin-right:4px';
   lbl.textContent='Add:';
 
   // Long/Short toggle
   const dirToggle=document.createElement('button');
   dirToggle.dataset.dir='long';
-  dirToggle.style.cssText='background:var(--gd);border:1px solid var(--green);border-radius:3px;color:var(--green);font-family:var(--mono);font-size:11px;padding:4px 10px;cursor:pointer;white-space:nowrap;min-width:60px';
+  dirToggle.style.cssText='background:var(--gd);border:1px solid var(--green);border-radius:3px;color:var(--green);font-family:var(--mono);font-size:12.5px;padding:4px 10px;cursor:pointer;white-space:nowrap;min-width:60px';
   dirToggle.textContent='LONG';
   dirToggle.addEventListener('click',()=>{
     const isLong=dirToggle.dataset.dir==='long';
@@ -2678,7 +2678,7 @@ function renderPositions(){
 
   // Refresh button — reloads positions from Supabase
   const refreshBtn=document.createElement('button');
-  refreshBtn.style.cssText='background:var(--bd);border:1px solid var(--blue);border-radius:3px;color:var(--blue);font-family:var(--mono);font-size:11px;padding:4px 12px;cursor:pointer;white-space:nowrap';
+  refreshBtn.style.cssText='background:var(--bd);border:1px solid var(--blue);border-radius:3px;color:var(--blue);font-family:var(--mono);font-size:12.5px;padding:4px 12px;cursor:pointer;white-space:nowrap';
   refreshBtn.textContent='⟳ Refresh';
   refreshBtn.title='Reload positions from shared database';
   refreshBtn.addEventListener('click',async()=>{
@@ -2694,7 +2694,7 @@ function renderPositions(){
   const tw=document.createElement('div');tw.style.cssText='flex:1;overflow-y:auto';
 
   if(!positions.length){
-    tw.innerHTML='<div class="state">No positions yet<br><span style="font-size:10px;color:var(--text2)">Enter a ticker above and click + Add Position</span></div>';
+    tw.innerHTML='<div class="state">No positions yet<br><span style="font-size:11.5px;color:var(--text2)">Enter a ticker above and click + Add Position</span></div>';
   } else {
     const tbl=document.createElement('table');
     const thead=document.createElement('thead');const hrow=document.createElement('tr');
@@ -2769,7 +2769,7 @@ function renderPositions(){
       const tdDir=document.createElement('td');
       const dirBadge=document.createElement('span');
       dirBadge.textContent=isLong?'L':'S';
-      dirBadge.style.cssText='display:inline-block;padding:1px 6px;border-radius:3px;font-family:var(--mono);font-size:10px;font-weight:600;'+(isLong?'background:var(--gd);color:var(--green);border:1px solid var(--green)':'background:var(--rd);color:var(--red);border:1px solid var(--red)');
+      dirBadge.style.cssText='display:inline-block;padding:1px 6px;border-radius:3px;font-family:var(--mono);font-size:11.5px;font-weight:600;'+(isLong?'background:var(--gd);color:var(--green);border:1px solid var(--green)':'background:var(--rd);color:var(--red);border:1px solid var(--red)');
       tdDir.appendChild(dirBadge);tr.appendChild(tdDir);
 
       // Ticker
@@ -2781,19 +2781,19 @@ function renderPositions(){
       // Theme
       const tdTheme=document.createElement('td');
       // themeName from rowData destructuring
-      tdTheme.style.cssText='font-size:12px;color:var(--blue);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+      tdTheme.style.cssText='font-size:13px;color:var(--blue);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
       tdTheme.textContent=themeName;
       tr.appendChild(tdTheme);
 
       // Entry Date
       const tdED=document.createElement('td');
-      tdED.style.cssText='font-family:var(--mono);font-size:11px;color:#fff;white-space:nowrap';
+      tdED.style.cssText='font-family:var(--mono);font-size:12.5px;color:#fff;white-space:nowrap';
       tdED.textContent=p.entry_date?p.entry_date:'—';
       tr.appendChild(tdED);
 
       // Notes — hover to see full text
       const tdN=document.createElement('td');
-      tdN.style.cssText='font-size:11px;color:#cdd6e8;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:default';
+      tdN.style.cssText='font-size:12.5px;color:#eef2fa;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:default';
       tdN.textContent=p.notes||'';
       tdN.title=p.notes||''; // shows full text on hover
       // Click to expand/collapse full note
@@ -2811,15 +2811,15 @@ function renderPositions(){
       tr.appendChild(tdN);
 
       // Price
-      const tdP=document.createElement('td');tdP.style.cssText='text-align:right;color:#fff;font-family:var(--mono);font-size:11px';
+      const tdP=document.createElement('td');tdP.style.cssText='text-align:right;color:#fff;font-family:var(--mono);font-size:12.5px';
       tdP.textContent=price!=null?'$'+price.toFixed(2):'—';tr.appendChild(tdP);
 
       // Entry
-      const tdE=document.createElement('td');tdE.style.cssText='text-align:right;color:#cdd6e8;font-family:var(--mono);font-size:11px';
+      const tdE=document.createElement('td');tdE.style.cssText='text-align:right;color:#eef2fa;font-family:var(--mono);font-size:12.5px';
       tdE.textContent=p.entry?'$'+p.entry.toFixed(2):'—';tr.appendChild(tdE);
 
       // % from Entry (pre-computed)
-      const tdMoveFrom=document.createElement('td');tdMoveFrom.style.cssText='text-align:right;font-family:var(--mono);font-size:11px;font-weight:500';
+      const tdMoveFrom=document.createElement('td');tdMoveFrom.style.cssText='text-align:right;font-family:var(--mono);font-size:12.5px;font-weight:500';
       if(pctFromEntry!=null){
         tdMoveFrom.style.color=pctFromEntry>=0?'var(--green)':'var(--red)';
         tdMoveFrom.textContent=(pctFromEntry>=0?'+':'')+pctFromEntry.toFixed(2)+'%';
@@ -2831,7 +2831,7 @@ function renderPositions(){
 
       // Vol %
       const tdVP=document.createElement('td');
-      tdVP.style.cssText='text-align:right;font-family:var(--mono);font-size:11px';
+      tdVP.style.cssText='text-align:right;font-family:var(--mono);font-size:12.5px';
       tdVP.style.color=volPct>=2.5?'var(--green)':volPct>=1.5?'#fff':'var(--text2)';
       tdVP.textContent=volPct?volPct.toFixed(2)+'%':'—';
       tr.appendChild(tdVP);
@@ -2866,8 +2866,8 @@ function renderPositions(){
 
         const mkField=(lbl,val,type='text')=>{
           const wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;gap:4px';
-          const l=document.createElement('label');l.style.cssText='font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em';l.textContent=lbl;
-          const inp=document.createElement('input');inp.className='pos-in';inp.type=type;inp.value=val||'';inp.style.cssText='width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12px;padding:6px 8px;outline:none';
+          const l=document.createElement('label');l.style.cssText='font-size:11.5px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em';l.textContent=lbl;
+          const inp=document.createElement('input');inp.className='pos-in';inp.type=type;inp.value=val||'';inp.style.cssText='width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:13px;padding:6px 8px;outline:none';
           inp.addEventListener('focus',()=>inp.style.borderColor='var(--blue)');
           inp.addEventListener('blur',()=>inp.style.borderColor='var(--border2)');
           wrap.append(l,inp);return{wrap,inp};
@@ -2881,11 +2881,11 @@ function renderPositions(){
 
         const btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:8px;justify-content:flex-end;margin-top:4px';
         const cancelBtn=document.createElement('button');cancelBtn.textContent='Cancel';
-        cancelBtn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:5px 14px;cursor:pointer';
+        cancelBtn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:5px 14px;cursor:pointer';
         cancelBtn.addEventListener('click',()=>document.body.removeChild(overlay));
 
         const saveEditBtn=document.createElement('button');saveEditBtn.textContent='Save';
-        saveEditBtn.style.cssText='background:var(--gd);border:1px solid var(--green);border-radius:3px;color:var(--green);font-family:var(--mono);font-size:11px;padding:5px 14px;cursor:pointer';
+        saveEditBtn.style.cssText='background:var(--gd);border:1px solid var(--green);border-radius:3px;color:var(--green);font-family:var(--mono);font-size:12.5px;padding:5px 14px;cursor:pointer';
         saveEditBtn.addEventListener('click',async()=>{
           posToEdit.entry_date=entryDateInp.value||posToEdit.entry_date||'';
           posToEdit.shares=parseFloat(sharesInp.value)||0;
@@ -2939,7 +2939,7 @@ function renderPositions(){
       const cols=hdrs.length;
       for(let i=0;i<cols;i++){
         const td=document.createElement('td');
-        td.style.cssText='padding:8px 10px;font-family:var(--mono);font-size:11px';
+        td.style.cssText='padding:8px 10px;font-family:var(--mono);font-size:12.5px';
         if(i===0){td.textContent='TOTAL';td.style.fontWeight='600';td.style.color='var(--text)';}
         trow.appendChild(td);
       }
@@ -3027,19 +3027,19 @@ function renderSofts(){
 
   const ctrl=document.createElement('div');
   ctrl.style.cssText='display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--border2);background:var(--bg2);flex-shrink:0;flex-wrap:wrap';
-  const lbl=document.createElement('span');lbl.style.cssText='font-size:12px;color:#fff;font-family:var(--mono)';lbl.textContent='Softs / Weather — ENSO + Cocoa & Coffee Belt Rainfall';
+  const lbl=document.createElement('span');lbl.style.cssText='font-size:13px;color:#fff;font-family:var(--mono)';lbl.textContent='Softs / Weather — ENSO + Cocoa & Coffee Belt Rainfall';
   const refreshBtn=document.createElement('button');
   refreshBtn.className='sbtn';refreshBtn.textContent='⟳ Refresh';
   const sep=document.createElement('span');sep.style.cssText='color:var(--border2)';sep.textContent='|';
-  const chartsLbl=document.createElement('span');chartsLbl.style.cssText='font-size:11px;color:var(--text2);font-family:var(--mono)';chartsLbl.textContent='Charts:';
+  const chartsLbl=document.createElement('span');chartsLbl.style.cssText='font-size:12.5px;color:var(--text2);font-family:var(--mono)';chartsLbl.textContent='Charts:';
   const mkChartLink=(sym,label)=>{
     const a=document.createElement('button');
-    a.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--blue);font-family:var(--mono);font-size:11px;padding:3px 8px;cursor:pointer';
+    a.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--blue);font-family:var(--mono);font-size:12.5px;padding:3px 8px;cursor:pointer';
     a.textContent=label;
     a.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+sym,'_blank'));
     return a;
   };
-  const updEl=document.createElement('span');updEl.id='softs-updated';updEl.style.cssText='font-size:10px;color:var(--text3);font-family:var(--mono);margin-left:auto';
+  const updEl=document.createElement('span');updEl.id='softs-updated';updEl.style.cssText='font-size:11.5px;color:var(--text3);font-family:var(--mono);margin-left:auto';
   ctrl.append(lbl,refreshBtn,sep,chartsLbl,mkChartLink('CC1!','Cocoa'),mkChartLink('KC1!','Coffee'),mkChartLink('SB1!','Sugar'),updEl);
 
   const body=document.createElement('div');
@@ -3132,7 +3132,7 @@ function renderSoftsBody(body){
   if(!softsData||softsData.error){
     body.innerHTML='<div class="state" style="color:var(--amber)">'+
       (softsData&&softsData.error?'Weather fetch failed: '+softsData.error:'No data yet')+
-      '<br><span style="font-size:10px;color:var(--text3)">Make sure the weather endpoint is deployed at:<br>'+WEATHER_URL+'</span></div>';
+      '<br><span style="font-size:11.5px;color:var(--text3)">Make sure the weather endpoint is deployed at:<br>'+WEATHER_URL+'</span></div>';
     return;
   }
 
@@ -3148,22 +3148,22 @@ function renderSoftsBody(body){
     const card=document.createElement('div');
     card.style.cssText='background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:14px';
     card.innerHTML=
-      '<div style="font-size:10px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin-bottom:8px">NOAA CPC ENSO Status</div>'+
+      '<div style="font-size:11.5px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin-bottom:8px">NOAA CPC ENSO Status</div>'+
       '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px">'+
         '<span style="font-size:20px;font-weight:500;color:'+phCol+';background:'+phBg+';padding:2px 10px;border-radius:4px">'+e.phase+'</span>'+
         '<span style="font-family:var(--mono);font-size:13px;color:var(--text)">RONI '+(e.value>0?'+':'')+e.value.toFixed(2)+'°C</span>'+
       '</div>'+
-      '<div style="font-size:11px;color:var(--text2);margin-bottom:10px">'+e.seas+' '+e.yr+' — Relative Oceanic Niño Index (replaced ONI, Feb 2026)</div>'+
-      '<div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:4px;text-transform:uppercase">Last 8 Seasons</div>';
+      '<div style="font-size:12.5px;color:var(--text2);margin-bottom:10px">'+e.seas+' '+e.yr+' — Relative Oceanic Niño Index (replaced ONI, Feb 2026)</div>'+
+      '<div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:4px;text-transform:uppercase">Last 8 Seasons</div>';
     const chartDiv=document.createElement('div');chartDiv.innerHTML=ensoTrendChart(e.trend);
     card.appendChild(chartDiv);
     const note=document.createElement('div');
-    note.style.cssText='font-size:10px;color:var(--text3);margin-top:8px;line-height:1.5';
+    note.style.cssText='font-size:11.5px;color:var(--text3);margin-top:8px;line-height:1.5';
     note.textContent='El Niño (amber) tends toward drier West Africa / wetter Brazil; La Niña (blue) the reverse — but relationships are probabilistic, not deterministic.';
     card.appendChild(note);
     grid.appendChild(card);
   } else {
-    const err=document.createElement('div');err.style.cssText='color:var(--red);font-size:11px';err.textContent='ENSO data unavailable'+(softsData.enso&&softsData.enso.error?': '+softsData.enso.error:'');
+    const err=document.createElement('div');err.style.cssText='color:var(--red);font-size:12.5px';err.textContent='ENSO data unavailable'+(softsData.enso&&softsData.enso.error?': '+softsData.enso.error:'');
     grid.appendChild(err);
   }
 
@@ -3172,17 +3172,17 @@ function renderSoftsBody(body){
     const card=document.createElement('div');
     card.style.cssText='background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:14px';
     if(r.error){
-      card.innerHTML='<div style="font-size:11px;color:var(--text)">'+r.label+'</div><div style="color:var(--red);font-size:11px;margin-top:6px">'+r.error+'</div>';
+      card.innerHTML='<div style="font-size:12.5px;color:var(--text)">'+r.label+'</div><div style="color:var(--red);font-size:12.5px;margin-top:6px">'+r.error+'</div>';
       grid.appendChild(card);return;
     }
     const anomCol=r.anomalyPct==null?'var(--text2)':r.anomalyPct>=10?'var(--green)':r.anomalyPct<=-10?'var(--red)':'var(--text2)';
     card.innerHTML=
-      '<div style="font-size:10px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin-bottom:8px">'+r.label+'</div>'+
+      '<div style="font-size:11.5px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin-bottom:8px">'+r.label+'</div>'+
       '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px">'+
         '<span style="font-family:var(--mono);font-size:18px;color:var(--text)">'+r.last30Actual+'mm</span>'+
-        '<span style="font-size:11px;color:var(--text2)">last 30d</span>'+
+        '<span style="font-size:12.5px;color:var(--text2)">last 30d</span>'+
       '</div>'+
-      '<div style="font-size:11px;color:var(--text2);margin-bottom:10px">Normal: '+(r.normal!=null?r.normal+'mm':'—')+
+      '<div style="font-size:12.5px;color:var(--text2);margin-bottom:10px">Normal: '+(r.normal!=null?r.normal+'mm':'—')+
         ' &nbsp;·&nbsp; <span style="color:'+anomCol+';font-weight:500">'+(r.anomalyPct!=null?((r.anomalyPct>0?'+':'')+r.anomalyPct+'% vs normal'):'—')+'</span></div>';
     const chartDiv=document.createElement('div');chartDiv.innerHTML=rainMiniChart(r.monthly);
     card.appendChild(chartDiv);
@@ -3197,27 +3197,27 @@ function renderSoftsBody(body){
     const insightCard=document.createElement('div');
     insightCard.style.cssText='background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:14px;margin-top:12px';
     const ihdr=document.createElement('div');
-    ihdr.style.cssText='font-size:10px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin-bottom:10px';
+    ihdr.style.cssText='font-size:11.5px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono);margin-bottom:10px';
     ihdr.textContent='What This Means';
     insightCard.appendChild(ihdr);
     const ul=document.createElement('ul');
     ul.style.cssText='margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px';
     insights.forEach(txt=>{
       const li=document.createElement('li');
-      li.style.cssText='font-size:12px;color:var(--text);line-height:1.5';
+      li.style.cssText='font-size:13px;color:var(--text);line-height:1.5';
       li.textContent=txt;
       ul.appendChild(li);
     });
     insightCard.appendChild(ul);
     const disclaimer=document.createElement('div');
-    disclaimer.style.cssText='font-size:10px;color:var(--text3);margin-top:10px';
+    disclaimer.style.cssText='font-size:11.5px;color:var(--text3);margin-top:10px';
     disclaimer.textContent='Auto-generated from the data above using simple, rule-based thresholds — a read on what the numbers show, not a forecast or trading recommendation.';
     insightCard.appendChild(disclaimer);
     body.appendChild(insightCard);
   }
 
   const foot=document.createElement('div');
-  foot.style.cssText='font-size:10px;color:var(--text3);margin-top:14px;line-height:1.6';
+  foot.style.cssText='font-size:11.5px;color:var(--text3);margin-top:14px;line-height:1.6';
   foot.innerHTML='Sources: NOAA CPC RONI (<a href="https://www.cpc.ncep.noaa.gov/data/indices/RONI.ascii.txt" target="_blank" style="color:var(--text2)">cpc.ncep.noaa.gov</a>) · Rainfall: Open-Meteo / ERA5 reanalysis at fixed reference coordinates per region — actual station siting will vary within each belt, treat as a directional signal, not local ground truth. Dashed line = 10-yr calendar-month normal. Grey bar = current month-to-date (partial).';
   body.appendChild(foot);
 }
@@ -3235,25 +3235,25 @@ function renderGaps(){
   ctrl.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border2);background:var(--bg2);flex-shrink:0;flex-wrap:wrap';
 
   const lbl=document.createElement('span');
-  lbl.style.cssText='font-size:12px;color:#fff;font-family:var(--mono)';
+  lbl.style.cssText='font-size:13px;color:#fff;font-family:var(--mono)';
   lbl.textContent='Min Gap %';
 
   const gapIn=document.createElement('input');
   gapIn.type='number';gapIn.value='10';gapIn.min='1';gapIn.max='100';gapIn.step='1';
-  gapIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:60px;outline:none;text-align:right';
+  gapIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 6px;width:60px;outline:none;text-align:right';
 
   const sep1=document.createElement('span');sep1.style.cssText='color:var(--border2);margin:0 4px';sep1.textContent='|';
 
   const lbl2=document.createElement('span');
-  lbl2.style.cssText='font-size:12px;color:#fff;font-family:var(--mono)';
+  lbl2.style.cssText='font-size:13px;color:#fff;font-family:var(--mono)';
   lbl2.textContent='Min AvgVol $';
 
   const dvolIn=document.createElement('input');
   dvolIn.type='number';dvolIn.value='80';dvolIn.min='0';dvolIn.step='10';
-  dvolIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:65px;outline:none;text-align:right';
+  dvolIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 6px;width:65px;outline:none;text-align:right';
 
   const lbl3=document.createElement('span');
-  lbl3.style.cssText='font-size:12px;color:#fff;font-family:var(--mono)';
+  lbl3.style.cssText='font-size:13px;color:#fff;font-family:var(--mono)';
   lbl3.textContent='M/day';
 
   const sep2=document.createElement('span');sep2.style.cssText='color:var(--border2);margin:0 4px';sep2.textContent='|';
@@ -3261,7 +3261,7 @@ function renderGaps(){
   // Vol filter toggle
   const volToggle=document.createElement('button');
   volToggle.dataset.on='1';
-  volToggle.style.cssText='background:var(--ad);border:1px solid var(--amber);border-radius:3px;color:var(--amber);font-family:var(--mono);font-size:11px;padding:4px 8px;cursor:pointer';
+  volToggle.style.cssText='background:var(--ad);border:1px solid var(--amber);border-radius:3px;color:var(--amber);font-family:var(--mono);font-size:12.5px;padding:4px 8px;cursor:pointer';
   volToggle.textContent='Vol >1x only';
   volToggle.addEventListener('click',()=>{
     const on=volToggle.dataset.on==='1';
@@ -3274,13 +3274,13 @@ function renderGaps(){
 
   const countEl=document.createElement('span');
   countEl.id='gap-count';
-  countEl.style.cssText='font-size:12px;color:#fff;font-family:var(--mono);margin-left:auto';
+  countEl.style.cssText='font-size:13px;color:#fff;font-family:var(--mono);margin-left:auto';
 
   // Session indicator
   const session=getMarketSession();
   const sessionCol=session==='Market Hours'?'var(--green)':session==='Pre-Market'?'var(--amber)':session==='After-Hours'?'var(--blue)':'var(--text2)';
   const sessionBadge=document.createElement('span');
-  sessionBadge.style.cssText='font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:3px;border:1px solid '+sessionCol+';color:'+sessionCol+';background:'+sessionCol+'22;flex-shrink:0';
+  sessionBadge.style.cssText='font-size:11.5px;font-family:var(--mono);padding:2px 8px;border-radius:3px;border:1px solid '+sessionCol+';color:'+sessionCol+';background:'+sessionCol+'22;flex-shrink:0';
   sessionBadge.textContent='⏱ '+session;
 
   const rebuild=()=>buildGaps(parseFloat(gapIn.value)||10,parseFloat(dvolIn.value)||80,volToggle.dataset.on==='1',body);
@@ -3350,13 +3350,13 @@ function buildGaps(minGap, minDVol, volOnly, body){
   body.innerHTML='';
 
   if(!results.length){
-    body.innerHTML=`<div class="state" style="padding:30px;color:var(--text2)">No gaps ≥${minGap}% found in today\'s data<br><span style="font-size:10px">Sync during market hours for fresh gap data</span></div>`;
+    body.innerHTML=`<div class="state" style="padding:30px;color:var(--text2)">No gaps ≥${minGap}% found in today\'s data<br><span style="font-size:11.5px">Sync during market hours for fresh gap data</span></div>`;
     return;
   }
 
   // Header
   const hdr=document.createElement('div');
-  hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
+  hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:11px;color:#eef2fa;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
   hdr.innerHTML=
     '<div style="width:60px;flex-shrink:0">Ticker</div>'+
     '<div style="flex:1">Theme</div>'+
@@ -3373,12 +3373,12 @@ function buildGaps(minGap, minDVol, volOnly, body){
   const mkSection=(title,rows,isUp)=>{
     if(!rows.length) return;
     const secHdr=document.createElement('div');
-    secHdr.style.cssText='padding:6px 14px;font-size:10px;font-weight:600;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;background:var(--bg3);border-bottom:1px solid var(--border2);color:'+(isUp?'var(--green)':'var(--red)')+';display:flex;align-items:center;gap:10px';
+    secHdr.style.cssText='padding:6px 14px;font-size:11.5px;font-weight:600;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;background:var(--bg3);border-bottom:1px solid var(--border2);color:'+(isUp?'var(--green)':'var(--red)')+';display:flex;align-items:center;gap:10px';
     const secTitle=document.createElement('span');
     secTitle.textContent=(isUp?'▲ Gap Up':'▼ Gap Down')+' — '+rows.length+' ticker'+(rows.length!==1?'s':'');
     const secNote=document.createElement('span');
     const noteCol=gapSession==='Market Hours'?'var(--green)':gapSession==='Pre-Market'?'var(--amber)':gapSession==='After-Hours'?'var(--blue)':'var(--text2)';
-    secNote.style.cssText='font-size:9px;color:'+noteCol+';letter-spacing:.04em;font-weight:400;text-transform:none';
+    secNote.style.cssText='font-size:11px;color:'+noteCol+';letter-spacing:.04em;font-weight:400;text-transform:none';
     secNote.textContent=gapSession==='Pre-Market'?'⚡ Pre-market gaps - may fill at open':
                         gapSession==='Market Hours'?'✓ Intraday gaps from yesterday close':
                         gapSession==='After-Hours'?'🌙 After-hours moves from today close':
@@ -3394,19 +3394,19 @@ function buildGaps(minGap, minDVol, volOnly, body){
       row.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
 
       const tk=document.createElement('div');
-      tk.style.cssText='width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:11px;flex-shrink:0';
+      tk.style.cssText='width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:12.5px;flex-shrink:0';
       tk.textContent=r.ticker;
 
       const th=document.createElement('div');
-      th.style.cssText='flex:1;font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+      th.style.cssText='flex:1;font-size:12.5px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
       th.textContent=r.theme;
 
       const gap=document.createElement('div');
-      gap.style.cssText='width:90px;text-align:right;font-family:var(--mono);font-size:12px;font-weight:600;flex-shrink:0;color:'+(isUp?'var(--green)':'var(--red)');
+      gap.style.cssText='width:90px;text-align:right;font-family:var(--mono);font-size:13px;font-weight:600;flex-shrink:0;color:'+(isUp?'var(--green)':'var(--red)');
       gap.textContent=(isUp?'+':'')+r.gap.toFixed(2)+'%';
 
       const price=document.createElement('div');
-      price.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0;color:#fff';
+      price.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:12.5px;flex-shrink:0;color:#fff';
       price.textContent=r.price!=null?'$'+r.price.toFixed(2):'—';
 
       const atrMA=document.createElement('div');
@@ -3418,7 +3418,7 @@ function buildGaps(minGap, minDVol, volOnly, body){
       vol.appendChild(volChip(r.volume,r.avgVolume));
 
       const dvol=document.createElement('div');
-      dvol.style.cssText='width:80px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';
+      dvol.style.cssText='width:80px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--text2);flex-shrink:0';
       dvol.textContent=r.avgDVol!=null?'$'+r.avgDVol.toFixed(0)+'M':'—';
 
       const w1=document.createElement('div');
@@ -3453,43 +3453,43 @@ function renderExtension(){
 
   // Min ATR multiple threshold
   const lbl1=document.createElement('span');
-  lbl1.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';
+  lbl1.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono)';
   lbl1.textContent='Min ATR/50MA';
   const atrIn=document.createElement('input');
   atrIn.type='number';atrIn.value='3';atrIn.min='0.5';atrIn.step='0.5';
-  atrIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:55px;outline:none;text-align:right';
+  atrIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 6px;width:55px;outline:none;text-align:right';
 
   const sep1=document.createElement('span');sep1.style.cssText='color:var(--border2);margin:0 4px';sep1.textContent='|';
 
   // Min Vol%
   const lbl2=document.createElement('span');
-  lbl2.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';
+  lbl2.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono)';
   lbl2.textContent='Min Vol %';
   const volPctIn=document.createElement('input');
   volPctIn.type='number';volPctIn.value='4';volPctIn.min='0';volPctIn.step='0.5';
-  volPctIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:55px;outline:none;text-align:right';
+  volPctIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 6px;width:55px;outline:none;text-align:right';
   const lbl2b=document.createElement('span');
-  lbl2b.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';
+  lbl2b.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono)';
   lbl2b.textContent='%';
 
   const sep2=document.createElement('span');sep2.style.cssText='color:var(--border2);margin:0 4px';sep2.textContent='|';
 
   // Min avg dollar volume
   const lbl3=document.createElement('span');
-  lbl3.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';
+  lbl3.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono)';
   lbl3.textContent='Min AvgVol $';
   const dvolIn=document.createElement('input');
   dvolIn.type='number';dvolIn.value='80';dvolIn.min='0';dvolIn.step='10';
-  dvolIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:65px;outline:none;text-align:right';
+  dvolIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 6px;width:65px;outline:none;text-align:right';
   const lbl3b=document.createElement('span');
-  lbl3b.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';
+  lbl3b.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono)';
   lbl3b.textContent='M/day';
 
   const sep3=document.createElement('span');sep3.style.cssText='color:var(--border2);margin:0 4px';sep3.textContent='|';
 
   // Direction toggle
   const dirLbl=document.createElement('span');
-  dirLbl.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';
+  dirLbl.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono)';
   dirLbl.textContent='Direction:';
   const extDirToggle=document.createElement('div');extDirToggle.style.cssText='display:flex;gap:2px';
   extDirToggle.dataset.dir='above';
@@ -3497,7 +3497,7 @@ function renderExtension(){
   const mkExtDir=(lbl,val,activeCol,activeBg)=>{
     const btn=document.createElement('button');
     btn.dataset.val=val;
-    btn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 9px;cursor:pointer';
+    btn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:12.5px;padding:3px 9px;cursor:pointer';
     btn.textContent=lbl;
     btn.addEventListener('click',()=>{
       extDirBtns.forEach(b=>{b.style.background='var(--bg3)';b.style.borderColor='var(--border2)';b.style.color='var(--text)';});
@@ -3516,7 +3516,7 @@ function renderExtension(){
 
   const countEl=document.createElement('span');
   countEl.id='ext-count';
-  countEl.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono);margin-left:auto';
+  countEl.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono);margin-left:auto';
 
   const rebuildExt=()=>{
     wrap.dataset.atr=atrIn.value;
@@ -3543,13 +3543,13 @@ function renderExtension(){
   const histHdr=document.createElement('div');
   histHdr.style.cssText='display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--bg2);cursor:pointer;user-select:none';
   const histLbl=document.createElement('span');
-  histLbl.style.cssText='font-size:11px;color:var(--text2);font-family:var(--mono);letter-spacing:.05em';
+  histLbl.style.cssText='font-size:12.5px;color:var(--text2);font-family:var(--mono);letter-spacing:.05em';
   histLbl.textContent='📋 EXTENSION HISTORY';
   const histToggleBtn=document.createElement('span');
-  histToggleBtn.style.cssText='font-size:10px;color:var(--blue);font-family:var(--mono);margin-left:auto';
+  histToggleBtn.style.cssText='font-size:11.5px;color:var(--blue);font-family:var(--mono);margin-left:auto';
   histToggleBtn.textContent='▼ Show';
   const backfillBtn=document.createElement('button');
-  backfillBtn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-family:var(--mono);font-size:9px;padding:2px 7px;cursor:pointer;margin-left:8px';
+  backfillBtn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-family:var(--mono);font-size:11px;padding:2px 7px;cursor:pointer;margin-left:8px';
   backfillBtn.textContent='⟳ Backfill';
   backfillBtn.title='Re-run historical backfill from bar data';
   const histBody=document.createElement('div');
@@ -3583,7 +3583,7 @@ function renderExtension(){
   });
 
   const exportBtn=document.createElement('button');
-  exportBtn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-family:var(--mono);font-size:9px;padding:2px 7px;cursor:pointer;margin-left:8px';
+  exportBtn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-family:var(--mono);font-size:11px;padding:2px 7px;cursor:pointer;margin-left:8px';
   exportBtn.textContent='↓ Export XLS';
   exportBtn.title='Download recurrence report as Excel';
   exportBtn.addEventListener('click',async(e)=>{
@@ -3801,7 +3801,7 @@ async function loadExtensionHistory(container){
   }
   // Clear any stale cache explicitly
   window._extHistCache=null;
-  container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text2);font-family:var(--mono)">Loading history...</div>';
+  container.innerHTML='<div style="padding:12px 14px;font-size:12.5px;color:var(--text2);font-family:var(--mono)">Loading history...</div>';
   const now=new Date();
   const y=now.getFullYear(),m=now.getMonth();
   const buckets=[];
@@ -3814,7 +3814,7 @@ async function loadExtensionHistory(container){
   }
 
   try{
-    container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text2);font-family:var(--mono)"><span style="display:inline-block;width:10px;height:10px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;vertical-align:middle"></span>Loading history...</div>';
+    container.innerHTML='<div style="padding:12px 14px;font-size:12.5px;color:var(--text2);font-family:var(--mono)"><span style="display:inline-block;width:10px;height:10px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;vertical-align:middle"></span>Loading history...</div>';
     // Fetch all buckets in parallel
     const allBucketData=await Promise.all(buckets.map(async bk=>{
       try{
@@ -3837,7 +3837,7 @@ async function loadExtensionHistory(container){
     window._extHistActiveTab=0;
     renderExtHistFromCache(container, allBucketData, 0);
   }catch(e){
-    container.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--red);font-family:var(--mono)">Error loading history: '+e.message+'</div>';
+    container.innerHTML='<div style="padding:12px 14px;font-size:12.5px;color:var(--red);font-family:var(--mono)">Error loading history: '+e.message+'</div>';
   }
 }
 
@@ -3849,7 +3849,7 @@ function renderExtHistFromCache(container, allBucketData, activeTabIdx){
 
   allBucketData.forEach(({bk,sorted},i)=>{
     const tab=document.createElement('button');
-    tab.style.cssText='background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text2);font-family:var(--mono);font-size:10px;padding:6px 12px;cursor:pointer;white-space:nowrap';
+    tab.style.cssText='background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text2);font-family:var(--mono);font-size:11.5px;padding:6px 12px;cursor:pointer;white-space:nowrap';
     tab.textContent=bk.label+' ('+(sorted.length)+')';
     tab.addEventListener('click',()=>{
       window._extHistActiveTab=i;
@@ -3865,7 +3865,7 @@ function renderExtHistFromCache(container, allBucketData, activeTabIdx){
     panels.push(panel);
 
     if(!sorted.length){
-      panel.innerHTML='<div style="padding:12px 14px;font-size:11px;color:var(--text2);font-family:var(--mono)">No extension events recorded this period.</div>';
+      panel.innerHTML='<div style="padding:12px 14px;font-size:12.5px;color:var(--text2);font-family:var(--mono)">No extension events recorded this period.</div>';
       return;
     }
 
@@ -3887,14 +3887,14 @@ function renderExtHistFromCache(container, allBucketData, activeTabIdx){
         const volXCol=volX>=2?'var(--green)':volX>=1.5?'var(--amber)':'var(--text2)';
         const avgDvol=r.avg_dvol!=null?parseFloat(r.avg_dvol):null;
         row.innerHTML=
-          '<div style="width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:11px;flex-shrink:0">'+r.ticker+'</div>'+
-          '<div style="flex:1;font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+r.theme+'</div>'+
-          '<div style="width:110px;text-align:right;font-family:var(--mono);font-size:12px;color:'+atrCol+';font-weight:500;flex-shrink:0">'+(isAbove?'+':'')+parseFloat(r.atr_ma).toFixed(2)+'x</div>'+
-          '<div style="width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:#fff;flex-shrink:0">'+(r.price?'$'+parseFloat(r.price).toFixed(2):'—')+'</div>'+
-          '<div style="width:70px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0">'+(r.vol_pct?parseFloat(r.vol_pct).toFixed(2)+'%':'—')+'</div>'+
-          '<div style="width:65px;text-align:right;font-family:var(--mono);font-size:11px;color:'+volXCol+';flex-shrink:0">'+(volX!=null?volX.toFixed(2)+'x':'—')+'</div>'+
-          '<div style="width:90px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0">'+(avgDvol!=null?'$'+avgDvol.toFixed(0)+'M':'—')+'</div>'+
-          '<div style="width:100px;text-align:right;font-family:var(--mono);font-size:10px;color:var(--text2);flex-shrink:0">'+dateStr+'</div>';
+          '<div style="width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:12.5px;flex-shrink:0">'+r.ticker+'</div>'+
+          '<div style="flex:1;font-size:12.5px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+r.theme+'</div>'+
+          '<div style="width:110px;text-align:right;font-family:var(--mono);font-size:13px;color:'+atrCol+';font-weight:500;flex-shrink:0">'+(isAbove?'+':'')+parseFloat(r.atr_ma).toFixed(2)+'x</div>'+
+          '<div style="width:75px;text-align:right;font-family:var(--mono);font-size:12.5px;color:#fff;flex-shrink:0">'+(r.price?'$'+parseFloat(r.price).toFixed(2):'—')+'</div>'+
+          '<div style="width:70px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--text2);flex-shrink:0">'+(r.vol_pct?parseFloat(r.vol_pct).toFixed(2)+'%':'—')+'</div>'+
+          '<div style="width:65px;text-align:right;font-family:var(--mono);font-size:12.5px;color:'+volXCol+';flex-shrink:0">'+(volX!=null?volX.toFixed(2)+'x':'—')+'</div>'+
+          '<div style="width:90px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--text2);flex-shrink:0">'+(avgDvol!=null?'$'+avgDvol.toFixed(0)+'M':'—')+'</div>'+
+          '<div style="width:100px;text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--text2);flex-shrink:0">'+dateStr+'</div>';
         rc.appendChild(row);
       });
     };
@@ -3914,7 +3914,7 @@ function renderExtHistFromCache(container, allBucketData, activeTabIdx){
     };
 
     const ph=document.createElement('div');
-    ph.style.cssText='display:flex;align-items:center;padding:0 14px;height:24px;font-size:9px;color:var(--text2);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:3';
+    ph.style.cssText='display:flex;align-items:center;padding:0 14px;height:24px;font-size:11px;color:var(--text2);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:3';
 
     const mkHCol=(label,col,width)=>{
       const h=document.createElement('div');
@@ -3938,7 +3938,7 @@ function renderExtHistFromCache(container, allBucketData, activeTabIdx){
     panel.appendChild(ph);
 
     const note=document.createElement('div');
-    note.style.cssText='padding:4px 14px;font-size:9px;color:var(--text3);font-family:var(--mono);background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0';
+    note.style.cssText='padding:4px 14px;font-size:11px;color:var(--text3);font-family:var(--mono);background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0';
     note.textContent='\u26a1 Vol \u00d7 populated by live Sync only \u2014 backfilled rows show \u2014 for that column';
     panel.appendChild(note);
 
@@ -3992,13 +3992,13 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
   body.innerHTML='';
 
   if(!results.length){
-    body.innerHTML='<div class="state" style="padding:30px;color:var(--text2)">No tickers found at current thresholds<br><span style="font-size:10px">Try lowering the Min ATR/50MA threshold</span></div>';
+    body.innerHTML='<div class="state" style="padding:30px;color:var(--text2)">No tickers found at current thresholds<br><span style="font-size:11.5px">Try lowering the Min ATR/50MA threshold</span></div>';
     return;
   }
 
   // Header
   const hdr=document.createElement('div');
-  hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
+  hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:11px;color:#eef2fa;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
   hdr.innerHTML=
     '<div style="width:60px;flex-shrink:0">Ticker</div>'+
     '<div style="flex:1">Theme</div>'+
@@ -4021,11 +4021,11 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
     row.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
 
     const tk=document.createElement('div');
-    tk.style.cssText='width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:11px;flex-shrink:0';
+    tk.style.cssText='width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:12.5px;flex-shrink:0';
     tk.textContent=r.ticker;
 
     const th=document.createElement('div');
-    th.style.cssText='flex:1;font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+    th.style.cssText='flex:1;font-size:12.5px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
     th.textContent=r.theme;
 
     const atrMA=document.createElement('div');
@@ -4033,11 +4033,11 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
     atrMA.appendChild(atrBar(r.atrMA));
 
     const price=document.createElement('div');
-    price.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:#fff;flex-shrink:0';
+    price.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:12.5px;color:#fff;flex-shrink:0';
     price.textContent=r.price?'$'+r.price.toFixed(2):'—';
 
     const vp=document.createElement('div');
-    vp.style.cssText='width:70px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';
+    vp.style.cssText='width:70px;text-align:right;font-family:var(--mono);font-size:12.5px;flex-shrink:0';
     vp.style.color=r.volPct>=2.5?'var(--green)':r.volPct>=1.5?'#fff':'var(--text2)';
     vp.textContent=r.volPct?r.volPct.toFixed(2)+'%':'—';
 
@@ -4046,7 +4046,7 @@ function buildExtension(minAtr, minVolPct, minDVol, direction, body){
     vol.appendChild(volChip(r.volume,r.avgVolume));
 
     const dvol=document.createElement('div');
-    dvol.style.cssText='width:80px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';
+    dvol.style.cssText='width:80px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--text2);flex-shrink:0';
     dvol.textContent=r.avgDVol?'$'+r.avgDVol.toFixed(0)+'M':'—';
 
     const today=document.createElement('div');
@@ -4149,7 +4149,7 @@ function renderCorrelation(tk1, tk2){
   wrap.appendChild(title);
 
   const subtitle=document.createElement('div');
-  subtitle.style.cssText='font-size:11px;color:var(--text2);margin-bottom:20px;font-family:var(--mono)';
+  subtitle.style.cssText='font-size:12.5px;color:var(--text2);margin-bottom:20px;font-family:var(--mono)';
   subtitle.textContent='Directional concordance (primary) · Spearman r (reference) · 80%+ same direction = Strong positive';
   wrap.appendChild(subtitle);
 
@@ -4166,7 +4166,7 @@ function renderCorrelation(tk1, tk2){
 
   if(!aligned1.length||!aligned2.length){
     const err=document.createElement('div');
-    err.style.cssText='color:var(--amber);font-size:12px;font-family:var(--mono);padding:16px;background:var(--bg3);border-radius:4px;border:1px solid var(--border2)';
+    err.style.cssText='color:var(--amber);font-size:13px;font-family:var(--mono);padding:16px;background:var(--bg3);border-radius:4px;border:1px solid var(--border2)';
     err.textContent='⚠ Missing data for '+((!d1||!d1.closes)?tk1.toUpperCase():'')+((!d1||!d1.closes)&&(!d2||!d2.closes)?' and ':'')+
       ((!d2||!d2.closes)?tk2.toUpperCase():'')+'. Run Sync first to load bar data.';
     wrap.appendChild(err);
@@ -4233,7 +4233,7 @@ function renderCorrelation(tk1, tk2){
     card.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:14px 12px;text-align:center';
 
     const lbl=document.createElement('div');
-    lbl.style.cssText='font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px';
+    lbl.style.cssText='font-size:11.5px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px';
     lbl.textContent=label;
 
     // Primary: concordance score
@@ -4242,17 +4242,17 @@ function renderCorrelation(tk1, tk2){
     val.textContent=conc!==null?conc.toFixed(2):'—';
 
     const desc=document.createElement('div');
-    desc.style.cssText='font-size:9px;margin-top:4px;font-family:var(--mono);color:'+concColor(conc);
+    desc.style.cssText='font-size:11px;margin-top:4px;font-family:var(--mono);color:'+concColor(conc);
     desc.textContent=concLabel(conc);
 
     // Secondary: % same direction
     const agreeEl=document.createElement('div');
-    agreeEl.style.cssText='font-size:11px;margin-top:6px;font-family:var(--mono);color:'+(agree>=65?'var(--green)':agree>=50?'var(--amber)':'var(--red)')+';border-top:1px solid rgba(255,255,255,0.08);padding-top:5px';
+    agreeEl.style.cssText='font-size:12.5px;margin-top:6px;font-family:var(--mono);color:'+(agree>=65?'var(--green)':agree>=50?'var(--amber)':'var(--red)')+';border-top:1px solid rgba(255,255,255,0.08);padding-top:5px';
     agreeEl.textContent=agree!==null?(agree+'% same direction'):'—';
 
     // Tertiary: Spearman r for institutional reference
     const rEl=document.createElement('div');
-    rEl.style.cssText='font-size:10px;margin-top:3px;font-family:var(--mono);color:var(--text2)';
+    rEl.style.cssText='font-size:11.5px;margin-top:3px;font-family:var(--mono);color:var(--text2)';
     rEl.textContent=r!==null?('Spearman r = '+r.toFixed(2)):'—';
 
     card.append(lbl,val,desc,agreeEl,rEl);
@@ -4268,7 +4268,7 @@ function renderCorrelation(tk1, tk2){
     const row=document.createElement('div');
     row.style.cssText='display:flex;align-items:center;gap:12px;margin-bottom:10px';
     const lbl=document.createElement('span');
-    lbl.style.cssText='width:70px;font-size:11px;color:var(--text2);font-family:var(--mono);flex-shrink:0';
+    lbl.style.cssText='width:70px;font-size:12.5px;color:var(--text2);font-family:var(--mono);flex-shrink:0';
     lbl.textContent=label+':';
     const track=document.createElement('div');
     track.style.cssText='flex:1;height:8px;background:var(--bg4);border-radius:4px;position:relative;overflow:hidden';
@@ -4283,7 +4283,7 @@ function renderCorrelation(tk1, tk2){
     ctr.style.cssText='position:absolute;left:50%;width:1px;height:100%;background:var(--border2)';
     track.append(fill,ctr);
     const val=document.createElement('span');
-    val.style.cssText='width:45px;font-size:11px;font-family:var(--mono);font-weight:600;color:'+col+';text-align:right;flex-shrink:0';
+    val.style.cssText='width:45px;font-size:12.5px;font-family:var(--mono);font-weight:600;color:'+col+';text-align:right;flex-shrink:0';
     val.textContent=conc.toFixed(2);
     row.append(lbl,track,val);
     return row;
@@ -4292,7 +4292,7 @@ function renderCorrelation(tk1, tk2){
   const barsSection=document.createElement('div');
   barsSection.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:14px 16px;margin-bottom:16px';
   const barsTitle=document.createElement('div');
-  barsTitle.style.cssText='font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px';
+  barsTitle.style.cssText='font-size:11.5px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px';
   barsTitle.textContent='Correlation Scale  (-1 = inverse  ·  0 = none  ·  +1 = perfect)';
   barsSection.appendChild(barsTitle);
   [5,10,20,50,100,200].forEach(d=>{
@@ -4308,8 +4308,8 @@ function renderCorrelation(tk1, tk2){
     const box=document.createElement('div');
     box.style.cssText='flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:12px 14px';
     const t=document.createElement('div');t.style.cssText='font-size:14px;font-weight:600;color:var(--blue);font-family:var(--mono)';t.textContent=tk.toUpperCase();
-    const p=document.createElement('div');p.style.cssText='font-size:11px;color:var(--text2);margin-top:4px';p.textContent=d.price?'$'+d.price.toFixed(2):'No price data';
-    const chg=document.createElement('div');chg.style.cssText='font-size:11px;margin-top:2px';
+    const p=document.createElement('div');p.style.cssText='font-size:12.5px;color:var(--text2);margin-top:4px';p.textContent=d.price?'$'+d.price.toFixed(2):'No price data';
+    const chg=document.createElement('div');chg.style.cssText='font-size:12.5px;margin-top:2px';
     chg.style.color=d.today>0?'var(--green)':d.today<0?'var(--red)':'var(--text2)';
     chg.textContent=d.today!=null?(d.today>0?'+':'')+d.today.toFixed(2)+'% today':'';
     box.append(t,p,chg);
@@ -4320,7 +4320,7 @@ function renderCorrelation(tk1, tk2){
 
   // Back button
   const back=document.createElement('button');
-  back.className='dback';back.textContent='← Back';back.style.cssText='margin-top:16px;background:transparent;border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:4px 10px;cursor:pointer';
+  back.className='dback';back.textContent='← Back';back.style.cssText='margin-top:16px;background:transparent;border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:4px 10px;cursor:pointer';
   back.addEventListener('click',()=>{document.getElementById('gsearch').value='';renderMain();});
   wrap.appendChild(back);
 
@@ -4354,7 +4354,7 @@ function showAddTickerModal(){
   hdr.append(title,closeBtn);
 
   const sub=document.createElement('div');
-  sub.style.cssText='font-size:11px;color:var(--text2);font-family:var(--mono)';
+  sub.style.cssText='font-size:12.5px;color:var(--text2);font-family:var(--mono)';
   sub.textContent='Add any ticker to your personal watchlist — gets synced with Polygon data automatically';
 
   // Input row
@@ -4368,7 +4368,7 @@ function showAddTickerModal(){
 
   const addBtn2=document.createElement('button');
   addBtn2.className='sbtn';addBtn2.textContent='Add';
-  addBtn2.style.cssText='background:var(--gd);border:1px solid var(--green);border-radius:3px;color:var(--green);font-family:var(--mono);font-size:12px;padding:6px 16px;cursor:pointer';
+  addBtn2.style.cssText='background:var(--gd);border:1px solid var(--green);border-radius:3px;color:var(--green);font-family:var(--mono);font-size:13px;padding:6px 16px;cursor:pointer';
   addBtn2.addEventListener('click',async()=>{
     const tk=inp.value.trim().toUpperCase();
     if(!tk){inp.focus();return;}
@@ -4389,7 +4389,7 @@ function showAddTickerModal(){
 
   // Current watchlist
   const wlTitle=document.createElement('div');
-  wlTitle.style.cssText='font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;padding-top:4px;border-top:1px solid var(--border)';
+  wlTitle.style.cssText='font-size:11.5px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;padding-top:4px;border-top:1px solid var(--border)';
   wlTitle.textContent='Current Watchlist';
 
   const wlList=document.createElement('div');
@@ -4400,7 +4400,7 @@ function showAddTickerModal(){
     wlList.innerHTML='';
     if(!watchlistTickers.length){
       const empty=document.createElement('div');
-      empty.style.cssText='font-size:11px;color:var(--text2);font-family:var(--mono);padding:8px 0';
+      empty.style.cssText='font-size:12.5px;color:var(--text2);font-family:var(--mono);padding:8px 0';
       empty.textContent='No custom tickers yet';
       wlList.appendChild(empty);
       return;
@@ -4409,16 +4409,16 @@ function showAddTickerModal(){
       const item=document.createElement('div');
       item.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:5px 8px;background:var(--bg3);border-radius:3px;border:1px solid var(--border)';
       const tklbl=document.createElement('span');
-      tklbl.style.cssText='font-family:var(--mono);font-size:12px;color:var(--blue);font-weight:500';
+      tklbl.style.cssText='font-family:var(--mono);font-size:13px;color:var(--blue);font-weight:500';
       tklbl.textContent=tk;
       // Check if in themes
       const inThemes=THEMES.some(t=>t.tickers.includes(tk));
       const badge=document.createElement('span');
-      badge.style.cssText='font-size:9px;color:var(--text2);font-family:var(--mono)';
+      badge.style.cssText='font-size:11px;color:var(--text2);font-family:var(--mono)';
       badge.textContent=inThemes?'in themes':'watchlist only';
       const rmBtn=document.createElement('button');
       rmBtn.textContent='✕';
-      rmBtn.style.cssText='background:none;border:none;color:var(--red);cursor:pointer;font-size:12px;opacity:0.6;padding:0 2px';
+      rmBtn.style.cssText='background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;opacity:0.6;padding:0 2px';
       rmBtn.addEventListener('click',async()=>{
         await removeFromWatchlist(tk);
         renderWatchlistItems();
@@ -4430,7 +4430,7 @@ function showAddTickerModal(){
   renderWatchlistItems();
 
   const note=document.createElement('div');
-  note.style.cssText='font-size:10px;color:var(--text2);font-family:var(--mono);line-height:1.6';
+  note.style.cssText='font-size:11.5px;color:var(--text2);font-family:var(--mono);line-height:1.6';
   note.textContent='⚡ Watchlist tickers are fetched during Sync and available for search and correlation lookups. Shared across all users.';
 
   modal.append(hdr,sub,row,wlTitle,wlList,note);
@@ -4607,9 +4607,9 @@ function mkH(label, col){
     // Small info icon that triggers tooltip — separate from sort click
     const icon=document.createElement('span');
     icon.textContent=' ⓘ';
-    icon.style.cssText='font-size:9px;opacity:0.5;cursor:help;vertical-align:middle';
+    icon.style.cssText='font-size:11px;opacity:0.5;cursor:help;vertical-align:middle';
     const tipDiv=document.createElement('div');
-    tipDiv.style.cssText='display:none;position:fixed;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:8px 10px;font-size:11px;font-family:var(--sans);line-height:1.5;width:220px;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.5);font-weight:400;text-align:left;white-space:normal;pointer-events:none';
+    tipDiv.style.cssText='display:none;position:fixed;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:8px 10px;font-size:12.5px;font-family:var(--sans);line-height:1.5;width:220px;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.5);font-weight:400;text-align:left;white-space:normal;pointer-events:none';
     tipDiv.textContent=tip;
     h.append(inner,icon);
     setTimeout(()=>{if(!tipDiv.parentElement)document.body.appendChild(tipDiv);},0);
@@ -4644,10 +4644,10 @@ function addColumnTip(container, label){
   if(!tip) return;
   const icon=document.createElement('span');
   icon.textContent=' ⓘ';
-  icon.style.cssText='font-size:9px;opacity:0.5;cursor:help;vertical-align:middle';
+  icon.style.cssText='font-size:11px;opacity:0.5;cursor:help;vertical-align:middle';
   container.appendChild(icon);
   const tipDiv=document.createElement('div');
-  tipDiv.style.cssText='display:none;position:fixed;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:8px 10px;font-size:11px;font-family:var(--sans);line-height:1.5;width:220px;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.5);font-weight:400;text-align:left;white-space:normal;pointer-events:none';
+  tipDiv.style.cssText='display:none;position:fixed;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:8px 10px;font-size:12.5px;font-family:var(--sans);line-height:1.5;width:220px;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.5);font-weight:400;text-align:left;white-space:normal;pointer-events:none';
   tipDiv.textContent=tip;
   setTimeout(()=>{if(!tipDiv.parentElement)document.body.appendChild(tipDiv);},0);
   icon.addEventListener('click',(e)=>{
@@ -4676,9 +4676,9 @@ function mkHStatic(label, align){
   if(tip){
     const inner=document.createElement('span');inner.textContent=label;
     const icon=document.createElement('span');icon.textContent=' ⓘ';
-    icon.style.cssText='font-size:9px;opacity:0.5;cursor:help;vertical-align:middle';
+    icon.style.cssText='font-size:11px;opacity:0.5;cursor:help;vertical-align:middle';
     const tipDiv=document.createElement('div');
-    tipDiv.style.cssText='display:none;position:fixed;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:8px 10px;font-size:11px;font-family:var(--sans);line-height:1.5;width:220px;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.5);font-weight:400;text-align:left;white-space:normal;pointer-events:none';
+    tipDiv.style.cssText='display:none;position:fixed;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:8px 10px;font-size:12.5px;font-family:var(--sans);line-height:1.5;width:220px;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.5);font-weight:400;text-align:left;white-space:normal;pointer-events:none';
     tipDiv.textContent=tip;
     h.append(inner,icon);
     setTimeout(()=>{if(!tipDiv.parentElement)document.body.appendChild(tipDiv);},0);
@@ -4709,35 +4709,35 @@ function render20MAScan(){
   const main=document.getElementById('main');const noData=Object.keys(cache).length===0;
   const wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;height:100%;overflow:hidden';
   const ctrl=document.createElement('div');ctrl.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border2);background:var(--bg2);flex-shrink:0;flex-wrap:wrap';
-  const lbl=document.createElement('span');lbl.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';lbl.textContent='Within';
-  const threshIn=document.createElement('input');threshIn.type='number';threshIn.value='2';threshIn.min='0.1';threshIn.max='10';threshIn.step='0.1';threshIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:55px;outline:none;text-align:right';
-  const lbl2=document.createElement('span');lbl2.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';lbl2.textContent='% of 20MA';
+  const lbl=document.createElement('span');lbl.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono)';lbl.textContent='Within';
+  const threshIn=document.createElement('input');threshIn.type='number';threshIn.value='2';threshIn.min='0.1';threshIn.max='10';threshIn.step='0.1';threshIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 6px;width:55px;outline:none;text-align:right';
+  const lbl2=document.createElement('span');lbl2.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono)';lbl2.textContent='% of 20MA';
   const sep1=document.createElement('span');sep1.style.cssText='color:var(--border2);margin:0 4px';sep1.textContent='|';
-  const lbl3=document.createElement('span');lbl3.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';lbl3.textContent='Min ATR%';
-  const atrPctIn=document.createElement('input');atrPctIn.type='number';atrPctIn.value='4';atrPctIn.min='0';atrPctIn.step='0.5';atrPctIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:55px;outline:none;text-align:right';
-  const lbl4=document.createElement('span');lbl4.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';lbl4.textContent='%';
+  const lbl3=document.createElement('span');lbl3.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono)';lbl3.textContent='Min ATR%';
+  const atrPctIn=document.createElement('input');atrPctIn.type='number';atrPctIn.value='4';atrPctIn.min='0';atrPctIn.step='0.5';atrPctIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 6px;width:55px;outline:none;text-align:right';
+  const lbl4=document.createElement('span');lbl4.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono)';lbl4.textContent='%';
   const sep2=document.createElement('span');sep2.style.cssText='color:var(--border2);margin:0 4px';sep2.textContent='|';
-  const lbl5=document.createElement('span');lbl5.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';lbl5.textContent='Min AvgVol $';
-  const dvolIn=document.createElement('input');dvolIn.type='number';dvolIn.value='80';dvolIn.min='0';dvolIn.step='10';dvolIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:11px;padding:3px 6px;width:65px;outline:none;text-align:right';
-  const lbl6=document.createElement('span');lbl6.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';lbl6.textContent='M/day';
+  const lbl5=document.createElement('span');lbl5.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono)';lbl5.textContent='Min AvgVol $';
+  const dvolIn=document.createElement('input');dvolIn.type='number';dvolIn.value='80';dvolIn.min='0';dvolIn.step='10';dvolIn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12.5px;padding:3px 6px;width:65px;outline:none;text-align:right';
+  const lbl6=document.createElement('span');lbl6.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono)';lbl6.textContent='M/day';
   const sep3=document.createElement('span');sep3.style.cssText='color:var(--border2);margin:0 4px';sep3.textContent='|';
-  const dirLbl=document.createElement('span');dirLbl.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';dirLbl.textContent='Direction:';
+  const dirLbl=document.createElement('span');dirLbl.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono)';dirLbl.textContent='Direction:';
   const dirToggle20=document.createElement('div');dirToggle20.style.cssText='display:flex;gap:2px';dirToggle20.dataset.dir='all';
   const dir20Btns=[];
-  const mkDir20=(lbl,val,col,bg)=>{const btn=document.createElement('button');btn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 9px;cursor:pointer';btn.textContent=lbl;btn.addEventListener('click',()=>{dir20Btns.forEach(b=>{b.style.background='var(--bg3)';b.style.borderColor='var(--border2)';b.style.color='var(--text)';});btn.style.background=bg;btn.style.borderColor=col;btn.style.color=col;dirToggle20.dataset.dir=val;rebuild20();});dir20Btns.push(btn);return btn;};
+  const mkDir20=(lbl,val,col,bg)=>{const btn=document.createElement('button');btn.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:12.5px;padding:3px 9px;cursor:pointer';btn.textContent=lbl;btn.addEventListener('click',()=>{dir20Btns.forEach(b=>{b.style.background='var(--bg3)';b.style.borderColor='var(--border2)';b.style.color='var(--text)';});btn.style.background=bg;btn.style.borderColor=col;btn.style.color=col;dirToggle20.dataset.dir=val;rebuild20();});dir20Btns.push(btn);return btn;};
   const btn20All=mkDir20('All','all','var(--blue)','var(--bd)');btn20All.style.background='var(--bd)';btn20All.style.borderColor='var(--blue)';btn20All.style.color='var(--blue)';
   mkDir20('▼ Below 20MA','below','var(--red)','var(--rd)');mkDir20('▲ Above 20MA','above','var(--green)','var(--gd)');
   dirToggle20.append(...dir20Btns);
-  const countEl=document.createElement('span');countEl.id='scan20-count';countEl.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono);margin-left:auto';
+  const countEl=document.createElement('span');countEl.id='scan20-count';countEl.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono);margin-left:auto';
   // Daily / Weekly toggle
   const sep4=document.createElement('span');sep4.style.cssText='color:var(--border2);margin:0 4px';sep4.textContent='|';
-  const tfLbl=document.createElement('span');tfLbl.style.cssText='font-size:12px;color:var(--text);font-family:var(--mono)';tfLbl.textContent='Timeframe:';
+  const tfLbl=document.createElement('span');tfLbl.style.cssText='font-size:13px;color:var(--text);font-family:var(--mono)';tfLbl.textContent='Timeframe:';
   const tfToggle20=document.createElement('div');tfToggle20.style.cssText='display:flex;gap:2px';tfToggle20.dataset.tf='daily';
   const tf20Btns=[];
   const mkTF20=(label,val)=>{
     const btn=document.createElement('button');
     const isOn=val==='daily';
-    btn.style.cssText='background:'+(isOn?'var(--bd)':'var(--bg3)')+';border:1px solid '+(isOn?'var(--blue)':'var(--border2)')+';border-radius:3px;color:'+(isOn?'var(--blue)':'var(--text)')+';font-family:var(--mono);font-size:11px;padding:3px 9px;cursor:pointer';
+    btn.style.cssText='background:'+(isOn?'var(--bd)':'var(--bg3)')+';border:1px solid '+(isOn?'var(--blue)':'var(--border2)')+';border-radius:3px;color:'+(isOn?'var(--blue)':'var(--text)')+';font-family:var(--mono);font-size:12.5px;padding:3px 9px;cursor:pointer';
     btn.textContent=label;
     btn.addEventListener('click',()=>{
       tf20Btns.forEach(b=>{b.style.background='var(--bg3)';b.style.borderColor='var(--border2)';b.style.color='var(--text)';});
@@ -4813,7 +4813,7 @@ function build20MAScan(thresh,minAtrPct,minDVol,direction,scanTF,body){
     return d;
   };
 
-  const hdr=document.createElement('div');hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:9px;color:#d0d8e8;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
+  const hdr=document.createElement('div');hdr.style.cssText='display:flex;align-items:center;padding:0 14px;height:26px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:5;font-size:11px;color:#eef2fa;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)';
   const h20s=(t,w)=>{const d=document.createElement('div');d.style.cssText='width:'+w+';text-align:right;flex-shrink:0';d.textContent=t;addColumnTip(d,t);return d;};
   hdr.append(
     (()=>{const d=document.createElement('div');d.style.cssText='width:60px;flex-shrink:0';d.textContent='Ticker';return d;})(),
@@ -4828,17 +4828,17 @@ function build20MAScan(thresh,minAtrPct,minDVol,direction,scanTF,body){
     const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;padding:0 14px;height:34px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .08s';
     row.addEventListener('mouseenter',()=>row.style.background='var(--bg3)');row.addEventListener('mouseleave',()=>row.style.background='');
     row.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
-    const tk=document.createElement('div');tk.style.cssText='width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:11px;flex-shrink:0';tk.textContent=r.ticker;
-    const th=document.createElement('div');th.style.cssText='flex:1;font-size:11px;color:#cdd6e8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';th.textContent=r.theme;
-    const price=document.createElement('div');price.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:#fff;flex-shrink:0';price.textContent='$'+r.price.toFixed(2);
-    const ma=document.createElement('div');ma.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';ma.textContent='$'+r.ma20.toFixed(2);
-    const pct=document.createElement('div');pct.style.cssText='width:90px;text-align:right;font-family:var(--mono);font-size:11px;font-weight:500;flex-shrink:0;color:'+pctCol;pct.textContent=(isAbove?'+':'')+r.pctFromMA.toFixed(3)+'%';
-    const atr=document.createElement('div');atr.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text2);flex-shrink:0';atr.textContent=r.atr?'$'+r.atr.toFixed(2):'—';
-    const atrPctEl=document.createElement('div');atrPctEl.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:12px;flex-shrink:0';atrPctEl.style.color=r.atrPct>=8?'var(--green)':r.atrPct>=4?'#fff':'#c0cce0';atrPctEl.textContent=r.atrPct?r.atrPct.toFixed(1)+'%':'—';
+    const tk=document.createElement('div');tk.style.cssText='width:60px;font-family:var(--mono);font-weight:500;color:var(--blue);font-size:12.5px;flex-shrink:0';tk.textContent=r.ticker;
+    const th=document.createElement('div');th.style.cssText='flex:1;font-size:12.5px;color:#eef2fa;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';th.textContent=r.theme;
+    const price=document.createElement('div');price.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:12.5px;color:#fff;flex-shrink:0';price.textContent='$'+r.price.toFixed(2);
+    const ma=document.createElement('div');ma.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--text2);flex-shrink:0';ma.textContent='$'+r.ma20.toFixed(2);
+    const pct=document.createElement('div');pct.style.cssText='width:90px;text-align:right;font-family:var(--mono);font-size:12.5px;font-weight:500;flex-shrink:0;color:'+pctCol;pct.textContent=(isAbove?'+':'')+r.pctFromMA.toFixed(3)+'%';
+    const atr=document.createElement('div');atr.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--text2);flex-shrink:0';atr.textContent=r.atr?'$'+r.atr.toFixed(2):'—';
+    const atrPctEl=document.createElement('div');atrPctEl.style.cssText='width:65px;text-align:right;font-family:var(--mono);font-size:13px;flex-shrink:0';atrPctEl.style.color=r.atrPct>=8?'var(--green)':r.atrPct>=4?'#fff':'#c0cce0';atrPctEl.textContent=r.atrPct?r.atrPct.toFixed(1)+'%':'—';
     const atrMA20El=document.createElement('div');atrMA20El.style.cssText='width:90px;text-align:right;flex-shrink:0';atrMA20El.appendChild(atrBar(r.atrMA20??null));
     const vol=document.createElement('div');vol.style.cssText='width:70px;text-align:right;flex-shrink:0';vol.appendChild(volChip(r.volume,r.avgVolume));
-    const dvol=document.createElement('div');dvol.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--text2);flex-shrink:0';dvol.textContent=r.avgDVol?'$'+r.avgDVol.toFixed(0)+'M':'—';
-    const today=document.createElement('div');today.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:11px;flex-shrink:0';today.className=pc(r.today);today.textContent=f2(r.today);
+    const dvol=document.createElement('div');dvol.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:13px;color:var(--text2);flex-shrink:0';dvol.textContent=r.avgDVol?'$'+r.avgDVol.toFixed(0)+'M':'—';
+    const today=document.createElement('div');today.style.cssText='width:75px;text-align:right;font-family:var(--mono);font-size:12.5px;flex-shrink:0';today.className=pc(r.today);today.textContent=f2(r.today);
     row.append(tk,th,price,ma,pct,atr,atrPctEl,atrMA20El,vol,dvol,today);body.appendChild(row);
   });
 }
@@ -4935,16 +4935,16 @@ function renderTickerSearch(q){
     tkS.title=r.stale?'No recent data — may be delisted or halted':'';
     tkS.addEventListener('click',()=>window.open('https://www.tradingview.com/chart/?symbol='+r.ticker,'_blank'));
     tdTk.appendChild(tkS);tr.appendChild(tdTk);
-    const tdTh=document.createElement('td');tdTh.style.cssText='font-size:11px;color:var(--text2)';
+    const tdTh=document.createElement('td');tdTh.style.cssText='font-size:12.5px;color:var(--text2)';
     tdTh.textContent=r.theme;tr.appendChild(tdTh);
-    const tdP=document.createElement('td');tdP.style.cssText='text-align:right;color:#fff;font-family:var(--mono);font-size:11px';
+    const tdP=document.createElement('td');tdP.style.cssText='text-align:right;color:#fff;font-family:var(--mono);font-size:12.5px';
     tdP.textContent=r.price!=null?'$'+Number(r.price).toFixed(2):'—';tr.appendChild(tdP);
     const tdV=document.createElement('td');tdV.appendChild(volChip(r.volume,r.avgVolume));tr.appendChild(tdV);
     // ATR $
-    const tdA=document.createElement('td');tdA.style.cssText='text-align:right;color:var(--text2);font-family:var(--mono);font-size:11px';
+    const tdA=document.createElement('td');tdA.style.cssText='text-align:right;color:var(--text2);font-family:var(--mono);font-size:12.5px';
     tdA.textContent=r.atr!=null?'$'+r.atr.toFixed(2):'—';tr.appendChild(tdA);
     // Vol % (ATR/Price)
-    const tdVpct=document.createElement('td');tdVpct.style.cssText='text-align:right;font-family:var(--mono);font-size:11px';
+    const tdVpct=document.createElement('td');tdVpct.style.cssText='text-align:right;font-family:var(--mono);font-size:12.5px';
     const atrPct=r.dailyVol??null;
     tdVpct.style.color=atrPct>=2.5?'var(--green)':atrPct>=1.5?'#fff':'var(--text2)';
     tdVpct.textContent=atrPct!=null?atrPct.toFixed(2)+'%':'—';tr.appendChild(tdVpct);
