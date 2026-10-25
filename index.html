@@ -1214,7 +1214,8 @@ function pillarScores(off){
      let det='10Y '+y[y.length-1].toFixed(2)+'% ('+(dy>=0?'+':'')+dy.toFixed(2)+' 3M) · 2s10s '+cv[cv.length-1].toFixed(2)+' ('+(dc>=0?'+':'')+dc.toFixed(2)+' 4w)';
      if(o){const r=_ret(o,20);if(r>8){pts-=1;det+=' · Oil '+sgn(r)+'% (inflation pressure)';}}
      const tv=_rvol(_cl('TLT',off));
-     if(tv&&dy<-0.15&&tv.pct>=75){pts-=1;det+=' · Bond rally with high rate vol';}
+     const dy20=_d(y,20);
+     if(tv&&dy20<-0.15&&tv.pct>=75){pts-=1;det+=' · Yields '+(dy20>=0?'+':'')+dy20.toFixed(2)+' in 4w with high rate vol (scared bond rally)';}
      out.push({v:pts>=1?1:pts<=-1?-1:0,d:det});}
    else{const t=_cl('TLT',off),h=_cl('HYG',off);
      if(t&&h){const a=t[t.length-1]>_ema(t,50),b=_ret(t,60)>0,c=h[h.length-1]>_ema(h,50);const pts=(a?1:-1)+(b?1:-1)+(c?1:-1);
@@ -1224,8 +1225,11 @@ function pillarScores(off){
   {const L=window._liq&&window._liq.series;const u=_cl('UUP',off);
    if(L&&L.length>=75){const e=L.length-1-off;
      const cur=L[e].net,c4=(cur/L[e-20].net-1)*100,c13=(cur/L[e-65].net-1)*100;
-     const pts=(c4>0.3?1:c4<-0.3?-1:0)+(c13>0.5?2:c13<-0.5?-2:0);
-     out.push({v:pts>=2?1:pts<=-2?-1:0,d:'Fed net liquidity $'+(cur/1000).toFixed(2)+'T · 4w '+sgn(c4)+'% · 13w '+sgn(c13)+'%'});}
+     let pts=(c4>0.3?1:c4<-0.3?-1:0)+(c13>0.5?2:c13<-0.5?-2:0);
+     let det='Fed net liquidity $'+(cur/1000).toFixed(2)+'T · 4w '+sgn(c4)+'% · 13w '+sgn(c13)+'%';
+     const hy=_x('hy',off);
+     if(hy){const c=_d(hy,20);pts+=c>0.25?-1:c<-0.25?1:0;det+=' · HY spread '+(c>=0?'▲':'▼')+Math.abs(c).toFixed(2)+' 4w';}
+     out.push({v:pts>=2?1:pts<=-2?-1:0,d:det});}
    else if(u){const weakA=u[u.length-1]<_ema(u,50),weakB=_ret(u,60)<0;const pts=(weakA?1:-1)+(weakB?1:-1);
      out.push({v:pts>=2?1:pts<=-2?-1:0,d:'USD (UUP) '+(weakA?'below':'above')+' 50EMA · 3M '+(weakB?'down':'up')+' (proxy)'});}
    else out.push(null);}
@@ -1245,8 +1249,8 @@ function pillarScores(off){
 const MACRO_PILLARS=[
   ['Technical Analysis','SPY & QQQ vs 50 EMA and 200 SMA (3-4 of 4 above = On, 2 = Neutral, 0-1 = Off). A QQQ drawdown of 7%+ from its 60-day high subtracts a point.'],
   ['Market Structure','Points from: % of your tickers above 50 EMA (60%+ On, under 40% Off); high-yield credit spread over 4 weeks (widening 0.15pp = -1, widening 0.40pp+ = -2 since credit stress is the stronger signal; tightening 0.15pp+ = +1); VIX above 25 or jumping 25%+ (Off) vs under 16 (On); bond-market volatility (TLT realized vol, a stand-in for the MOVE index) in its top quarter of the past year (Off) or bottom quarter (On); equal-weight vs cap-weight only counts while SPY is rising. Two net points flips the score.'],
-  ['Monetary & Fiscal Policy','FRED data: 10Y yield change over 3 months (rising = tighter), 2s10s curve over 4 weeks (flattening = tighter), a point off for an oil spike of 8%+ (inflation pressure), and a point off when yields are falling while bond volatility is in its top quarter (a scared bond rally, not an easing one). Falls back to a TLT/HYG read if FRED data is unavailable.'],
-  ['Global Liquidity','Fed net liquidity (balance sheet minus TGA minus reverse repo) from FRED. The 13-week change counts double and the 4-week change counts once; two net points flips the score. Falls back to the US dollar trend if the feed is down.'],
+  ['Monetary & Fiscal Policy','FRED data: 10Y yield change over 3 months (rising = tighter), 2s10s curve over 4 weeks (flattening = tighter), a point off for an oil spike of 8%+ (inflation pressure), and a point off when yields have fallen 0.15pp+ over the last 4 weeks while bond volatility is in its top quarter (a scared bond rally, not an easing one). Falls back to a TLT/HYG read if FRED data is unavailable.'],
+  ['Global Liquidity','Fed net liquidity (balance sheet minus TGA minus reverse repo) from FRED. The 13-week change counts double and the 4-week change counts once, and high-yield spreads widening (or tightening) by 0.25pp+ over 4 weeks adds or removes a point, since credit conditions are part of liquidity; two net points flips the score. Falls back to the US dollar trend if the feed is down.'],
   ['Gov\u2019t & Geopolitics','Automatic proxy: gold outperforming SPY, oil spikes of 8%+ and SPY drawdown. You can override it with the dropdown (saved in this browser) for things the data cannot see, such as elections.']
 ];
 const LIQUIDITY_URL='https://pulse-export.vercel.app/api/liquidity';
