@@ -658,7 +658,13 @@ async function doSync(){
       const bars=d.results||[];
       if(bars.length>=16&&bars[bars.length-1].h!=null){
         const last=bars[bars.length-1].c,prev=bars[bars.length-2].c;
-        const anchor=days=>{const cut=days==='ytd'?new Date(now.getFullYear(),0,1).getTime():Date.now()-days*864e5;let a=bars[0].c;for(const b of bars){if(b.t>=cut){a=b.c;break;}}return a;};
+        const anchor=days=>{
+          // Baseline = the close N TRADING sessions before the latest bar (1W=5, 1M=21, 3M=63, 6M=126),
+          // and for YTD the last close of the previous year. (Old calendar cut-off skipped the baseline day.)
+          if(days==='ytd'){const y0=new Date(now.getFullYear(),0,1).getTime();let a=bars[0].c;for(const b of bars){if(b.t<y0)a=b.c;else break;}return a;}
+          const n={7:5,30:21,90:63,180:126}[days]||5;
+          return bars[Math.max(0,bars.length-1-n)].c;
+        };
         const pct=(a,v)=>a?+((v-a)/a*100).toFixed(2):null;
         if(!cache[ticker])cache[ticker]={today:null,price:null,volume:null,avgVolume:null};
         // Only use aggs price as fallback — snapshot price is more current (live delayed)
