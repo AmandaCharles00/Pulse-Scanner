@@ -679,7 +679,8 @@ async function doSync(){
         cache[ticker].bars=bars; // store for historical backfill
         cache[ticker]['1W']=pct(anchor(7),last);cache[ticker]['1M']=pct(anchor(30),last);
         cache[ticker]['3M']=pct(anchor(90),last);cache[ticker]['6M']=pct(anchor(180),last);cache[ticker].YTD=pct(anchor('ytd'),last);
-        if(prev&&(cache[ticker].today==null||cache[ticker].today===0))cache[ticker].today=+((last-prev)/prev*100).toFixed(2);
+        // Today = latest daily close vs previous close (regular session). The live snapshot's % can include after-hours trades.
+        if(prev)cache[ticker].today=+((last-prev)/prev*100).toFixed(2);
         cache[ticker].volume=bars[bars.length-1].v||cache[ticker].volume||null;
         cache[ticker].avgVolume=Math.round(bars.slice(-20).reduce((s,b)=>s+b.v,0)/20)||cache[ticker].avgVolume||null;
         const allTRs=[];
