@@ -651,26 +651,31 @@ async function doSync(){
   }
 
   let done=0,idx2=0;
+  const failedFetch=[];
+  {const old=document.getElementById('sync-warn');if(old)old.remove();}
   const tasks=all.map(ticker=>async()=>{
     try{
-      const r=await fetch('https://api.polygon.io/v2/aggs/ticker/'+ticker+'/range/1/day/'+fromStr+'/'+toStr+'?adjusted=true&sort=asc&limit=500&apiKey='+key);
-      const d=await r.json();
-      const bars=d.results||[];
+      let bars=[],got=false;
+      const aggUrl='https://api.polygon.io/v2/aggs/ticker/'+ticker+'/range/1/day/'+fromStr+'/'+toStr+'?adjusted=true&sort=asc&limit=500&apiKey='+key;
+      for(let attempt=0;attempt<4&&!got;attempt++){
+        try{
+          const r=await fetch(aggUrl);const d=await r.json();
+          if(r.status===429||d.status==='ERROR'||d.error){await new Promise(res=>setTimeout(res,700*(attempt+1)));continue;}
+          bars=d.results||[];got=true;
+        }catch(e){await new Promise(res=>setTimeout(res,400*(attempt+1)));}
+      }
+      if(!got) failedFetch.push(ticker);
       if(bars.length>=16&&bars[bars.length-1].h!=null){
         const last=bars[bars.length-1].c,prev=bars[bars.length-2].c;
-        const anchor=days=>{
-          // Baseline = the close N TRADING sessions before the latest bar (1W=5, 1M=21, 3M=63, 6M=126),
-          // and for YTD the last close of the previous year. (Old calendar cut-off skipped the baseline day.)
-          if(days==='ytd'){const y0=new Date(now.getFullYear(),0,1).getTime();let a=bars[0].c;for(const b of bars){if(b.t<y0)a=b.c;else break;}return a;}
-          const n={7:5,30:21,90:63,180:126}[days]||5;
-          return bars[Math.max(0,bars.length-1-n)].c;
-        };
+        const lab={7:'1W',30:'1M',90:'3M',180:'6M',ytd:'YTD'};
+        const anchor=days=>{const b=_baseBar(bars,lab[days]);return b?b.c:bars[0].c;};
         const pct=(a,v)=>a?+((v-a)/a*100).toFixed(2):null;
         if(!cache[ticker])cache[ticker]={today:null,price:null,volume:null,avgVolume:null};
         // Only use aggs price as fallback — snapshot price is more current (live delayed)
         if(!cache[ticker].price) cache[ticker].price=+last.toFixed(2);
         cache[ticker].closes=bars.map(b=>b.c).filter(v=>v!=null);
         cache[ticker].closeDates=bars.filter(b=>b.c!=null).map(b=>b.t);
+        cache[ticker]._asOf=new Date(bars[bars.length-1].t).toISOString().slice(0,10);
         cache[ticker].bars=bars; // store for historical backfill
         cache[ticker]['1W']=pct(anchor(7),last);cache[ticker]['1M']=pct(anchor(30),last);
         cache[ticker]['3M']=pct(anchor(90),last);cache[ticker]['6M']=pct(anchor(180),last);cache[ticker].YTD=pct(anchor('ytd'),last);
@@ -753,6 +758,16 @@ async function doSync(){
   });
   const workers=Array.from({length:12},async()=>{while(idx2<tasks.length)await tasks[idx2++]();});
   await Promise.all(workers);
+  if(failedFetch.length){
+    const w=document.createElement('div');w.id='sync-warn';
+    w.style.cssText='position:fixed;left:14px;bottom:14px;z-index:60;max-width:420px;background:var(--bg3);border:1px solid var(--red);border-radius:6px;padding:10px 12px;font-family:var(--mono);font-size:12px;color:var(--text);cursor:pointer';
+    w.title='Click to dismiss';
+    w.innerHTML='<div style="color:var(--red);font-weight:700;margin-bottom:4px">'+failedFetch.length+' ticker'+(failedFetch.length>1?'s':'')+' did not refresh</div>'+
+      '<div style="color:var(--text2)">Price history failed to download after retries (usually a rate limit). Their returns show blank. Hit Sync again to retry.</div>'+
+      '<div style="margin-top:6px;color:var(--text3)">'+failedFetch.slice(0,25).join(', ')+(failedFetch.length>25?' …':'')+'</div>';
+    w.addEventListener('click',()=>w.remove());
+    document.body.appendChild(w);
+  }
 
   buildStats();buildSectorStats();checkAlerts();checkAndPlayAlert();saveCache();saveExtensionHistory();backfillExtensionHistory();saveHighsLowsHistory();backfillHighsLowsHistory();
   window._extHistCache=null;
@@ -1319,6 +1334,59 @@ function buildMacroPillars(){
   return panel;
 }
 
+// Baseline bar for a period, by CALENDAR date relative to the latest bar (robust to missing days):
+// 1W = 7 days back, 1M/3M/6M = same day N months back, YTD = last bar of the prior year.
+// Returns the last bar on or before that date.
+function _baseBar(bars,label){
+  if(!bars||!bars.length)return null;
+  const lastT=bars[bars.length-1].t,SLACK=6*3600e3;let cut;
+  if(label==='YTD'){const y=new Date(lastT).getUTCFullYear();cut=Date.UTC(y,0,1)-1;}
+  else if(label==='1W'){cut=lastT-7*864e5+SLACK;}
+  else{const n={'1M':1,'3M':3,'6M':6}[label]||1,d=new Date(lastT);
+    const tm=d.getUTCMonth()-n,ty=d.getUTCFullYear()+Math.floor(tm/12),tmo=((tm%12)+12)%12;
+    const dim=new Date(Date.UTC(ty,tmo+1,0)).getUTCDate();
+    cut=Date.UTC(ty,tmo,Math.min(d.getUTCDate(),dim))+(lastT%864e5)+SLACK;}
+  let base=bars[0];for(const b of bars){if(b.t<=cut)base=b;else break;}
+  return base;
+}
+function buildDataCheck(){
+  const box=document.createElement('details');
+  box.style.cssText='margin-top:14px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;overflow:hidden';
+  const sum=document.createElement('summary');
+  sum.style.cssText='cursor:pointer;padding:12px 16px;font-size:13px;font-weight:600;color:#fff';
+  sum.textContent='Data check · verify any ticker’s returns against a chart';
+  box.appendChild(sum);
+  const body=document.createElement('div');body.style.cssText='padding:4px 16px 16px';
+  const row=document.createElement('div');row.style.cssText='display:flex;gap:8px;align-items:center;margin-bottom:10px';
+  const inp=document.createElement('input');inp.type='text';inp.value='SPY';
+  inp.style.cssText='background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:12px;padding:4px 8px;width:110px;text-transform:uppercase';
+  const go=document.createElement('button');go.textContent='Check';
+  go.style.cssText='background:var(--blue);border:1px solid var(--blue);border-radius:3px;color:#fff;font-family:var(--mono);font-size:12px;padding:4px 12px;cursor:pointer';
+  row.append(inp,go);
+  const out=document.createElement('div');out.style.cssText='font-family:var(--mono);font-size:12px;color:var(--text)';
+  const fmtD=t=>new Date(t).toISOString().slice(0,10);
+  const show=()=>{
+    const tk=inp.value.trim().toUpperCase();const c=cache[tk];const bars=c&&c.bars;
+    if(!bars||bars.length<10){out.innerHTML='<span style="color:var(--text2)">No price history in memory for '+tk+'. Hit Sync first (history is not saved between sessions).</span>';return;}
+    const L=bars.length-1,last=bars[L];
+    const line=(label,base,shown)=>{
+      const calc=(last.c/base.c-1)*100;
+      const bad=shown!=null&&Math.abs(calc-shown)>0.05;
+      return '<tr><td style="padding:3px 14px 3px 0;color:var(--text2)">'+label+'</td><td style="padding:3px 14px 3px 0">'+fmtD(base.t)+'</td><td style="padding:3px 14px 3px 0">'+base.c.toFixed(2)+'</td>'+
+        '<td style="padding:3px 14px 3px 0;color:'+(calc>=0?'var(--green)':'var(--red)')+'">'+(calc>=0?'+':'')+calc.toFixed(2)+'%</td>'+
+        '<td style="padding:3px 0;color:'+(bad?'var(--red)':'var(--text3)')+'">'+(shown==null?'blank in scanner':'scanner shows '+(shown>=0?'+':'')+shown.toFixed(2)+'%'+(bad?'  ← differs':''))+'</td></tr>';
+    };
+    out.innerHTML='<div style="margin-bottom:8px;color:var(--text2)">Latest close <b style="color:#fff">'+last.c.toFixed(2)+'</b> on <b style="color:#fff">'+fmtD(last.t)+'</b> · '+bars.length+' daily bars</div>'+
+      '<table style="border-collapse:collapse"><tr style="color:var(--text3)"><td style="padding:3px 14px 3px 0">Period</td><td style="padding:3px 14px 3px 0">Baseline date</td><td style="padding:3px 14px 3px 0">Baseline close</td><td style="padding:3px 14px 3px 0">Return</td><td></td></tr>'+
+      line('1W (7 days back)',_baseBar(bars,'1W'),c['1W'])+line('1M (1 month back)',_baseBar(bars,'1M'),c['1M'])+line('3M (3 months back)',_baseBar(bars,'3M'),c['3M'])+line('6M (6 months back)',_baseBar(bars,'6M'),c['6M'])+line('YTD (prior year close)',_baseBar(bars,'YTD'),c.YTD)+'</table>'+
+      '<div style="margin-top:8px;color:var(--text2)">Recent bars: '+bars.slice(-9).reverse().map(b=>fmtD(b.t).slice(5)+' '+b.c.toFixed(2)).join(' · ')+'</div>'+
+      '<div style="margin-top:8px;color:var(--text3)">Compare the baseline date and close to a chart. A 1W return starts from the close 7 days before the latest bar (last Friday’s close if the latest bar is a Friday). Check the recent-bars list above for any missing sessions.</div>';
+  };
+  go.addEventListener('click',show);inp.addEventListener('keydown',e=>{if(e.key==='Enter')show();});
+  box.addEventListener('toggle',()=>{if(box.open)show();});
+  body.append(row,out);box.appendChild(body);
+  return box;
+}
 function renderSpreads(){
   const main=document.getElementById('main');
   const tfLabel=tf==='today'?'1D':tf;
@@ -1389,6 +1457,7 @@ function renderSpreads(){
   panel.appendChild(grid);
   wrap.appendChild(buildMacroPillars());
   wrap.appendChild(panel);
+  wrap.appendChild(buildDataCheck());
   main.innerHTML='';main.appendChild(wrap);
 }
 
