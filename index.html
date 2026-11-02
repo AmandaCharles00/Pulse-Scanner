@@ -634,7 +634,7 @@ async function doSync(){
   // Always include major benchmark ETFs for correlation lookups
   const benchmarks=['SPY','QQQ','IWM','DIA','GLD','SLV','TLT','HYG','XLK','XLF','XLV','XLE','XLI','XLB','XLP','XLY','XLRE','XLU','XLC','IGV','RSP','UUP','USO'];
   // Include watchlist tickers from Supabase
-  const all=[...new Set([...etfs,...allTickers,...posTickers,...benchmarks,...watchlistTickers])];
+  const all=[...new Set([...etfs,...allTickers,...posTickers,...benchmarks,...watchlistTickers])].filter(t=>typeof t==='string'&&/^[A-Za-z0-9.\-]+$/.test(t));
   const fromDate=new Date(now);fromDate.setDate(fromDate.getDate()-450);
   const fromStr=fmtDate(fromDate),toStr=fmtDate(now);
 
@@ -651,20 +651,25 @@ async function doSync(){
   }
 
   let done=0,idx2=0;
-  const failedFetch=[];
+  const failedFetch=[],rejectedFetch=[];
   {const old=document.getElementById('sync-warn');if(old)old.remove();}
   const tasks=all.map(ticker=>async()=>{
     try{
-      let bars=[],got=false;
-      const aggUrl='https://api.polygon.io/v2/aggs/ticker/'+ticker+'/range/1/day/'+fromStr+'/'+toStr+'?adjusted=true&sort=asc&limit=500&apiKey='+key;
+      let bars=[],got=false,why='';
+      const aggUrl='https://api.polygon.io/v2/aggs/ticker/'+encodeURIComponent(ticker)+'/range/1/day/'+fromStr+'/'+toStr+'?adjusted=true&sort=asc&limit=500&apiKey='+key;
       for(let attempt=0;attempt<4&&!got;attempt++){
         try{
-          const r=await fetch(aggUrl);const d=await r.json();
-          if(r.status===429||d.status==='ERROR'||d.error){await new Promise(res=>setTimeout(res,700*(attempt+1)));continue;}
+          const r=await fetch(aggUrl);let d={};try{d=await r.json();}catch(e){}
+          const msg=d.error||d.message||d.status||'';
+          if(r.status===429||r.status>=500){why='HTTP '+r.status+' (rate limit or server busy)';await new Promise(res=>setTimeout(res,700*(attempt+1)));continue;}
+          if(r.status===400||r.status===403||r.status===404||d.status==='NOT_AUTHORIZED'||d.status==='NOT_FOUND'){
+            // definitive answer from Polygon: symbol unknown or not in your plan. Do not retry.
+            rejectedFetch.push({t:ticker,why:(msg||('HTTP '+r.status)).toString().slice(0,90)});got=true;break;}
+          if(d.status==='ERROR'||d.error){why=(msg||'error').toString().slice(0,90);await new Promise(res=>setTimeout(res,700*(attempt+1)));continue;}
           bars=d.results||[];got=true;
-        }catch(e){await new Promise(res=>setTimeout(res,400*(attempt+1)));}
+        }catch(e){why='network error';await new Promise(res=>setTimeout(res,400*(attempt+1)));}
       }
-      if(!got) failedFetch.push(ticker);
+      if(!got) failedFetch.push({t:ticker,why});
       if(bars.length>=16&&bars[bars.length-1].h!=null){
         const last=bars[bars.length-1].c,prev=bars[bars.length-2].c;
         const lab={7:'1W',30:'1M',90:'3M',180:'6M',ytd:'YTD'};
@@ -759,13 +764,15 @@ async function doSync(){
   });
   const workers=Array.from({length:12},async()=>{while(idx2<tasks.length)await tasks[idx2++]();});
   await Promise.all(workers);
-  if(failedFetch.length){
+  if(failedFetch.length||rejectedFetch.length){
     const w=document.createElement('div');w.id='sync-warn';
-    w.style.cssText='position:fixed;left:14px;bottom:14px;z-index:60;max-width:420px;background:var(--bg3);border:1px solid var(--red);border-radius:6px;padding:10px 12px;font-family:var(--mono);font-size:12px;color:var(--text);cursor:pointer';
+    w.style.cssText='position:fixed;left:14px;bottom:14px;z-index:60;max-width:460px;background:var(--bg3);border:1px solid var(--red);border-radius:6px;padding:10px 12px;font-family:var(--mono);font-size:12px;color:var(--text);cursor:pointer';
     w.title='Click to dismiss';
-    w.innerHTML='<div style="color:var(--red);font-weight:700;margin-bottom:4px">'+failedFetch.length+' ticker'+(failedFetch.length>1?'s':'')+' did not refresh</div>'+
-      '<div style="color:var(--text2)">Price history failed to download after retries (usually a rate limit). Their returns show blank. Hit Sync again to retry.</div>'+
-      '<div style="margin-top:6px;color:var(--text3)">'+failedFetch.slice(0,25).join(', ')+(failedFetch.length>25?' …':'')+'</div>';
+    const li=a=>a.slice(0,12).map(x=>'<div style="color:var(--text);margin-top:2px">'+(x.t||'(blank symbol)')+' <span style="color:var(--text3)">\u2014 '+(x.why||'no reason given')+'</span></div>').join('')+(a.length>12?'<div style="color:var(--text3)">\u2026 and '+(a.length-12)+' more</div>':'');
+    let h='';
+    if(failedFetch.length)h+='<div style="color:var(--red);font-weight:700;margin-bottom:4px">'+failedFetch.length+' ticker'+(failedFetch.length>1?'s':'')+' did not refresh</div><div style="color:var(--text2)">The download failed after retries. Their returns show blank. Hit Sync again to retry.</div>'+li(failedFetch);
+    if(rejectedFetch.length)h+='<div style="color:var(--amber);font-weight:700;margin:'+(h?'10px':'0')+' 0 4px">'+rejectedFetch.length+' symbol'+(rejectedFetch.length>1?'s':'')+' rejected by Polygon</div><div style="color:var(--text2)">Retrying will not help. The symbol is unknown, delisted, or not included in your Polygon plan. Remove or correct it.</div>'+li(rejectedFetch);
+    w.innerHTML=h;
     w.addEventListener('click',()=>w.remove());
     document.body.appendChild(w);
   }
