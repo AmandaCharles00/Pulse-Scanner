@@ -627,8 +627,9 @@ async function doSync(){
   cache={};stats={};
 
   const now=new Date();
-  const allTickers=[...new Set(THEMES.flatMap(t=>t.tickers))];
-  const etfs=[...new Set(THEMES.map(t=>t.etf))];
+  // Include the Sectors tab's constituents and ETFs too (some tickers, e.g. TTWO, live only there and were never downloaded)
+  const allTickers=[...new Set([...THEMES.flatMap(t=>t.tickers),...SECTORS.flatMap(t=>t.tickers)])];
+  const etfs=[...new Set([...THEMES.map(t=>t.etf),...SECTORS.map(t=>t.etf)])];
   // Also include any position tracker tickers
   const posTickers=positions.map(p=>p.ticker).filter(Boolean);
   // Always include major benchmark ETFs for correlation lookups
@@ -757,7 +758,7 @@ async function doSync(){
         const lastBarAge=(Date.now()-bars[bars.length-1].t)/864e5;
         cache[ticker].stale=lastBarAge>7;
       }
-    }catch(e){}
+    }catch(e){failedFetch.push({t:ticker,why:'processing error: '+((e&&e.message)||e)});console.warn('Sync error for',ticker,e);}
     done++;
     btn.textContent='⟳ '+done+'/'+all.length;
     if(done%15===0||done===all.length){buildStats();if(!drillId&&tab==='themes')renderMain();}
